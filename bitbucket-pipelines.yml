@@ -5,11 +5,36 @@
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: node:10.15.3
 
+# pipelines:
+#   default:
+#     - step:
+#         caches:
+#           - node
+#         script: # Modify the commands below to build your repository.
+#           - npm install
+#           - npm test
+
 pipelines:
-  default:
-    - step:
-        caches:
-          - node
-        script: # Modify the commands below to build your repository.
-          - npm install
-          - npm test
+  branches:
+    dev:
+      - step:
+          deployment: dev-admin
+          caches:
+            - node
+          script: # Modify the commands below to build your repository.
+            - npm install
+            - npm run build
+            - pip install awscli --upgrade --ignore-installed six
+            - aws s3 sync ./build s3://dev-chatloop-admin
+            - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://dev-chatloop-admin/
+    master:
+      - step:
+          deployment: Production
+          caches:
+            - node
+          script: # Modify the commands below to build your repository.
+            - npm install
+            - npm run build
+            - pip install awscli --upgrade --ignore-installed six
+            - aws s3 sync ./build s3://chatloop-admin
+            - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://chatloop-admin/
