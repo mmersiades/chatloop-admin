@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core";
 import LoginPage from "../pages/LoginPage";
+import AppRouter from "../routers/AppRouter";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,7 +19,7 @@ function App() {
   const classes = useStyles();
   return (
     <div className={classes.appContainer}>
-      <LoginPage />
+      <AppRouter />
     </div>
   );
 }
