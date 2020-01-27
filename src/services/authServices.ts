@@ -18,8 +18,11 @@ const login = async (
   }
 };
 
+const logout = () => localStorage.clear();
+
 const authService = {
-  login
+  login,
+  logout
 };
 
 export default authService;

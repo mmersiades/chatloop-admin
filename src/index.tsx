@@ -1,4 +1,5 @@
 import React from "react";
+import "typeface-lato";
 import ReactDOM from "react-dom";
 import Root from "./components/Root";
 import App from "./components/App";

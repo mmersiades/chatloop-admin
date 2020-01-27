@@ -68,7 +68,10 @@ const LoginPage = () => {
           actions.resetForm();
           console.log("response", response);
           if (!response.isAuthError) {
-            history.push("/dashboard");
+            history.push({
+              pathname: "/dashboard",
+              state: { title: "Dashboard" }
+            });
           }
         }}
       >

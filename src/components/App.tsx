@@ -1,5 +1,6 @@
 import React from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core";
+import Navbar from "../components/Navbar";
 import AppRouter from "../routers/AppRouter";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -18,6 +19,7 @@ function App() {
   const classes = useStyles();
   return (
     <div className={classes.appContainer}>
+      <Navbar />
       <AppRouter />
     </div>
   );

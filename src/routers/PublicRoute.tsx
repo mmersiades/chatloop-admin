@@ -9,12 +9,6 @@ import { Route, Redirect, RouteProps } from "react-router-dom";
 /** Props for PublicRoute component */
 interface IPublicRouteProps {
   /**
-   * Has the User logged in?<br>
-   * Passed in by **react-redux**
-   *  */
-  // isLoggedIn: boolean;
-
-  /**
    * The component to be rendered as a child of PublicRoute<br>
    * Passed in by the parent component (AppRouter)
    *  */
@@ -61,10 +55,5 @@ export const PublicRoute = ({
     />
   );
 };
-
-/** @ignore */
-// const mapStateToProps = ({ authentication }: IStore) => {
-//   return { isLoggedIn: authentication.isLoggedIn };
-// };
 
 export default PublicRoute;
