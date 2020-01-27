@@ -1,17 +1,12 @@
 import React from "react";
-import {
-  Switch,
-  withRouter,
-  RouteComponentProps,
-  Redirect,
-  Route
-} from "react-router-dom";
+import { Switch } from "react-router-dom";
+import PublicRoute from "./PublicRoute";
 import LoginPage from "../pages/LoginPage";
 
 export const AppRouter = () => {
   return (
     <Switch>
-      <Route path="/" component={LoginPage} />
+      <PublicRoute path="/" component={LoginPage} />
     </Switch>
   );
 };
