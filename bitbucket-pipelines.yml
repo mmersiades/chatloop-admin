@@ -18,7 +18,7 @@ pipelines:
   branches:
     dev:
       - step:
-          deployment: dev-admin
+          deployment: chatloop-admin
           caches:
             - node
           script: # Modify the commands below to build your repository.
