@@ -1,9 +1,8 @@
 import React from "react";
-import { makeStyles, Theme, createStyles } from "@material-ui/core";
-import Navbar from "../components/Navbar";
+import { makeStyles, createStyles } from "@material-ui/core";
 import AppRouter from "../routers/AppRouter";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     appContainer: {
       position: "absolute",
@@ -15,14 +14,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function App() {
+const App = () => {
   const classes = useStyles();
   return (
     <div className={classes.appContainer}>
-      <Navbar />
       <AppRouter />
     </div>
   );
-}
+};
 
 export default App;

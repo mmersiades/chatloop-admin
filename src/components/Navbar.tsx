@@ -1,33 +1,81 @@
-import React from "react";
+import React, { FC, Dispatch, SetStateAction } from "react";
 import {
   AppBar,
   Toolbar,
   Typography,
-  Grid,
   makeStyles,
   createStyles,
-  Theme
+  Theme,
+  IconButton
 } from "@material-ui/core";
-import { useHistory, useLocation } from "react-router-dom";
+import MenuIcon from "@material-ui/icons/Menu";
+import { useLocation } from "react-router-dom";
+import clsx from "clsx";
 
-const useStyles = makeStyles(({ mixins }: Theme) =>
+const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   createStyles({
-    toolbar: { ...mixins.toolbar }
+    toolbar: {
+      minHeight: 48
+    },
+    appbar: {
+      backgroundColor: palette.common.black,
+      transition: transitions.create(["margin", "width"], {
+        easing: transitions.easing.sharp,
+        duration: transitions.duration.leavingScreen
+      })
+    },
+    appbarShift: {
+      width: `calc(100% - 200px)`,
+      marginLeft: 200,
+      transition: transitions.create(["margin", "width"], {
+        easing: transitions.easing.easeOut,
+        duration: transitions.duration.enteringScreen
+      })
+    },
+    menuButton: {
+      marginRight: spacing(2)
+    },
+    hide: {
+      display: "none"
+    }
   })
 );
 
-const Navbar = () => {
+interface INavbarProps {
+  showMenuDrawer: boolean;
+  setShowMenuDrawer: Dispatch<SetStateAction<boolean>>;
+}
+
+const Navbar: FC<INavbarProps> = ({
+  showMenuDrawer,
+  setShowMenuDrawer
+}: INavbarProps) => {
   const classes = useStyles();
   const location = useLocation();
+  console.log("location.state", location);
   // @ts-ignore
-  const title = location.state ? location.state.title : "Chatloop Admin";
+  const title = location.state ? location.state : "Chatloop Admin";
+
   return (
     <>
-      <AppBar>
-        <Toolbar>
-          <Grid container alignItems="center">
-            <Typography>{title}</Typography>
-          </Grid>
+      <AppBar
+        classes={{
+          root: clsx(classes.appbar, {
+            [classes.appbarShift]: showMenuDrawer
+          })
+        }}
+      >
+        <Toolbar variant="dense">
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={() => setShowMenuDrawer(true)}
+            edge="start"
+            className={clsx(classes.menuButton, showMenuDrawer && classes.hide)}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography>{title}</Typography>
         </Toolbar>
       </AppBar>
       <div className={classes.toolbar} />

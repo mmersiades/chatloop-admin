@@ -70,7 +70,7 @@ const LoginPage = () => {
           if (!response.isAuthError) {
             history.push({
               pathname: "/dashboard",
-              state: { title: "Dashboard" }
+              state: "Dashboard"
             });
           }
         }}
