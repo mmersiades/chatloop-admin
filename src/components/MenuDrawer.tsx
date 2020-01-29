@@ -81,6 +81,16 @@ const MenuDrawer: FC<IMenuDrawerProps> = ({
         >
           <ListItemText primary="Dashboard" />
         </ListItem>
+        <ListItem
+          classes={
+            location.pathname === "/users" ? { root: classes.selectedItem } : {}
+          }
+          button
+          component={Link}
+          to={{ pathname: "/users", state: "Manage Users" }}
+        >
+          <ListItemText primary="Users" />
+        </ListItem>
       </List>
       <Divider />
       <List dense>

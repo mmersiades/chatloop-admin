@@ -106,7 +106,6 @@ const LoginPage = () => {
                     return (
                       <TextField
                         {...field}
-                        autoFocus
                         variant="outlined"
                         label="Password"
                         type="password"
