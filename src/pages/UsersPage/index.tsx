@@ -15,8 +15,13 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TableBody
+  TableBody,
+  TextField,
+  Button
 } from '@material-ui/core';
+import { Formik, FormikProps, FieldProps, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { UserRoles } from '../../@types/enums';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -57,6 +62,11 @@ type usersAction =
       type: 'SET_TUTORS';
       payload?: Array<ITutor>;
     };
+
+interface IFormikValues {
+  email: string;
+  displayName: string;
+}
 
 const usersReducerInitialState: usersState = {
   learners: [],
@@ -110,63 +120,174 @@ const UsersPage = () => {
   }, []);
 
   const generateTable = () => {
+    const formikInitialValues: IFormikValues = {
+      email: '',
+      displayName: ''
+    };
+
+    let role = { userRole: '', role: '', getUser: () => {}, action: '' };
+    switch (tab) {
+      case 0:
+        role = {
+          userRole: UserRoles.learner,
+          role: 'learner',
+          getUser: usersService.getLearners,
+          action: 'SET_LEARNERS'
+        };
+        break;
+      case 1:
+        role = {
+          userRole: UserRoles.partner,
+          role: 'partner',
+          getUser: usersService.getPartners,
+          action: 'SET_PARTNERS'
+        };
+        break;
+      case 2:
+        role = { userRole: UserRoles.tutor, role: 'tutor', getUser: usersService.getTutors, action: 'SET_TUTORS' };
+        break;
+      default:
+        break;
+    }
+
+    const newUserSchema = Yup.object().shape({
+      displayName: Yup.string()
+        .min(3, 'displayName too short')
+        .max(25, 'displayName too long')
+        .required('DisplayName is required'),
+      email: Yup.string()
+        .email('Invalid email')
+        .required('Email is required')
+    });
+
     return (
-      <TableContainer classes={{ root: classes.tableContainer }} component={Paper}>
-        <Table size="small">
-          <TableHead classes={{ root: classes.tableHead }}>
-            <TableRow>
-              <TableCell classes={{ root: classes.tableCell }} align="center">
-                id
-              </TableCell>
-              <TableCell classes={{ root: classes.tableCell }} align="center">
-                displayName
-              </TableCell>
-              <TableCell classes={{ root: classes.tableCell }} align="center">
-                email
-              </TableCell>
-              {tab === 2 && (
-                <TableCell classes={{ root: classes.tableCell }} align="center">
-                  shift
-                </TableCell>
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tab === 0 &&
-              state.learners &&
-              state.learners.map((learners: ILearner) => (
-                <TableRow>
-                  <TableCell align="center">{learners.id}</TableCell>
-                  <TableCell align="center">{learners.displayName}</TableCell>
-                  <TableCell align="center">{learners.email}</TableCell>
-                </TableRow>
-              ))}
-            {tab === 1 &&
-              state.partners &&
-              state.partners.map((partner: IPartner) => (
-                <TableRow>
-                  <TableCell align="center">{partner.id}</TableCell>
-                  <TableCell align="center">{partner.displayName}</TableCell>
-                  <TableCell align="center">{partner.email}</TableCell>
-                </TableRow>
-              ))}
-            {tab === 2 &&
-              state.tutors &&
-              state.tutors.map((tutor: ITutor) => (
-                <TableRow>
-                  <TableCell align="center">{tutor.id}</TableCell>
-                  <TableCell align="center">{tutor.displayName}</TableCell>
-                  <TableCell align="center">{tutor.email}</TableCell>
-                  <TableCell align="center">{tutor.shift}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Formik
+        initialValues={formikInitialValues}
+        validationSchema={newUserSchema}
+        onSubmit={async (values, actions) => {
+          const newUser = {
+            email: values.email,
+            displayName: values.displayName,
+            userRole: role.userRole as UserRoles
+          };
+
+          const response = await usersService.createUser(newUser);
+          console.log('response', response);
+          const refreshedUsers = await role.getUser();
+          // @ts-ignore
+          dispatch({ type: role.action, payload: refreshedUsers });
+          actions.resetForm();
+          // add userRole before posting
+          // fetch users after posting
+        }}
+      >
+        {(props: FormikProps<IFormikValues>) => {
+          const disableButton =
+            props.isSubmitting ||
+            !props.touched.displayName ||
+            !props.touched.email ||
+            !!props.errors.displayName ||
+            !!props.errors.email;
+          return (
+            <Form>
+              <TableContainer classes={{ root: classes.tableContainer }} component={Paper}>
+                <Table size="small">
+                  <TableHead classes={{ root: classes.tableHead }}>
+                    <TableRow>
+                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                        id
+                      </TableCell>
+                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                        displayName
+                      </TableCell>
+                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                        email
+                      </TableCell>
+                      {tab === 2 && (
+                        <TableCell classes={{ root: classes.tableCell }} align="center">
+                          shift
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center">
+                        <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
+                          {`Add ${role.role}`}
+                        </Button>
+                      </TableCell>
+                      <Field name="displayName" value="values.displayName">
+                        {({ field }: FieldProps<IFormikValues>) => {
+                          return (
+                            <TableCell align="center">
+                              <TextField
+                                {...field}
+                                margin="dense"
+                                variant="standard"
+                                label="displayName"
+                                type="text"
+                                fullWidth
+                              />
+                            </TableCell>
+                          );
+                        }}
+                      </Field>
+                      <Field name="email" value="values.email">
+                        {({ field }: FieldProps<IFormikValues>) => {
+                          return (
+                            <TableCell align="center">
+                              <TextField
+                                {...field}
+                                margin="dense"
+                                variant="standard"
+                                label="email"
+                                type="text"
+                                fullWidth
+                              />
+                            </TableCell>
+                          );
+                        }}
+                      </Field>
+                    </TableRow>
+                    {tab === 0 &&
+                      state.learners &&
+                      state.learners.map((learner: ILearner) => (
+                        <TableRow key={learner.id}>
+                          <TableCell align="center">{learner.id}</TableCell>
+                          <TableCell align="center">{learner.displayName}</TableCell>
+                          <TableCell align="center">{learner.email}</TableCell>
+                        </TableRow>
+                      ))}
+                    {tab === 1 &&
+                      state.partners &&
+                      state.partners.map((partner: IPartner) => (
+                        <TableRow key={partner.id}>
+                          <TableCell align="center">{partner.id}</TableCell>
+                          <TableCell align="center">{partner.displayName}</TableCell>
+                          <TableCell align="center">{partner.email}</TableCell>
+                        </TableRow>
+                      ))}
+                    {tab === 2 &&
+                      state.tutors &&
+                      state.tutors.map((tutor: ITutor) => (
+                        <TableRow key={tutor.id}>
+                          <TableCell align="center">{tutor.id}</TableCell>
+                          <TableCell align="center">{tutor.displayName}</TableCell>
+                          <TableCell align="center">{tutor.email}</TableCell>
+                          <TableCell align="center">{tutor.shift}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Form>
+          );
+        }}
+      </Formik>
     );
   };
 
-  console.log('state', state);
   return (
     <usersContext.Provider value={state}>
       <div className={classes.tabs}>

@@ -1,7 +1,7 @@
 import apiChatloopOrg from '../config/axionConfig';
 import authHeader from '../helpers/getAuthHeader';
 import { ILearner, IPartner, ITutor } from '../@types/interfaces';
-import { TutorShifts } from '../@types/enums';
+import { TutorShifts, UserRoles } from '../@types/enums';
 
 const getLearners = async () => {
   const requestOptions = {
@@ -104,10 +104,28 @@ const getTutors = async () => {
   }
 };
 
+const createUser = async (newUser: { email: string; displayName: string; userRole: UserRoles }) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() }
+  };
+
+  const body = {
+    email: newUser.email,
+    displayName: newUser.displayName,
+    userRole: newUser.userRole
+  };
+
+  try {
+    const response = await apiChatloopOrg.post('/rest/user/create-user', body, requestOptions);
+    return response;
+  } catch (error) {}
+};
+
 const usersService = {
   getLearners,
   getPartners,
-  getTutors
+  getTutors,
+  createUser
 };
 
 export default usersService;
