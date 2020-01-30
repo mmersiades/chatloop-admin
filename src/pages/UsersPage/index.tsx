@@ -17,7 +17,8 @@ import {
   TableCell,
   TableBody,
   TextField,
-  Button
+  Button,
+  FormHelperText
 } from '@material-ui/core';
 import { Formik, FormikProps, FieldProps, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -39,6 +40,9 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
     },
     tableCell: {
       color: palette.common.white
+    },
+    helperTextSpacer: {
+      height: 20
     }
   })
 );
@@ -216,6 +220,7 @@ const UsersPage = () => {
                         <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
                           {`Add ${role.role}`}
                         </Button>
+                        <div className={classes.helperTextSpacer} />
                       </TableCell>
                       <Field name="displayName" value="values.displayName">
                         {({ field }: FieldProps<IFormikValues>) => {
@@ -224,11 +229,16 @@ const UsersPage = () => {
                               <TextField
                                 {...field}
                                 margin="dense"
-                                variant="standard"
-                                label="displayName"
+                                variant="outlined"
                                 type="text"
                                 fullWidth
+                                error={!!props.errors.displayName}
                               />
+                              {props.errors.displayName ? (
+                                <FormHelperText error>{props.errors.displayName}</FormHelperText>
+                              ) : (
+                                <div className={classes.helperTextSpacer} />
+                              )}
                             </TableCell>
                           );
                         }}
@@ -240,11 +250,16 @@ const UsersPage = () => {
                               <TextField
                                 {...field}
                                 margin="dense"
-                                variant="standard"
-                                label="email"
+                                variant="outlined"
                                 type="text"
                                 fullWidth
+                                error={!!props.errors.email}
                               />
+                              {props.errors.email ? (
+                                <FormHelperText error>{props.errors.email}</FormHelperText>
+                              ) : (
+                                <div className={classes.helperTextSpacer} />
+                              )}
                             </TableCell>
                           );
                         }}
