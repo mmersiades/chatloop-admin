@@ -122,30 +122,30 @@ const UsersPage = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchLearners = async () => {
-      const learners = await usersService.getLearners();
-      dispatch({ type: 'SET_LEARNERS', payload: learners });
-    };
+  const fetchTutors = async () => {
+    const tutors = await usersService.getTutors();
+    dispatch({ type: 'SET_TUTORS', payload: tutors });
+  };
 
+  const fetchPartners = async () => {
+    const partners = await usersService.getPartners();
+    dispatch({ type: 'SET_PARTNERS', payload: partners });
+  };
+
+  const fetchLearners = async () => {
+    const learners = await usersService.getLearners();
+    dispatch({ type: 'SET_LEARNERS', payload: learners });
+  };
+
+  useEffect(() => {
     fetchLearners();
   }, []);
 
   useEffect(() => {
-    const fetchPartners = async () => {
-      const partners = await usersService.getPartners();
-      dispatch({ type: 'SET_PARTNERS', payload: partners });
-    };
-
     fetchPartners();
   }, []);
 
   useEffect(() => {
-    const fetchTutors = async () => {
-      const tutors = await usersService.getTutors();
-      dispatch({ type: 'SET_TUTORS', payload: tutors });
-    };
-
     fetchTutors();
   }, []);
 
@@ -163,6 +163,25 @@ const UsersPage = () => {
       const handleChangeRowsPerPage = (event: any) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
+      };
+
+      const handleDelete = async (userId: number, userRole: UserRoles) => {
+        const response = await usersService.deleteUser(userId);
+        if (response && response.status === 200) {
+          alert(response.data);
+          switch (userRole) {
+            case UserRoles.learner:
+              fetchLearners();
+              break;
+            case UserRoles.partner:
+              fetchPartners();
+              break;
+            case UserRoles.tutor:
+              fetchTutors();
+              break;
+            default:
+          }
+        }
       };
 
       let role: IRoleParams = {
@@ -283,6 +302,7 @@ const UsersPage = () => {
                               shift
                             </TableCell>
                           )}
+                          <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody classes={{ root: classes.tableBody }}>
@@ -336,6 +356,7 @@ const UsersPage = () => {
                             }}
                           </Field>
                           {tab === 2 && <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>}
+                          <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                         </TableRow>
                         {role.rows.map((user: any) => (
                           <TableRow key={user.id}>
@@ -343,6 +364,11 @@ const UsersPage = () => {
                             <TableCell align="center">{user.displayName}</TableCell>
                             <TableCell align="center">{user.email}</TableCell>
                             {tab === 2 && <TableCell align="center">{user.shift}</TableCell>}
+                            <TableCell align="center">
+                              <Button color="secondary" onClick={() => handleDelete(user.id, role.userRole)}>
+                                DELETE
+                              </Button>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

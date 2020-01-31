@@ -3,6 +3,17 @@ import authHeader from '../helpers/getAuthHeader';
 import { ILearner, IPartner, ITutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
 
+const handleError = (error?: any) => {
+  if (error.response) {
+    console.log('error.response', error.response);
+  } else if (error.request) {
+    console.log(error.request);
+  } else {
+    console.log('error.message', error.message);
+  }
+  console.log('error.config', error.config);
+};
+
 const getLearners = async () => {
   const requestOptions = {
     headers: { authorization: authHeader() }
@@ -19,14 +30,7 @@ const getLearners = async () => {
     });
     return learners;
   } catch (error) {
-    if (error.response) {
-      console.log('error.response', error.response);
-    } else if (error.request) {
-      console.log(error.request);
-    } else {
-      console.log('error.message', error.message);
-    }
-    console.log('error.config', error.config);
+    handleError(error);
   }
 };
 
@@ -46,14 +50,7 @@ const getPartners = async () => {
     });
     return partners;
   } catch (error) {
-    if (error.response) {
-      console.log('error.response', error.response);
-    } else if (error.request) {
-      console.log(error.request);
-    } else {
-      console.log('error.message', error.message);
-    }
-    console.log('error.config', error.config);
+    handleError(error);
   }
 };
 
@@ -93,14 +90,7 @@ const getTutors = async () => {
 
     return shiftOneTutors.concat(shiftTwoTutors);
   } catch (error) {
-    if (error.response) {
-      console.log('error.response', error.response);
-    } else if (error.request) {
-      console.log(error.request);
-    } else {
-      console.log('error.message', error.message);
-    }
-    console.log('error.config', error.config);
+    handleError(error);
   }
 };
 
@@ -118,7 +108,9 @@ const createUser = async (newUser: { email: string; displayName: string; userRol
   try {
     const response = await apiChatloopOrg.post('/rest/user/create-user', body, requestOptions);
     return response;
-  } catch (error) {}
+  } catch (error) {
+    handleError(error);
+  }
 };
 
 const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number; learner: number }) => {
@@ -128,7 +120,22 @@ const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number
   try {
     const response = await apiChatloopOrg.post('/rest/admin/assign-learner-to-tutor', body, requestOptions);
     return response;
-  } catch (error) {}
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+const deleteUser = async (userId: number) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() }
+  };
+
+  try {
+    const response = await apiChatloopOrg.delete(`/rest/user/hard-delete/${userId}`, requestOptions);
+    return response;
+  } catch (error) {
+    handleError(error);
+  }
 };
 
 const usersService = {
@@ -136,7 +143,8 @@ const usersService = {
   getPartners,
   getTutors,
   createUser,
-  assignTutors
+  assignTutors,
+  deleteUser
 };
 
 export default usersService;
