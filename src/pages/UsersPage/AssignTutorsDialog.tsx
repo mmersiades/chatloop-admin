@@ -1,22 +1,16 @@
 import React from 'react';
 import { Formik, Form, Field, FieldProps } from 'formik';
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Select,
-  MenuItem,
-  TextField,
-  Grid
-} from '@material-ui/core';
+import { DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, Grid } from '@material-ui/core';
 import { ITutor, ILearner } from '../../@types/interfaces';
 import { TutorShifts } from '../../@types/enums';
+import usersService from '../../services/usersService';
 
 interface IAssignTutorProps {
   tutors?: Array<ITutor>;
   newLearnerEmail: string;
   learners?: Array<ILearner>;
+  setShowAssignTutors: (show: boolean) => void;
+  setnewLearnerEmail: (email: string) => void;
 }
 
 interface IAssignTutorValues {
@@ -24,7 +18,13 @@ interface IAssignTutorValues {
   shiftTwoTutor: number;
 }
 
-export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners }: IAssignTutorProps) => {
+export const AssignTutorsDialog = ({
+  tutors,
+  newLearnerEmail,
+  learners,
+  setShowAssignTutors,
+  setnewLearnerEmail
+}: IAssignTutorProps) => {
   const shiftOneTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
   const shiftTwoTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.two);
   const learner = learners
@@ -39,12 +39,25 @@ export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners }: IAssig
   return (
     <Formik
       initialValues={assignTutorsInitialValues}
-      onSubmit={(values, actions) => console.log('values', values, learner && learner.id)}
+      onSubmit={async (values, actions) => {
+        const response = await usersService.assignTutors({
+          shiftOneTutor: values.shiftOneTutor,
+          shiftTwoTutor: values.shiftTwoTutor,
+          learner: learner.id
+        });
+        if (response && response.status === 200) {
+          setShowAssignTutors(false);
+          setnewLearnerEmail('');
+          actions.resetForm();
+        } else {
+          console.log('response', response);
+        }
+      }}
     >
       {(props) => {
         return (
           <Form>
-            <DialogTitle>{`Assign Tutors to ${learner.displayName}`}</DialogTitle>
+            <DialogTitle>{`Assign Tutors to ${learner ? learner.displayName : 'Learner'}`}</DialogTitle>
 
             <DialogContent>
               <Grid container direction="column">

@@ -33,14 +33,15 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
     tabs: {
       position: 'absolute',
-      width: '100%',
+      width: 'calc(100vw - 200px)',
       top: 48,
 
       backgroundColor: palette.common.white
     },
     tableContainer: {
       margin: spacing(4),
-      maxHeight: 'calc(100vh - 144px)'
+      maxHeight: 'calc(100vh - 160px)',
+      overflow: 'none'
     },
     tableHead: {
       backgroundColor: palette.primary.main
@@ -83,6 +84,16 @@ interface IFormikValues {
   displayName: string;
 }
 
+/** An object of params passed to `tableGenerator` based on the role of Users the table is for */
+interface IRoleParams {
+  userRole: UserRoles;
+  role: string;
+  getUser: any;
+  action: 'SET_LEARNERS' | 'SET_PARTNERS' | 'SET_TUTORS' | '';
+  count: number;
+  rows: Array<any>;
+}
+
 const usersReducerInitialState: usersState = {
   learners: [],
   partners: [],
@@ -109,6 +120,7 @@ const UsersPage = () => {
   const [showAssignTutors, setShowAssignTutors] = useState(false);
   const [newLearnerEmail, setnewLearnerEmail] = useState();
   const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchLearners = async () => {
@@ -138,211 +150,223 @@ const UsersPage = () => {
   }, []);
 
   const generateTable = () => {
-    const formikInitialValues: IFormikValues = {
-      email: '',
-      displayName: ''
-    };
+    if (state.learners && state.partners && state.tutors) {
+      const formikInitialValues: IFormikValues = {
+        email: '',
+        displayName: ''
+      };
 
-    const handleChangePage = (event: any, newPage: any) => {
-      setPage(newPage);
-    };
+      const handleChangePage = (event: any, newPage: any) => {
+        setPage(newPage);
+      };
 
-    let role = { userRole: '', role: '', getUser: () => {}, action: '', count: 0 };
-    switch (tab) {
-      case 0:
-        role = {
-          userRole: UserRoles.learner,
-          role: 'learner',
-          getUser: usersService.getLearners,
-          action: 'SET_LEARNERS',
-          count: state.learners ? state.learners.length : 0
-        };
-        break;
-      case 1:
-        role = {
-          userRole: UserRoles.partner,
-          role: 'partner',
-          getUser: usersService.getPartners,
-          action: 'SET_PARTNERS',
-          count: state.partners ? state.partners.length : 0
-        };
-        break;
-      case 2:
-        role = {
-          userRole: UserRoles.tutor,
-          role: 'tutor',
-          getUser: usersService.getTutors,
-          action: 'SET_TUTORS',
-          count: state.tutors ? state.tutors.length : 0
-        };
-        break;
-      default:
-        break;
-    }
+      const handleChangeRowsPerPage = (event: any) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+      };
 
-    const newUserSchema = Yup.object().shape({
-      displayName: Yup.string()
-        .min(3, 'displayName too short')
-        .max(25, 'displayName too long')
-        .required('DisplayName is required'),
-      email: Yup.string()
-        .email('Invalid email')
-        .required('Email is required')
-    });
+      let role: IRoleParams = {
+        userRole: '' as UserRoles,
+        role: '',
+        getUser: () => {},
+        action: '',
+        count: 0,
+        rows: []
+      };
+      switch (tab) {
+        case 0:
+          role = {
+            userRole: UserRoles.learner,
+            role: 'learner',
+            getUser: usersService.getLearners,
+            action: 'SET_LEARNERS',
+            count: state.learners.length,
+            rows:
+              rowsPerPage > 0
+                ? state.learners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : state.learners
+          };
+          break;
+        case 1:
+          role = {
+            userRole: UserRoles.partner,
+            role: 'partner',
+            getUser: usersService.getPartners,
+            action: 'SET_PARTNERS',
+            count: state.partners.length,
+            rows:
+              rowsPerPage > 0
+                ? state.partners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : state.partners
+          };
+          break;
+        case 2:
+          role = {
+            userRole: UserRoles.tutor,
+            role: 'tutor',
+            getUser: usersService.getTutors,
+            action: 'SET_TUTORS',
+            count: state.tutors.length,
+            rows:
+              rowsPerPage > 0 ? state.tutors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : state.tutors
+          };
+          break;
+        default:
+          break;
+      }
 
-    return (
-      <>
-        <Dialog open={!!state.tutors && showAssignTutors}>
-          <AssignTutorsDialog tutors={state.tutors} newLearnerEmail={newLearnerEmail} learners={state.learners} />
-        </Dialog>
-        <Formik
-          initialValues={formikInitialValues}
-          validationSchema={newUserSchema}
-          onSubmit={async (values, actions) => {
-            const newUser = {
-              email: values.email,
-              displayName: values.displayName,
-              userRole: role.userRole as UserRoles
-            };
+      const newUserSchema = Yup.object().shape({
+        displayName: Yup.string()
+          .min(3, 'displayName too short')
+          .max(25, 'displayName too long')
+          .required('DisplayName is required'),
+        email: Yup.string()
+          .email('Invalid email')
+          .required('Email is required')
+      });
 
-            const response = await usersService.createUser(newUser);
-            console.log('response', response);
-            const refreshedUsers = await role.getUser();
-            // @ts-ignore
-            dispatch({ type: role.action, payload: refreshedUsers });
-            actions.resetForm();
-            setnewLearnerEmail(values.email);
-            role.userRole === UserRoles.learner && setShowAssignTutors(true);
-          }}
-        >
-          {(props: FormikProps<IFormikValues>) => {
-            const disableButton =
-              props.isSubmitting ||
-              !props.touched.displayName ||
-              !props.touched.email ||
-              !!props.errors.displayName ||
-              !!props.errors.email;
-            return (
-              <Form>
-                <TableContainer classes={{ root: classes.tableContainer }} component={Paper}>
-                  <Table size="small">
-                    <TableHead classes={{ root: classes.tableHead }}>
-                      <TableRow>
-                        <TableCell classes={{ root: classes.tableCell }} align="center">
-                          id
-                        </TableCell>
-                        <TableCell classes={{ root: classes.tableCell }} align="center">
-                          displayName
-                        </TableCell>
-                        <TableCell classes={{ root: classes.tableCell }} align="center">
-                          email
-                        </TableCell>
-                        {tab === 2 && (
+      return (
+        <>
+          <Dialog open={!!state.tutors && showAssignTutors}>
+            <AssignTutorsDialog
+              tutors={state.tutors}
+              newLearnerEmail={newLearnerEmail}
+              learners={state.learners}
+              setShowAssignTutors={setShowAssignTutors}
+              setnewLearnerEmail={setnewLearnerEmail}
+            />
+          </Dialog>
+          <Formik
+            initialValues={formikInitialValues}
+            validationSchema={newUserSchema}
+            onSubmit={async (values, actions) => {
+              const newUser = {
+                email: values.email,
+                displayName: values.displayName,
+                userRole: role.userRole as UserRoles
+              };
+
+              await usersService.createUser(newUser);
+
+              const refreshedUsers = await role.getUser();
+              // @ts-ignore
+              dispatch({ type: role.action, payload: refreshedUsers });
+              actions.resetForm();
+              setnewLearnerEmail(values.email);
+              role.userRole === UserRoles.learner && setShowAssignTutors(true);
+            }}
+          >
+            {(props: FormikProps<IFormikValues>) => {
+              const disableButton =
+                props.isSubmitting ||
+                !props.touched.displayName ||
+                !props.touched.email ||
+                !!props.errors.displayName ||
+                !!props.errors.email;
+              return (
+                <Form>
+                  <TableContainer classes={{ root: classes.tableContainer }} component={Paper}>
+                    <Table size="small">
+                      <TableHead classes={{ root: classes.tableHead }}>
+                        <TableRow>
                           <TableCell classes={{ root: classes.tableCell }} align="center">
-                            shift
+                            id
                           </TableCell>
-                        )}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody classes={{ root: classes.tableBody }}>
-                      <TableRow>
-                        <TableCell align="center">
-                          <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
-                            {`Add ${role.role}`}
-                          </Button>
-                          <div className={classes.helperTextSpacer} />
-                        </TableCell>
-                        <Field name="displayName" value="values.displayName">
-                          {({ field }: FieldProps<IFormikValues>) => {
-                            return (
-                              <TableCell align="center">
-                                <TextField
-                                  {...field}
-                                  margin="dense"
-                                  variant="outlined"
-                                  type="text"
-                                  fullWidth
-                                  error={!!props.errors.displayName}
-                                />
-                                {props.errors.displayName ? (
-                                  <FormHelperText error>{props.errors.displayName}</FormHelperText>
-                                ) : (
-                                  <div className={classes.helperTextSpacer} />
-                                )}
-                              </TableCell>
-                            );
-                          }}
-                        </Field>
-                        <Field name="email" value="values.email">
-                          {({ field }: FieldProps<IFormikValues>) => {
-                            return (
-                              <TableCell align="center">
-                                <TextField
-                                  {...field}
-                                  margin="dense"
-                                  variant="outlined"
-                                  type="text"
-                                  fullWidth
-                                  error={!!props.errors.email}
-                                />
-                                {props.errors.email ? (
-                                  <FormHelperText error>{props.errors.email}</FormHelperText>
-                                ) : (
-                                  <div className={classes.helperTextSpacer} />
-                                )}
-                              </TableCell>
-                            );
-                          }}
-                        </Field>
-                      </TableRow>
-                      {tab === 0 &&
-                        state.learners &&
-                        state.learners.map((learner: ILearner) => (
-                          <TableRow key={learner.id}>
-                            <TableCell align="center">{learner.id}</TableCell>
-                            <TableCell align="center">{learner.displayName}</TableCell>
-                            <TableCell align="center">{learner.email}</TableCell>
+                          <TableCell classes={{ root: classes.tableCell }} align="center">
+                            displayName
+                          </TableCell>
+                          <TableCell classes={{ root: classes.tableCell }} align="center">
+                            email
+                          </TableCell>
+                          {tab === 2 && (
+                            <TableCell classes={{ root: classes.tableCell }} align="center">
+                              shift
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody classes={{ root: classes.tableBody }}>
+                        <TableRow>
+                          <TableCell align="center">
+                            <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
+                              {`Add ${role.role}`}
+                            </Button>
+                            <div className={classes.helperTextSpacer} />
+                          </TableCell>
+                          <Field name="displayName" value="values.displayName">
+                            {({ field }: FieldProps<IFormikValues>) => {
+                              return (
+                                <TableCell align="center">
+                                  <TextField
+                                    {...field}
+                                    margin="dense"
+                                    variant="outlined"
+                                    type="text"
+                                    fullWidth
+                                    error={!!props.errors.displayName}
+                                  />
+                                  {props.errors.displayName ? (
+                                    <FormHelperText error>{props.errors.displayName}</FormHelperText>
+                                  ) : (
+                                    <div className={classes.helperTextSpacer} />
+                                  )}
+                                </TableCell>
+                              );
+                            }}
+                          </Field>
+                          <Field name="email" value="values.email">
+                            {({ field }: FieldProps<IFormikValues>) => {
+                              return (
+                                <TableCell align="center">
+                                  <TextField
+                                    {...field}
+                                    margin="dense"
+                                    variant="outlined"
+                                    type="text"
+                                    fullWidth
+                                    error={!!props.errors.email}
+                                  />
+                                  {props.errors.email ? (
+                                    <FormHelperText error>{props.errors.email}</FormHelperText>
+                                  ) : (
+                                    <div className={classes.helperTextSpacer} />
+                                  )}
+                                </TableCell>
+                              );
+                            }}
+                          </Field>
+                          {tab === 2 && <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>}
+                        </TableRow>
+                        {role.rows.map((user: any) => (
+                          <TableRow key={user.id}>
+                            <TableCell align="center">{user.id}</TableCell>
+                            <TableCell align="center">{user.displayName}</TableCell>
+                            <TableCell align="center">{user.email}</TableCell>
+                            {tab === 2 && <TableCell align="center">{user.shift}</TableCell>}
                           </TableRow>
                         ))}
-                      {tab === 1 &&
-                        state.partners &&
-                        state.partners.map((partner: IPartner) => (
-                          <TableRow key={partner.id}>
-                            <TableCell align="center">{partner.id}</TableCell>
-                            <TableCell align="center">{partner.displayName}</TableCell>
-                            <TableCell align="center">{partner.email}</TableCell>
-                          </TableRow>
-                        ))}
-                      {tab === 2 &&
-                        state.tutors &&
-                        state.tutors.map((tutor: ITutor) => (
-                          <TableRow key={tutor.id}>
-                            <TableCell align="center">{tutor.id}</TableCell>
-                            <TableCell align="center">{tutor.displayName}</TableCell>
-                            <TableCell align="center">{tutor.email}</TableCell>
-                            <TableCell align="center">{tutor.shift}</TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                    <TableFooter>
-                      <TableRow>
-                        <TablePagination
-                          count={role.count}
-                          rowsPerPage={10}
-                          onChangePage={handleChangePage}
-                          page={page}
-                          ActionsComponent={TablePaginationActions}
-                        />
-                      </TableRow>
-                    </TableFooter>
-                  </Table>
-                </TableContainer>
-              </Form>
-            );
-          }}
-        </Formik>
-      </>
-    );
+                      </TableBody>
+                      <TableFooter>
+                        <TableRow>
+                          <TablePagination
+                            count={role.count}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onChangePage={handleChangePage}
+                            onChangeRowsPerPage={handleChangeRowsPerPage}
+                            ActionsComponent={TablePaginationActions}
+                          />
+                        </TableRow>
+                      </TableFooter>
+                    </Table>
+                  </TableContainer>
+                </Form>
+              );
+            }}
+          </Formik>
+        </>
+      );
+    }
   };
 
   return (
@@ -360,7 +384,7 @@ const UsersPage = () => {
           <Tab label="Tutors" />
         </Tabs>
       </div>
-      {generateTable()}
+      {state.learners && state.partners && state.tutors && generateTable()}
     </usersContext.Provider>
   );
 };

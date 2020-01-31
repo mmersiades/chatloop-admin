@@ -121,11 +121,22 @@ const createUser = async (newUser: { email: string; displayName: string; userRol
   } catch (error) {}
 };
 
+const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number; learner: number }) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() }
+  };
+  try {
+    const response = await apiChatloopOrg.post('/rest/admin/assign-learner-to-tutor', body, requestOptions);
+    return response;
+  } catch (error) {}
+};
+
 const usersService = {
   getLearners,
   getPartners,
   getTutors,
-  createUser
+  createUser,
+  assignTutors
 };
 
 export default usersService;
