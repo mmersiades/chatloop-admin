@@ -1,5 +1,5 @@
 import apiChatloopOrg from '../config/axionConfig';
-import authHeader from '../helpers/getAuthHeader';
+import { authHeader } from '../helpers/getAuthHeader';
 import { ILearner, IPartner, ITutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
 

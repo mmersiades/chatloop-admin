@@ -3,8 +3,8 @@
  */
 
 /** */
-import React from "react";
-import { Route, Redirect, RouteProps } from "react-router-dom";
+import React from 'react';
+import { Route, Redirect, RouteProps } from 'react-router-dom';
 
 /** Props for PublicRoute component */
 interface IPublicRouteProps {
@@ -35,23 +35,17 @@ interface IPublicRouteProps {
  * If user is logged in, the wrapper redirects paths to the
  * ChatPage component.
  */
-export const PublicRoute = ({
-  component: Component,
-  path,
-  ...rest
-}: IPublicRouteProps): JSX.Element => {
+export const PublicRoute = ({ component: Component, path, ...rest }: IPublicRouteProps): JSX.Element => {
   // Determines login status by looking for JWT in localStorage
-  const token: string | null = localStorage.getItem("token");
+  const token: string | null = localStorage.getItem('loginToken');
 
   // Where redirect to if logged in
-  const to = "/dashboard";
+  const to = '/dashboard';
 
   return (
     <Route
       path={path}
-      render={(routeProps: RouteProps) =>
-        token ? <Redirect to={to} /> : <Component {...routeProps} {...rest} />
-      }
+      render={(routeProps: RouteProps) => (token ? <Redirect to={to} /> : <Component {...routeProps} {...rest} />)}
     />
   );
 };
