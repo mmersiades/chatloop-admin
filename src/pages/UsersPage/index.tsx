@@ -116,7 +116,7 @@ const usersReducer = (state: usersState, action: usersAction) => {
 const UsersPage = () => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = React.useState(0);
   const [showAssignTutors, setShowAssignTutors] = useState(false);
   const [newLearnerEmail, setnewLearnerEmail] = useState();
   const [page, setPage] = React.useState(0);
@@ -365,7 +365,11 @@ const UsersPage = () => {
                             <TableCell align="center">{user.email}</TableCell>
                             {tab === 2 && <TableCell align="center">{user.shift}</TableCell>}
                             <TableCell align="center">
-                              <Button color="secondary" onClick={() => handleDelete(user.id, role.userRole)}>
+                              <Button
+                                color="secondary"
+                                onClick={() => handleDelete(user.id, role.userRole)}
+                                data-test="add-user-button"
+                              >
                                 DELETE
                               </Button>
                             </TableCell>
