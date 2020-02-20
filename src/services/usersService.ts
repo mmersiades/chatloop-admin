@@ -2,17 +2,18 @@ import apiChatloopOrg from '../config/axiosConfig';
 import { authHeader } from '../helpers/getAuthHeader';
 import { ILearner, IPartner, ITutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
+import { handleError } from '../helpers/handleError';
 
-const handleError = (error?: any) => {
-  if (error.response) {
-    console.log('error.response', error.response);
-  } else if (error.request) {
-    console.log(error.request);
-  } else {
-    console.log('error.message', error.message);
-  }
-  console.log('error.config', error.config);
-};
+// const handleError = (error?: any) => {
+//   if (error.response) {
+//     console.log('error.response', error.response);
+//   } else if (error.request) {
+//     console.log(error.request);
+//   } else {
+//     console.log('error.message', error.message);
+//   }
+//   console.log('error.config', error.config);
+// };
 
 const getLearners = async (dispatch: any) => {
   const requestOptions = {

@@ -28,6 +28,7 @@ import * as Yup from 'yup';
 import { UserRoles } from '../../@types/enums';
 import AssignTutorsDialog from './AssignTutorsDialog';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
+import { handleError } from '../../helpers/handleError';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -262,7 +263,7 @@ const UsersPage = () => {
               try {
                 await usersService.createUser(newUser);
               } catch (error) {
-                console.log('error', error);
+                handleError(error);
               }
               actions.resetForm();
               role.userRole === UserRoles.learner && setnewLearnerEmail(values.email);
