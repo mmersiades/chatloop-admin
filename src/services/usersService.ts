@@ -14,7 +14,7 @@ const handleError = (error?: any) => {
   console.log('error.config', error.config);
 };
 
-const getLearners = async () => {
+const getLearners = async (dispatch: any) => {
   const requestOptions = {
     headers: { authorization: authHeader() }
   };
@@ -28,13 +28,13 @@ const getLearners = async () => {
       delete learner.admin;
       return learner;
     });
-    return learners;
+    dispatch({ type: 'SET_LEARNERS', payload: learners });
   } catch (error) {
     handleError(error);
   }
 };
 
-const getPartners = async () => {
+const getPartners = async (dispatch: any) => {
   const requestOptions = {
     headers: { authorization: authHeader() }
   };
@@ -48,13 +48,13 @@ const getPartners = async () => {
       delete partner.admin;
       return partner;
     });
-    return partners;
+    dispatch({ type: 'SET_PARTNERS', payload: partners });
   } catch (error) {
     handleError(error);
   }
 };
 
-const getTutors = async () => {
+const getTutors = async (dispatch: any) => {
   let shiftOneTutors: Array<ITutor> = [];
   let shiftTwoTutors: Array<ITutor> = [];
   const requestOptions = {
@@ -87,8 +87,7 @@ const getTutors = async () => {
       tutor.shift = TutorShifts.two;
       return tutor;
     });
-
-    return shiftOneTutors.concat(shiftTwoTutors);
+    dispatch({ type: 'SET_TUTORS', payload: shiftOneTutors.concat(shiftTwoTutors) });
   } catch (error) {
     handleError(error);
   }

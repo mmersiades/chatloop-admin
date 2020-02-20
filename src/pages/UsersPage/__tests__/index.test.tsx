@@ -99,6 +99,7 @@ describe('Testing useState hooks', () => {
     React.useState = jest.fn(() => [0, mockSetTab]);
     const mockChangeEvent = {} as ChangeEvent<{ checked: boolean }>;
     const mockTabValue = 1;
+    // wrappedPartnerTab.simulate('click');
     // if (wrappedPartnerTab.props().onChange) {
     //   // @ts-ignore
     //   wrappedPartnerTab.props().onChange(mockChangeEvent, mockTabValue);

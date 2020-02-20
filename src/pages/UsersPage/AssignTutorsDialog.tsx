@@ -9,7 +9,6 @@ interface IAssignTutorProps {
   tutors?: Array<ITutor>;
   newLearnerEmail: string;
   learners?: Array<ILearner>;
-  setShowAssignTutors: (show: boolean) => void;
   setnewLearnerEmail: (email: string) => void;
 }
 
@@ -18,13 +17,7 @@ interface IAssignTutorValues {
   shiftTwoTutor: number;
 }
 
-export const AssignTutorsDialog = ({
-  tutors,
-  newLearnerEmail,
-  learners,
-  setShowAssignTutors,
-  setnewLearnerEmail
-}: IAssignTutorProps) => {
+export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLearnerEmail }: IAssignTutorProps) => {
   const shiftOneTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
   const shiftTwoTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.two);
   const learner = learners
@@ -46,7 +39,6 @@ export const AssignTutorsDialog = ({
           learner: learner.id
         });
         if (response && response.status === 200) {
-          setShowAssignTutors(false);
           setnewLearnerEmail('');
           actions.resetForm();
         } else {

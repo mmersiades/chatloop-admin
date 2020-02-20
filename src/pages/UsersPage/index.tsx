@@ -117,24 +117,20 @@ const UsersPage = () => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
   const [tab, setTab] = React.useState(0);
-  const [showAssignTutors, setShowAssignTutors] = useState(false);
   const [newLearnerEmail, setnewLearnerEmail] = useState();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const fetchTutors = async () => {
-    const tutors = await usersService.getTutors();
-    dispatch({ type: 'SET_TUTORS', payload: tutors });
+    await usersService.getTutors(dispatch);
   };
 
   const fetchPartners = async () => {
-    const partners = await usersService.getPartners();
-    dispatch({ type: 'SET_PARTNERS', payload: partners });
+    await usersService.getPartners(dispatch);
   };
 
   const fetchLearners = async () => {
-    const learners = await usersService.getLearners();
-    dispatch({ type: 'SET_LEARNERS', payload: learners });
+    await usersService.getLearners(dispatch);
   };
 
   useEffect(() => {
@@ -197,7 +193,7 @@ const UsersPage = () => {
           role = {
             userRole: UserRoles.learner,
             role: 'learner',
-            getUser: usersService.getLearners,
+            getUser: () => usersService.getLearners(dispatch),
             action: 'SET_LEARNERS',
             count: state.learners.length,
             rows:
@@ -210,7 +206,7 @@ const UsersPage = () => {
           role = {
             userRole: UserRoles.partner,
             role: 'partner',
-            getUser: usersService.getPartners,
+            getUser: () => usersService.getPartners(dispatch),
             action: 'SET_PARTNERS',
             count: state.partners.length,
             rows:
@@ -223,7 +219,7 @@ const UsersPage = () => {
           role = {
             userRole: UserRoles.tutor,
             role: 'tutor',
-            getUser: usersService.getTutors,
+            getUser: () => usersService.getTutors(dispatch),
             action: 'SET_TUTORS',
             count: state.tutors.length,
             rows:
@@ -246,12 +242,11 @@ const UsersPage = () => {
 
       return (
         <>
-          <Dialog open={!!state.tutors && showAssignTutors}>
+          <Dialog open={!!state.tutors && !!newLearnerEmail}>
             <AssignTutorsDialog
               tutors={state.tutors}
               newLearnerEmail={newLearnerEmail}
               learners={state.learners}
-              setShowAssignTutors={setShowAssignTutors}
               setnewLearnerEmail={setnewLearnerEmail}
             />
           </Dialog>
@@ -264,15 +259,14 @@ const UsersPage = () => {
                 displayName: values.displayName,
                 userRole: role.userRole as UserRoles
               };
-
-              await usersService.createUser(newUser);
-
-              const refreshedUsers = await role.getUser();
-              // @ts-ignore
-              dispatch({ type: role.action, payload: refreshedUsers });
+              try {
+                await usersService.createUser(newUser);
+              } catch (error) {
+                console.log('error', error);
+              }
               actions.resetForm();
-              setnewLearnerEmail(values.email);
-              role.userRole === UserRoles.learner && setShowAssignTutors(true);
+              role.userRole === UserRoles.learner && setnewLearnerEmail(values.email);
+              await role.getUser();
             }}
           >
             {(props: FormikProps<IFormikValues>) => {
