@@ -5,6 +5,7 @@ import Root from '../../../components/Root';
 import { Tabs, Tab, TableContainer, TextField, TableFooter } from '@material-ui/core';
 import Navbar from '../../../components/Navbar';
 import MenuDrawer from '../../../components/MenuDrawer';
+import usersService from '../../../services/usersService';
 
 let wrappedUsersPage: ReactWrapper;
 let props: any;
@@ -95,15 +96,49 @@ describe('Testing useState hooks', () => {
     const wrappedTabs = wrappedUsersPage.find(Tabs);
     const wrappedPartnerTab = wrappedUsersPage.find(Tab).at(1);
     // console.log('wrappedPartnerTab', wrappedPartnerTab.props());
-    const mockSetTab = jest.fn();
-    React.useState = jest.fn(() => [0, mockSetTab]);
-    const mockChangeEvent = {} as ChangeEvent<{ checked: boolean }>;
-    const mockTabValue = 1;
+    // const mockSetTab = jest.fn();
+    // React.useState = jest.fn(() => [0, mockSetTab]);
+    // const mockChangeEvent = {} as ChangeEvent<{ checked: boolean }>;
+    // const mockTabValue = 1;
     // wrappedPartnerTab.simulate('click');
     // if (wrappedPartnerTab.props().onChange) {
     //   // @ts-ignore
     //   wrappedPartnerTab.props().onChange(mockChangeEvent, mockTabValue);
     // }
     // expect(mockSetTab).toHaveBeenCalled();
+  });
+});
+
+describe('Testing useEffect hooks', () => {
+  const mockGetLearners = jest.fn();
+  const mockGetPartners = jest.fn();
+  const mockGetTutors = jest.fn();
+
+  beforeEach(() => {
+    mockGetLearners.mockClear();
+    mockGetPartners.mockClear();
+    mockGetTutors.mockClear();
+    usersService.getLearners = mockGetLearners;
+    usersService.getPartners = mockGetPartners;
+    usersService.getTutors = mockGetTutors;
+
+    props = createTestProps({});
+    wrappedUsersPage = mount(
+      <Root>
+        <UsersPage {...props} />
+      </Root>
+    );
+  });
+
+  afterEach(() => wrappedUsersPage.unmount());
+
+  test('should call getLearners on UsersPage mount', () => {
+    expect(mockGetLearners).toHaveBeenCalled();
+  });
+  test('should call getPartners on UsersPage mount', () => {
+    expect(mockGetPartners).toHaveBeenCalled();
+  });
+  test('should call getTutors on UsersPage mount', () => {
+    expect(mockGetTutors).toHaveBeenCalled();
   });
 });

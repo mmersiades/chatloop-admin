@@ -3,7 +3,7 @@
  */
 
 /** */
-import apiChatloopOrg from '../config/axionConfig';
+import apiChatloopOrg from '../config/axiosConfig';
 import { refreshHeader } from '../helpers/getAuthHeader';
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
