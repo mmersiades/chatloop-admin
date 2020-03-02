@@ -15,10 +15,19 @@ image: nikolaik/python-nodejs
 #           - npm test
 
 pipelines:
-  branches:
-    dev:
-      - step:
-          deployment: chatloop-admin
+  custom:
+    # Run tests
+    test:
+      - step: &test
+          name: Test
+          script:
+            - npm install
+            - npm test
+    # Build & deploy app to staging environment
+    deploy_staging:
+      - step: &deploy_staging
+          name: Deploy to Staging
+          deployment: staging
           caches:
             - node
           script: # Modify the commands below to build your repository.
@@ -27,9 +36,12 @@ pipelines:
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
             - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://dev-chatloop-admin/
-    master:
-      - step:
-          deployment: Production
+    # Build & deploy app to production environment
+    deploy_production:
+      - step: &deploy_production
+          name: Deploy to Production
+          trigger: manual
+          deployment: production
           caches:
             - node
           script: # Modify the commands below to build your repository.
@@ -38,3 +50,36 @@ pipelines:
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
             - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://chatloop-admin/
+  # branches:
+  #   dev:
+  #     - step:
+  #         deployment: staging
+  #         caches:
+  #           - node
+  #         script: # Modify the commands below to build your repository.
+  #           - npm install
+  #           - npm run build
+  #           - pip install awscli --upgrade --ignore-installed six
+  #           - aws s3 sync ./build s3://dev-chatloop-admin
+  #           - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://dev-chatloop-admin/
+  #   master:
+  #     - step:
+  #         deployment: production
+  #         caches:
+  #           - node
+  #         script: # Modify the commands below to build your repository.
+  #           - npm install
+  #           - npm run build
+  #           - pip install awscli --upgrade --ignore-installed six
+  #           - aws s3 sync ./build s3://chatloop-admin
+  #           - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://chatloop-admin/
+
+  default:
+    - step: *test
+
+  branches:
+    master:
+      # All commits to master get automatically deployed to staging environment
+      - step: *deploy_staging
+      # All commits to master can be manually deployed to production environment via pipeline web interface
+      - step: *deploy_production
