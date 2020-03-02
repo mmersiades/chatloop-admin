@@ -1,16 +1,8 @@
-import React, { FC, Dispatch, SetStateAction } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  makeStyles,
-  createStyles,
-  Theme,
-  IconButton
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import { useLocation } from "react-router-dom";
-import clsx from "clsx";
+import React, { FC, Dispatch, SetStateAction } from 'react';
+import { AppBar, Toolbar, Typography, makeStyles, createStyles, Theme, IconButton } from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
+import { useLocation } from 'react-router-dom';
+import clsx from 'clsx';
 
 const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   createStyles({
@@ -19,7 +11,7 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
     },
     appbar: {
       backgroundColor: palette.common.black,
-      transition: transitions.create(["margin", "width"], {
+      transition: transitions.create(['margin', 'width'], {
         easing: transitions.easing.sharp,
         duration: transitions.duration.leavingScreen
       })
@@ -27,7 +19,7 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
     appbarShift: {
       width: `calc(100% - 200px)`,
       marginLeft: 200,
-      transition: transitions.create(["margin", "width"], {
+      transition: transitions.create(['margin', 'width'], {
         easing: transitions.easing.easeOut,
         duration: transitions.duration.enteringScreen
       })
@@ -36,7 +28,7 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
       marginRight: spacing(2)
     },
     hide: {
-      display: "none"
+      display: 'none'
     }
   })
 );
@@ -46,15 +38,11 @@ interface INavbarProps {
   setShowMenuDrawer: Dispatch<SetStateAction<boolean>>;
 }
 
-const Navbar: FC<INavbarProps> = ({
-  showMenuDrawer,
-  setShowMenuDrawer
-}: INavbarProps) => {
+const Navbar: FC<INavbarProps> = ({ showMenuDrawer, setShowMenuDrawer }: INavbarProps) => {
   const classes = useStyles();
   const location = useLocation();
-  console.log("location.state", location);
   // @ts-ignore
-  const title = location.state ? location.state : "Chatloop Admin";
+  const title = location.state ? location.state : 'Chatloop Admin';
 
   return (
     <>
