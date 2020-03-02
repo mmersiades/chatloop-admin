@@ -8,4 +8,4 @@ export const baseUrl = {
   localhost
 };
 
-export default baseUrl.stagingApiChatloopOrg;
+export default baseUrl.apiChatloopOrg;
