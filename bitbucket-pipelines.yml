@@ -78,8 +78,11 @@ pipelines:
     - step: *test
 
   branches:
+    # All commits to master can be manually deployed to production environment via pipeline web interface
     master:
-      # All commits to master get automatically deployed to staging environment
-      - step: *deploy_staging
-      # All commits to master can be manually deployed to production environment via pipeline web interface
+      - step: *test
       - step: *deploy_production
+    # All commits to dev branch get automatically deployed to staging environment
+    dev:
+      - step: *test
+      - step: *deploy_staging
