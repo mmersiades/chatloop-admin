@@ -50,6 +50,6 @@ pipelines:
       - step: *deploy_production
 
     # All commits to dev branch get automatically deployed to staging environment
-    dev:
+    staging:
       - step: *test
       - step: *deploy_staging

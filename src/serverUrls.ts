@@ -1,11 +1,11 @@
-export const apiChatloopOrg = 'https://api.chatloop.org';
-export const stagingApiChatloopOrg = 'https://staging-api.chatloop.org';
-export const localhost = 'http://localhost:8080';
+export const production = 'https://api.chatloop.org';
+export const staging = 'https://staging-api.chatloop.org';
+export const local = 'http://localhost:8080';
 
 export const baseUrl = {
-  apiChatloopOrg,
-  stagingApiChatloopOrg,
-  localhost
+  production,
+  staging,
+  local
 };
 
-export default baseUrl.apiChatloopOrg;
+export default baseUrl.staging;
