@@ -1,18 +1,4 @@
-# This is a sample build configuration for JavaScript.
-# Check our guides at https://confluence.atlassian.com/x/14UWN for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
 image: nikolaik/python-nodejs
-
-# pipelines:
-#   default:
-#     - step:
-#         caches:
-#           - node
-#         script: # Modify the commands below to build your repository.
-#           - npm install
-#           - npm test
 
 pipelines:
   custom:
@@ -23,6 +9,7 @@ pipelines:
           script:
             - npm install
             - npm test
+
     # Build & deploy app to staging environment
     deploy_staging:
       - step: &deploy_staging
@@ -36,7 +23,8 @@ pipelines:
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
             - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://dev-chatloop-admin/
-    # Build & deploy app to production environment
+
+    # Build & deploy app to production environment, manually via pipeline web interface
     deploy_production:
       - step: &deploy_production
           name: Deploy to Production
@@ -44,36 +32,14 @@ pipelines:
           deployment: production
           caches:
             - node
-          script: # Modify the commands below to build your repository.
+          script:
             - npm install
             - npm run build
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
             - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://chatloop-admin/
-  # branches:
-  #   dev:
-  #     - step:
-  #         deployment: staging
-  #         caches:
-  #           - node
-  #         script: # Modify the commands below to build your repository.
-  #           - npm install
-  #           - npm run build
-  #           - pip install awscli --upgrade --ignore-installed six
-  #           - aws s3 sync ./build s3://dev-chatloop-admin
-  #           - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://dev-chatloop-admin/
-  #   master:
-  #     - step:
-  #         deployment: production
-  #         caches:
-  #           - node
-  #         script: # Modify the commands below to build your repository.
-  #           - npm install
-  #           - npm run build
-  #           - pip install awscli --upgrade --ignore-installed six
-  #           - aws s3 sync ./build s3://chatloop-admin
-  #           - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://chatloop-admin/
 
+  # Runs tests on commits to all branches ( excpet master and dev)
   default:
     - step: *test
 
@@ -82,6 +48,7 @@ pipelines:
     master:
       - step: *test
       - step: *deploy_production
+
     # All commits to dev branch get automatically deployed to staging environment
     dev:
       - step: *test
