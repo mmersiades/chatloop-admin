@@ -1,8 +1,9 @@
 import React, { FC, Dispatch, SetStateAction } from 'react';
-import { AppBar, Toolbar, Typography, makeStyles, createStyles, Theme, IconButton } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, makeStyles, createStyles, Theme, IconButton, Grid } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { useLocation } from 'react-router-dom';
 import clsx from 'clsx';
+import connectedUrl from '../serverUrls';
 
 const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   createStyles({
@@ -54,16 +55,19 @@ const Navbar: FC<INavbarProps> = ({ showMenuDrawer, setShowMenuDrawer }: INavbar
         }}
       >
         <Toolbar variant="dense">
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => setShowMenuDrawer(true)}
-            edge="start"
-            className={clsx(classes.menuButton, showMenuDrawer && classes.hide)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography>{title}</Typography>
+          <Grid container justify="space-between" alignItems="center">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => setShowMenuDrawer(true)}
+              edge="start"
+              className={clsx(classes.menuButton, showMenuDrawer && classes.hide)}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography>{title}</Typography>
+            <Typography>{connectedUrl}</Typography>
+          </Grid>
         </Toolbar>
       </AppBar>
       <div className={classes.toolbar} />
