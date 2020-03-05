@@ -38,11 +38,11 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
       position: 'absolute',
       width: 'calc(100vw - 200px)',
       top: 48,
-
       backgroundColor: palette.common.white
     },
     tableContainer: {
-      margin: spacing(4),
+      marginTop: spacing(2),
+      marginBottom: spacing(2),
       maxHeight: 'calc(100vh - 160px)',
       overflow: 'none'
     },
@@ -54,10 +54,6 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
     },
     helperTextSpacer: {
       height: 20
-    },
-    tableBody: {
-      // height: 500,
-      // overflow: 'auto'
     }
   })
 );
@@ -307,7 +303,7 @@ const UsersPage = () => {
                           <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                         </TableRow>
                       </TableHead>
-                      <TableBody classes={{ root: classes.tableBody }}>
+                      <TableBody>
                         <TableRow>
                           <TableCell align="center">
                             <div className={classes.helperTextSpacer} />
