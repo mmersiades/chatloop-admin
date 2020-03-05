@@ -21,11 +21,13 @@ import {
   FormHelperText,
   Dialog,
   TableFooter,
-  TablePagination
+  TablePagination,
+  Select,
+  MenuItem
 } from '@material-ui/core';
 import { Formik, FormikProps, FieldProps, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { UserRoles } from '../../@types/enums';
+import { UserRoles, TutorShifts } from '../../@types/enums';
 import AssignTutorsDialog from './AssignTutorsDialog';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 import { handleError } from '../../helpers/handleError';
@@ -83,6 +85,7 @@ type usersAction =
 interface IFormikValues {
   email: string;
   displayName: string;
+  shift: string;
 }
 
 /** An object of params passed to `tableGenerator` based on the role of Users the table is for */
@@ -150,7 +153,8 @@ const UsersPage = () => {
     if (state.learners && state.partners && state.tutors) {
       const formikInitialValues: IFormikValues = {
         email: '',
-        displayName: ''
+        displayName: '',
+        shift: ''
       };
 
       const handleChangePage = (event: any, newPage: any) => {
@@ -238,7 +242,13 @@ const UsersPage = () => {
           .required('DisplayName is required'),
         email: Yup.string()
           .email('Invalid email')
-          .required('Email is required')
+          .required('Email is required'),
+        shift:
+          role.userRole === UserRoles.tutor
+            ? Yup.string()
+                .oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
+                .required('Shift must be selected')
+            : Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
       });
 
       return (
@@ -258,7 +268,8 @@ const UsersPage = () => {
               const newUser = {
                 email: values.email,
                 displayName: values.displayName,
-                userRole: role.userRole as UserRoles
+                userRole: role.userRole as UserRoles,
+                shift: values.shift as TutorShifts
               };
               try {
                 await usersService.createUser(newUser);
@@ -272,11 +283,7 @@ const UsersPage = () => {
           >
             {(props: FormikProps<IFormikValues>) => {
               const disableButton =
-                props.isSubmitting ||
-                !props.touched.displayName ||
-                !props.touched.email ||
-                !!props.errors.displayName ||
-                !!props.errors.email;
+                props.isSubmitting || !!props.errors.displayName || !!props.errors.email || !!props.errors.shift;
               return (
                 <Form>
                   <TableContainer classes={{ root: classes.tableContainer }} component={Paper}>
@@ -303,6 +310,7 @@ const UsersPage = () => {
                       <TableBody classes={{ root: classes.tableBody }}>
                         <TableRow>
                           <TableCell align="center">
+                            <div className={classes.helperTextSpacer} />
                             <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
                               {`Add ${role.role}`}
                             </Button>
@@ -312,6 +320,7 @@ const UsersPage = () => {
                             {({ field }: FieldProps<IFormikValues>) => {
                               return (
                                 <TableCell align="center">
+                                  <div className={classes.helperTextSpacer} />
                                   <TextField
                                     {...field}
                                     margin="dense"
@@ -333,6 +342,7 @@ const UsersPage = () => {
                             {({ field }: FieldProps<IFormikValues>) => {
                               return (
                                 <TableCell align="center">
+                                  <div className={classes.helperTextSpacer} />
                                   <TextField
                                     {...field}
                                     margin="dense"
@@ -350,7 +360,27 @@ const UsersPage = () => {
                               );
                             }}
                           </Field>
-                          {tab === 2 && <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>}
+                          <Field name="shift" value="values.shift">
+                            {({ field }: FieldProps<IFormikValues>) => {
+                              return (
+                                tab === 2 && (
+                                  <TableCell classes={{ root: classes.tableCell }} align="center">
+                                    <div className={classes.helperTextSpacer} />
+                                    <Select {...field} fullWidth variant="outlined">
+                                      <MenuItem value={TutorShifts.one}>Shift One</MenuItem>
+                                      <MenuItem value={TutorShifts.two}>Shift Two</MenuItem>
+                                    </Select>
+                                    {props.errors.shift ? (
+                                      <FormHelperText error>{props.errors.shift}</FormHelperText>
+                                    ) : (
+                                      <div className={classes.helperTextSpacer} />
+                                    )}
+                                  </TableCell>
+                                )
+                              );
+                            }}
+                          </Field>
+
                           <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                         </TableRow>
                         {role.rows.map((user: any) => (

@@ -94,7 +94,7 @@ const getTutors = async (dispatch: any) => {
   }
 };
 
-const createUser = async (newUser: { email: string; displayName: string; userRole: UserRoles }) => {
+const createUser = async (newUser: { email: string; displayName: string; userRole: UserRoles; shift: TutorShifts }) => {
   const requestOptions = {
     headers: { authorization: authHeader() }
   };
@@ -102,7 +102,8 @@ const createUser = async (newUser: { email: string; displayName: string; userRol
   const body = {
     email: newUser.email,
     displayName: newUser.displayName,
-    userRole: newUser.userRole
+    userRole: newUser.userRole,
+    shift: newUser.shift
   };
 
   try {
