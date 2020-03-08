@@ -20,8 +20,9 @@ interface IAssignTutorValues {
 export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLearnerEmail }: IAssignTutorProps) => {
   const shiftOneTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
   const shiftTwoTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.two);
+
   const learner = learners
-    ? learners.filter((learner) => learner.email === newLearnerEmail)[0]
+    ? learners.filter((learner) => learner.email.toLowerCase() === newLearnerEmail.toLowerCase())[0]
     : { displayName: 'Learner', id: 999999 };
 
   const assignTutorsInitialValues: IAssignTutorValues = {
