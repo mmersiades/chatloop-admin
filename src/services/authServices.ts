@@ -4,7 +4,7 @@
 
 /** */
 import apiChatloopOrg from '../config/axiosConfig';
-import { refreshHeader } from '../helpers/getAuthHeader';
+import { refreshHeader, authHeader } from '../helpers/getAuthHeader';
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 const loginWithCredentials = async (username: string, password: string): Promise<{ isAuthError: boolean }> => {
@@ -85,6 +85,26 @@ const renewTokens = () => {
   }
 };
 
+/**
+ * Uses **axios** to `POST` an updated password to the server for the logged-in User
+ * @param password The existing (old) password
+ * @param newPassword The soon-to-be password
+ * @param confirmPassword Should be a repeat of `newPassword` for confirmation
+ */
+function updatePassword(password: string, newPassword: string, confirmPassword: string): Promise<AxiosResponse> {
+  const requestOptions: AxiosRequestConfig = {
+    headers: { authorization: authHeader() }
+  };
+
+  const body = {
+    password: password,
+    newPassword: newPassword,
+    confirmPassword: confirmPassword
+  };
+
+  return apiChatloopOrg.post('/rest/user/password', body, requestOptions);
+}
+
 const logout = () => localStorage.clear();
 
 /** Contains code to run just before an Axios request gets sent out */
@@ -104,6 +124,7 @@ apiChatloopOrg.interceptors.request.use((config: AxiosRequestConfig) => {
 const authService = {
   loginWithCredentials,
   loginWithToken,
+  updatePassword,
   logout
 };
 
