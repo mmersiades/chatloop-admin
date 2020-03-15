@@ -16,8 +16,8 @@ import usersService from '../../services/usersService';
 
 interface IAssignTutorProps {
   tutors?: Array<ITutor>;
-  newLearnerEmail?: string;
-  learners?: Array<ILearner>;
+  newLearnerEmail: string;
+  learners: Array<ILearner>;
   setnewLearnerEmail: (email: string) => void;
 }
 
@@ -49,8 +49,8 @@ export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLe
             learner: learner.id
           });
           if (response && response.status === 200) {
-            setnewLearnerEmail('');
             actions.resetForm();
+            setnewLearnerEmail('');
           } else {
             console.log('response', response);
           }

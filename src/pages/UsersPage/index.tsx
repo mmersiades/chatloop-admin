@@ -117,7 +117,7 @@ const UsersPage = () => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
   const [tab, setTab] = React.useState(0);
-  const [newLearnerEmail, setnewLearnerEmail] = useState<string>();
+  const [newLearnerEmail, setnewLearnerEmail] = useState<string>('');
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -249,14 +249,16 @@ const UsersPage = () => {
 
       return (
         <>
-          <Dialog open={!!state.tutors && !!newLearnerEmail}>
-            <AssignTutorsDialog
-              tutors={state.tutors}
-              newLearnerEmail={newLearnerEmail}
-              learners={state.learners}
-              setnewLearnerEmail={setnewLearnerEmail}
-            />
-          </Dialog>
+          {newLearnerEmail && state.learners && state.tutors && (
+            <Dialog open={!!state.tutors && !!newLearnerEmail}>
+              <AssignTutorsDialog
+                tutors={state.tutors}
+                newLearnerEmail={newLearnerEmail}
+                learners={state.learners}
+                setnewLearnerEmail={setnewLearnerEmail}
+              />
+            </Dialog>
+          )}
           <Formik
             initialValues={formikInitialValues}
             validationSchema={newUserSchema}
