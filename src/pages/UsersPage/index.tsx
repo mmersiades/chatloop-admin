@@ -117,7 +117,7 @@ const UsersPage = () => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
   const [tab, setTab] = React.useState(0);
-  const [newLearnerEmail, setnewLearnerEmail] = useState();
+  const [newLearnerEmail, setnewLearnerEmail] = useState<string>('');
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -249,32 +249,39 @@ const UsersPage = () => {
 
       return (
         <>
-          <Dialog open={!!state.tutors && !!newLearnerEmail}>
-            <AssignTutorsDialog
-              tutors={state.tutors}
-              newLearnerEmail={newLearnerEmail}
-              learners={state.learners}
-              setnewLearnerEmail={setnewLearnerEmail}
-            />
-          </Dialog>
+          {newLearnerEmail && state.learners && state.tutors && (
+            <Dialog open={!!state.tutors && !!newLearnerEmail}>
+              <AssignTutorsDialog
+                tutors={state.tutors}
+                newLearnerEmail={newLearnerEmail}
+                learners={state.learners}
+                setnewLearnerEmail={setnewLearnerEmail}
+              />
+            </Dialog>
+          )}
           <Formik
             initialValues={formikInitialValues}
             validationSchema={newUserSchema}
             onSubmit={async (values, actions) => {
-              const newUser = {
-                email: values.email,
-                displayName: values.displayName,
-                userRole: role.userRole as UserRoles,
-                shift: values.shift as TutorShifts
-              };
-              try {
-                await usersService.createUser(newUser);
-              } catch (error) {
-                handleError(error);
+              if (values.email && values.displayName) {
+                const newUser = {
+                  email: values.email,
+                  displayName: values.displayName,
+                  userRole: role.userRole as UserRoles,
+                  shift: values.shift as TutorShifts
+                };
+
+                try {
+                  await usersService.createUser(newUser);
+                } catch (error) {
+                  handleError(error);
+                }
+                actions.resetForm();
+                role.userRole === UserRoles.learner && setnewLearnerEmail(values.email);
+                await role.getUser();
+              } else {
+                throw new Error('Submit called without values');
               }
-              actions.resetForm();
-              role.userRole === UserRoles.learner && setnewLearnerEmail(values.email);
-              await role.getUser();
             }}
           >
             {(props: FormikProps<IFormikValues>) => {
