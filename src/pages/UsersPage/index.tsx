@@ -233,7 +233,7 @@ const UsersPage = () => {
 
       const newUserSchema = Yup.object().shape({
         displayName: Yup.string()
-          .min(3, 'displayName too short')
+          .min(2, 'displayName too short')
           .max(25, 'displayName too long')
           .required('DisplayName is required'),
         email: Yup.string()
