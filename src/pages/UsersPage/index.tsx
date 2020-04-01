@@ -23,7 +23,11 @@ import {
   TableFooter,
   TablePagination,
   Select,
-  MenuItem
+  MenuItem,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  DialogActions
 } from '@material-ui/core';
 import { Formik, FormikProps, FieldProps, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -31,6 +35,7 @@ import { UserRoles, TutorShifts } from '../../@types/enums';
 import AssignTutorsDialog from './AssignTutorsDialog';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 import { handleError } from '../../helpers/handleError';
+import { AxiosResponse } from 'axios';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -54,6 +59,12 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
     },
     helperTextSpacer: {
       height: 20
+    },
+    deleteButton: {
+      color: palette.error.main
+    },
+    highlightSpan: {
+      color: palette.secondary.main
     }
   })
 );
@@ -120,6 +131,7 @@ const UsersPage = () => {
   const [newLearnerEmail, setnewLearnerEmail] = useState<string>('');
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [emailForPasswordReset, setEmailForPasswordReset] = useState<string>('');
 
   const fetchTutors = async () => {
     await usersService.getTutors(dispatch);
@@ -144,6 +156,19 @@ const UsersPage = () => {
   useEffect(() => {
     fetchTutors();
   }, []);
+
+  const handlePasswordReset = async (email: string) => {
+    const response: AxiosResponse | undefined = await usersService.resetPassword(email);
+
+    if (response && response.status === 200) {
+      alert(`${response.data.status}. ${response.data.message}`);
+    } else {
+      alert('Password NOT reset. Something went wrong');
+      console.log('response', response);
+    }
+
+    setEmailForPasswordReset('');
+  };
 
   const generateTable = () => {
     if (state.learners && state.partners && state.tutors) {
@@ -308,6 +333,7 @@ const UsersPage = () => {
                             </TableCell>
                           )}
                           <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
+                          <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -383,7 +409,7 @@ const UsersPage = () => {
                               );
                             }}
                           </Field>
-
+                          <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                           <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                         </TableRow>
                         {role.rows.map((user: any) => (
@@ -395,8 +421,19 @@ const UsersPage = () => {
                             <TableCell align="center">
                               <Button
                                 color="secondary"
+                                onClick={() => setEmailForPasswordReset(user.email)}
+                                data-test="reset-password-button"
+                                size="small"
+                              >
+                                RESET PASSWORD
+                              </Button>
+                            </TableCell>
+                            <TableCell align="center">
+                              <Button
+                                classes={{ root: classes.deleteButton }}
                                 onClick={() => handleDelete(user.id, role.userRole)}
                                 data-test="add-user-button"
+                                size="small"
                               >
                                 DELETE
                               </Button>
@@ -442,6 +479,23 @@ const UsersPage = () => {
           <Tab label="Tutors" />
         </Tabs>
       </div>
+      {!!emailForPasswordReset && (
+        <Dialog open={!!emailForPasswordReset} onClose={() => setEmailForPasswordReset('')}>
+          <DialogTitle>Reset Password?</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to reset <span className={classes.highlightSpan}>{emailForPasswordReset}</span>'s
+              password?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setEmailForPasswordReset('')}>CANCEL</Button>
+            <Button color="secondary" variant="contained" onClick={() => handlePasswordReset(emailForPasswordReset)}>
+              RESET
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
       {state.learners && state.partners && state.tutors && generateTable()}
     </usersContext.Provider>
   );
