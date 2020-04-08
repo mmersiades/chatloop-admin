@@ -9,7 +9,7 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
 } from '@material-ui/core';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -21,20 +21,20 @@ const useStyles = makeStyles(({ mixins, palette }: Theme) =>
     drawerHeader: {
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'flex-end'
+      justifyContent: 'flex-end',
     },
     drawerPaper: {
       width: 200,
-      flexShrink: 0
+      flexShrink: 0,
     },
     menuNavbar: {
       backgroundColor: palette.common.white,
       color: palette.grey[600],
-      shadow: 'none'
+      shadow: 'none',
     },
     selectedItem: {
-      color: palette.secondary.main
-    }
+      color: palette.secondary.main,
+    },
   })
 );
 
@@ -72,6 +72,14 @@ const MenuDrawer: FC<IMenuDrawerProps> = ({ showMenuDrawer, setShowMenuDrawer })
           to={{ pathname: '/users', state: 'Manage Users' }}
         >
           <ListItemText primary="Users" />
+        </ListItem>
+        <ListItem
+          classes={location.pathname === '/invites' ? { root: classes.selectedItem } : {}}
+          button
+          component={Link}
+          to={{ pathname: '/invites', state: 'Manage Invites' }}
+        >
+          <ListItemText primary="Invites" />
         </ListItem>
       </List>
       <Divider />

@@ -5,7 +5,7 @@ export const local = 'http://localhost:8080';
 export const baseUrl = {
   production,
   staging,
-  local
+  local,
 };
 
 export default baseUrl.production;
