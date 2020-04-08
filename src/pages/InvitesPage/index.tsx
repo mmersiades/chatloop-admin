@@ -143,7 +143,7 @@ const InvitesPage: FC = () => {
           <div className={classes.queueContainer}>
             <List classes={{ root: classes.list }}>
               <ListItem>
-                <ListItemText primary="Refresh queue" />
+                <ListItemText primary="Partner Queue" />
                 <ListItemSecondaryAction>
                   <Button variant="contained" color="secondary" onClick={() => fetchQueue()}>
                     {fetchingQueue ? (
