@@ -12,17 +12,17 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
       height: 'calc(100% - 48px)',
       transition: transitions.create(['margin', 'width'], {
         easing: transitions.easing.sharp,
-        duration: transitions.duration.leavingScreen
-      })
+        duration: transitions.duration.leavingScreen,
+      }),
     },
     contentContainerShift: {
-      width: `calc(100% - 200px)`,
-      marginLeft: 200,
+      width: `calc(100% - 150px)`,
+      marginLeft: 150,
       transition: transitions.create(['margin', 'width'], {
         easing: transitions.easing.easeOut,
-        duration: transitions.duration.enteringScreen
-      })
-    }
+        duration: transitions.duration.enteringScreen,
+      }),
+    },
   })
 );
 
@@ -40,8 +40,8 @@ const withNavbar = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         <Grid
           classes={{
             root: clsx(classes.contentContainer, {
-              [classes.contentContainerShift]: showMenuDrawer
-            })
+              [classes.contentContainerShift]: showMenuDrawer,
+            }),
           }}
           container
           alignItems="center"

@@ -24,7 +24,7 @@ const useStyles = makeStyles(({ mixins, palette }: Theme) =>
       justifyContent: 'flex-end',
     },
     drawerPaper: {
-      width: 200,
+      width: 150,
       flexShrink: 0,
     },
     menuNavbar: {

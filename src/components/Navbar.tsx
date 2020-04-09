@@ -8,29 +8,29 @@ import connectedUrl from '../serverUrls';
 const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   createStyles({
     toolbar: {
-      minHeight: 48
+      minHeight: 48,
     },
     appbar: {
       backgroundColor: palette.common.black,
       transition: transitions.create(['margin', 'width'], {
         easing: transitions.easing.sharp,
-        duration: transitions.duration.leavingScreen
-      })
+        duration: transitions.duration.leavingScreen,
+      }),
     },
     appbarShift: {
-      width: `calc(100% - 200px)`,
-      marginLeft: 200,
+      width: `calc(100% - 150px)`,
+      marginLeft: 150,
       transition: transitions.create(['margin', 'width'], {
         easing: transitions.easing.easeOut,
-        duration: transitions.duration.enteringScreen
-      })
+        duration: transitions.duration.enteringScreen,
+      }),
     },
     menuButton: {
-      marginRight: spacing(2)
+      marginRight: spacing(2),
     },
     hide: {
-      display: 'none'
-    }
+      display: 'none',
+    },
   })
 );
 
@@ -50,8 +50,8 @@ const Navbar: FC<INavbarProps> = ({ showMenuDrawer, setShowMenuDrawer }: INavbar
       <AppBar
         classes={{
           root: clsx(classes.appbar, {
-            [classes.appbarShift]: showMenuDrawer
-          })
+            [classes.appbarShift]: showMenuDrawer,
+          }),
         }}
       >
         <Toolbar variant="dense">
