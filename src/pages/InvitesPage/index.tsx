@@ -280,7 +280,7 @@ const InvitesPage: FC = () => {
             <ListItem>
               <ListItemText primary="Invites" />
               <ListItemSecondaryAction>
-                <RefreshButton handleClick={fetchInvites} isRefreshing={isFetchingQueue} />
+                <RefreshButton handleClick={fetchInvites} isRefreshing={isFetchingInvites} />
               </ListItemSecondaryAction>
             </ListItem>
             <Divider />
