@@ -27,7 +27,7 @@ import {
   DialogTitle,
   DialogContent,
   Typography,
-  DialogActions
+  DialogActions,
 } from '@material-ui/core';
 import { Formik, FormikProps, FieldProps, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -41,31 +41,31 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
     tabs: {
       position: 'absolute',
-      width: 'calc(100vw - 200px)',
+      width: 'calc(100vw - 150px)',
       top: 48,
-      backgroundColor: palette.common.white
+      backgroundColor: palette.common.white,
     },
     tableContainer: {
       marginTop: spacing(2),
       marginBottom: spacing(2),
       maxHeight: 'calc(100vh - 160px)',
-      overflow: 'none'
+      overflow: 'none',
     },
     tableHead: {
-      backgroundColor: palette.primary.main
+      backgroundColor: palette.primary.main,
     },
     tableCell: {
-      color: palette.common.white
+      color: palette.common.white,
     },
     helperTextSpacer: {
-      height: 20
+      height: 20,
     },
     deleteButton: {
-      color: palette.error.main
+      color: palette.error.main,
     },
     highlightSpan: {
-      color: palette.secondary.main
-    }
+      color: palette.secondary.main,
+    },
   })
 );
 
@@ -108,7 +108,7 @@ interface IRoleParams {
 const usersReducerInitialState: usersState = {
   learners: [],
   partners: [],
-  tutors: []
+  tutors: [],
 };
 
 const usersReducer = (state: usersState, action: usersAction) => {
@@ -175,7 +175,7 @@ const UsersPage = () => {
       const formikInitialValues: IFormikValues = {
         email: '',
         displayName: '',
-        shift: ''
+        shift: '',
       };
 
       const handleChangePage = (event: any, newPage: any) => {
@@ -212,7 +212,7 @@ const UsersPage = () => {
         getUser: () => {},
         action: '',
         count: 0,
-        rows: []
+        rows: [],
       };
       switch (tab) {
         case 0:
@@ -225,7 +225,7 @@ const UsersPage = () => {
             rows:
               rowsPerPage > 0
                 ? state.learners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : state.learners
+                : state.learners,
           };
           break;
         case 1:
@@ -238,7 +238,7 @@ const UsersPage = () => {
             rows:
               rowsPerPage > 0
                 ? state.partners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : state.partners
+                : state.partners,
           };
           break;
         case 2:
@@ -249,7 +249,7 @@ const UsersPage = () => {
             action: 'SET_TUTORS',
             count: state.tutors.length,
             rows:
-              rowsPerPage > 0 ? state.tutors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : state.tutors
+              rowsPerPage > 0 ? state.tutors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : state.tutors,
           };
           break;
         default:
@@ -261,15 +261,11 @@ const UsersPage = () => {
           .min(2, 'displayName too short')
           .max(25, 'displayName too long')
           .required('DisplayName is required'),
-        email: Yup.string()
-          .email('Invalid email')
-          .required('Email is required'),
+        email: Yup.string().email('Invalid email').required('Email is required'),
         shift:
           role.userRole === UserRoles.tutor
-            ? Yup.string()
-                .oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
-                .required('Shift must be selected')
-            : Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
+            ? Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift').required('Shift must be selected')
+            : Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift'),
       });
 
       return (
@@ -293,7 +289,7 @@ const UsersPage = () => {
                   email: values.email,
                   displayName: values.displayName,
                   userRole: role.userRole as UserRoles,
-                  shift: values.shift as TutorShifts
+                  shift: values.shift as TutorShifts,
                 };
 
                 try {
