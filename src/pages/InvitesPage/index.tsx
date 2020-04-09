@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, useReducer } from 'react';
+import React, { FC, useEffect, useState, useReducer, useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
 import moment from 'moment';
 import withNavbar from '../../components/WithNavbar';
@@ -15,22 +15,31 @@ import {
   ListItemSecondaryAction,
   Button,
   CircularProgress,
+  Typography,
+  Card,
+  CardContent,
 } from '@material-ui/core';
 import invitesContext from '../../contexts/invitesContext';
+import clsx from 'clsx';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
-    queueContainer: {
+    // LAYOUT
+    listContainer: {
       backgroundColor: '#fff',
       height: 'calc(100vh - 50px)',
     },
-    list: {
-      padding: 'none',
+    invitesContainer: {
+      padding: spacing(2),
+    },
+    subListContainer: {
+      padding: 0,
     },
     queue: {
       overflow: 'auto',
       height: 'calc(100vh - 100px)',
     },
+    // STYLING
     spinner: {
       color: '#fff',
       marginTop: spacing(0.5),
@@ -38,15 +47,39 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
       marginRight: spacing(2.75),
       marginLeft: spacing(2.75),
     },
+    partnerId: {
+      color: palette.grey[400],
+    },
+    invitesHeader: {
+      backgroundColor: '#fff',
+      borderLeft: `1px solid ${palette.grey[50]}`,
+      borderRight: `1px solid ${palette.grey[50]}`,
+    },
   })
 );
 
 interface IPartnerInQueue {
   id: number;
   displayName: string;
-  currentNumberOfActivites: number;
+  currentNumberOfActivities: number;
   maxNumberOfActivities: number;
   lastChatFinished: string;
+}
+
+interface IRefreshButtonProps {
+  isRefreshing: boolean;
+  handleClick: () => void;
+}
+
+interface IPrimaryPartnerListText {
+  id: number;
+  displayName: string;
+}
+
+interface ISecondaryPartnerListTextProps {
+  duration: { days: () => number; hours: () => number };
+  currentActivities: number;
+  maxActivities: number;
 }
 
 type invitesState = {
@@ -120,38 +153,102 @@ const invitesReducer = (state: invitesState, action: invitesAction) => {
 };
 
 const InvitesPage: FC = () => {
-  const [fetchingQueue, setFetchingQueue] = useState<boolean>(true);
+  const [isFetchingQueue, setIsFetchingQueue] = useState<boolean>(true);
+  const [isFetchingStats, setIsFetchingStats] = useState<boolean>(true);
+  const [isFetchingInvites, setIsFetchingInvites] = useState<boolean>(true);
   const [state, dispatch] = useReducer(invitesReducer, invitesReducerInitialState);
 
   const classes = useStyles();
 
-  const fetchQueue = async () => {
-    setFetchingQueue(true);
-    const partnerQueue = await invitesService.getPartnerQueue();
-    dispatch({ type: 'SET_QUEUE', payload: partnerQueue });
-    setFetchingQueue(false);
-  };
+  /**
+   * Adds a 1s delay in fetching so Users can see the refresh,
+   * even on really fast networks
+   */
+  const wait = async () =>
+    new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+  const fetchQueue = useCallback(async () => {
+    setIsFetchingQueue(true);
+    const partnerQueue = await Promise.all([invitesService.getPartnerQueue(), wait()]);
+    dispatch({ type: 'SET_QUEUE', payload: partnerQueue[0] as invitesState });
+    setIsFetchingQueue(false);
+  }, []);
+
+  const fetchInviteStats = useCallback(async () => {
+    setIsFetchingStats(true);
+    await wait();
+    setIsFetchingStats(false);
+  }, []);
+
+  const fetchInvites = useCallback(async () => {
+    setIsFetchingInvites(true);
+    await wait();
+    setIsFetchingInvites(false);
+  }, []);
 
   useEffect(() => {
     fetchQueue();
-  }, []);
+  }, [fetchQueue]);
+
+  useEffect(() => {
+    fetchInviteStats();
+  }, [fetchInviteStats]);
+
+  useEffect(() => {
+    fetchInvites();
+  }, [fetchInvites]);
+
+  const RefreshButton: FC<IRefreshButtonProps> = ({ handleClick, isRefreshing }) => (
+    <Button variant="text" color="secondary" onClick={() => handleClick()}>
+      {isRefreshing ? <CircularProgress classes={{ root: classes.spinner }} size="1rem" thickness={2.4} /> : 'REFRESH'}
+    </Button>
+  );
+
+  const PrimaryPartnerListText: FC<IPrimaryPartnerListText> = ({ id, displayName }) => (
+    <Typography variant="body1" color="primary">
+      <span className={classes.partnerId}>{`[${id}] `}</span>
+      <strong>{displayName}</strong>
+    </Typography>
+  );
+
+  const SecondaryPartnerListText: FC<ISecondaryPartnerListTextProps> = ({
+    duration,
+    currentActivities,
+    maxActivities,
+  }) => (
+    <Grid container>
+      <Grid item xs={12}>
+        <Typography variant="caption">{`Waiting: ${duration.days()} ${
+          duration.days() === 1 ? 'day' : 'days'
+        } and ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="caption">
+          Current activities: <strong>{currentActivities}</strong>
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="caption">
+          Max activities: <strong>{maxActivities}</strong>
+        </Typography>
+      </Grid>
+    </Grid>
+  );
+
+  const inviteArray = [{ title: 'Invite 1' }, { title: 'Invite 2' }, { title: 'Invite 3' }];
 
   return (
     <invitesContext.Provider value={state}>
       <Grid container>
         <Grid item xs={3}>
-          <div className={classes.queueContainer}>
-            <List classes={{ root: classes.list }}>
+          <div className={classes.listContainer}>
+            <List classes={{ root: classes.subListContainer }}>
               <ListItem>
                 <ListItemText primary="Partner Queue" />
                 <ListItemSecondaryAction>
-                  <Button variant="contained" color="secondary" onClick={() => fetchQueue()}>
-                    {fetchingQueue ? (
-                      <CircularProgress classes={{ root: classes.spinner }} size="1rem" thickness={2.4} />
-                    ) : (
-                      'REFRESH'
-                    )}
-                  </Button>
+                  <RefreshButton handleClick={fetchQueue} isRefreshing={isFetchingQueue} />
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
@@ -161,10 +258,15 @@ const InvitesPage: FC = () => {
                   return (
                     <ListItem key={uuid()}>
                       <ListItemText
-                        primary={partner.displayName}
-                        secondary={`Waiting: ${duration.days()} ${
-                          duration.days() === 1 ? 'day' : 'days'
-                        } and ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}
+                        disableTypography
+                        primary={<PrimaryPartnerListText id={partner.id} displayName={partner.displayName} />}
+                        secondary={
+                          <SecondaryPartnerListText
+                            duration={duration}
+                            currentActivities={partner.currentNumberOfActivities}
+                            maxActivities={partner.maxNumberOfActivities}
+                          />
+                        }
                       />
                     </ListItem>
                   );
@@ -173,8 +275,43 @@ const InvitesPage: FC = () => {
             </List>
           </div>
         </Grid>
-        <Grid item xs={9}>
-          <p>hoo</p>
+        <Grid item xs={6}>
+          <List classes={{ root: clsx(classes.subListContainer, classes.invitesHeader) }}>
+            <ListItem>
+              <ListItemText primary="Invites" />
+              <ListItemSecondaryAction>
+                <RefreshButton handleClick={fetchInvites} isRefreshing={isFetchingQueue} />
+              </ListItemSecondaryAction>
+            </ListItem>
+            <Divider />
+          </List>
+          <Grid classes={{ root: classes.invitesContainer }} container spacing={2} justify="space-evenly">
+            {inviteArray.map((invite) => (
+              <Grid key={uuid()} item xs={4}>
+                <Card>
+                  <CardContent>
+                    <Typography>{invite.title}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+        <Grid item xs={3}>
+          <div className={classes.listContainer}>
+            <List classes={{ root: classes.subListContainer }}>
+              <ListItem>
+                <ListItemText primary="Invite Statistics" />
+                <ListItemSecondaryAction>
+                  <RefreshButton handleClick={fetchInviteStats} isRefreshing={isFetchingStats} />
+                </ListItemSecondaryAction>
+              </ListItem>
+              <Divider />
+              <ListItem>
+                <ListItemText primary="Add stats here" />
+              </ListItem>
+            </List>
+          </div>
         </Grid>
       </Grid>
     </invitesContext.Provider>
