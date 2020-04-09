@@ -237,12 +237,19 @@ const InvitesPage: FC = () => {
     </Grid>
   );
 
-  const inviteArray = [{ title: 'Invite 1' }, { title: 'Invite 2' }, { title: 'Invite 3' }];
+  const inviteArray = [
+    { title: 'Invite 1' },
+    { title: 'Invite 2' },
+    { title: 'Invite 3' },
+    { title: 'Invite 4' },
+    { title: 'Invite 5' },
+    { title: 'Invite 6' },
+  ];
 
   return (
     <invitesContext.Provider value={state}>
       <Grid container>
-        <Grid item xs={3}>
+        <Grid item xs={3} lg={2}>
           <div className={classes.listContainer}>
             <List classes={{ root: classes.subListContainer }}>
               <ListItem>
@@ -275,7 +282,7 @@ const InvitesPage: FC = () => {
             </List>
           </div>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} lg={8}>
           <List classes={{ root: clsx(classes.subListContainer, classes.invitesHeader) }}>
             <ListItem>
               <ListItemText primary="Invites" />
@@ -287,7 +294,7 @@ const InvitesPage: FC = () => {
           </List>
           <Grid classes={{ root: classes.invitesContainer }} container spacing={2} justify="space-evenly">
             {inviteArray.map((invite) => (
-              <Grid key={uuid()} item xs={4}>
+              <Grid key={uuid()} item xs={6} md={4} lg={3}>
                 <Card>
                   <CardContent>
                     <Typography>{invite.title}</Typography>
@@ -297,7 +304,7 @@ const InvitesPage: FC = () => {
             ))}
           </Grid>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={3} lg={2}>
           <div className={classes.listContainer}>
             <List classes={{ root: classes.subListContainer }}>
               <ListItem>
