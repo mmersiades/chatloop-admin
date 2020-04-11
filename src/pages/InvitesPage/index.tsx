@@ -264,71 +264,75 @@ const InvitesPage: FC = () => {
           </List>
           <div className={classes.queue}>
             <Grid classes={{ root: classes.invitesContainer }} container spacing={2} justify="space-evenly">
-              {state.invites?.content.map((invite: IInvite) => (
-                <Grid key={uuid()} item xs={6} md={6} lg={4}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="body1" color="primary">
-                        <span className={classes.partnerId}>{`[${invite.id}] `}</span>
-                        <strong>{invite.topic}</strong>
-                      </Typography>
-                      <Divider />
-                      <List dense disablePadding>
-                        <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
-                          <ListItemText
-                            disableTypography
-                            primary={
-                              <InviteUser
-                                designation="L"
-                                id={invite.learner.id}
-                                displayName={invite.learner.displayName}
-                              />
-                            }
-                            secondary={
-                              <Capacity
-                                maxActivities={invite.learner.maxNumberOfActivities}
-                                currentActivities={invite.learner.currentNumberOfActivities}
-                              />
-                            }
-                          />
-                        </ListItem>
-                        {invite.partners.map((partner: IPartnerInQueue) => {
-                          const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
-                          return (
-                            <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
-                              <ListItemText
-                                disableTypography
-                                primary={
-                                  <InviteUser designation="P" id={partner.id} displayName={partner.displayName} />
-                                }
-                                secondary={
-                                  <Grid container justify="space-between">
-                                    <Capacity
-                                      maxActivities={partner.maxNumberOfActivities}
-                                      currentActivities={partner.currentNumberOfActivities}
-                                    />
+              {state.invites?.content.length === 0 ? (
+                <p>No invites</p>
+              ) : (
+                state.invites?.content.map((invite: IInvite) => (
+                  <Grid key={uuid()} item xs={6} md={6} lg={4}>
+                    <Card>
+                      <CardContent>
+                        <Typography variant="body1" color="primary">
+                          <span className={classes.partnerId}>{`[${invite.id}] `}</span>
+                          <strong>{invite.topic}</strong>
+                        </Typography>
+                        <Divider />
+                        <List dense disablePadding>
+                          <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                            <ListItemText
+                              disableTypography
+                              primary={
+                                <InviteUser
+                                  designation="L"
+                                  id={invite.learner.id}
+                                  displayName={invite.learner.displayName}
+                                />
+                              }
+                              secondary={
+                                <Capacity
+                                  maxActivities={invite.learner.maxNumberOfActivities}
+                                  currentActivities={invite.learner.currentNumberOfActivities}
+                                />
+                              }
+                            />
+                          </ListItem>
+                          {invite.partners.map((partner: IPartnerInQueue) => {
+                            const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
+                            return (
+                              <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                                <ListItemText
+                                  disableTypography
+                                  primary={
+                                    <InviteUser designation="P" id={partner.id} displayName={partner.displayName} />
+                                  }
+                                  secondary={
+                                    <Grid container justify="space-between">
+                                      <Capacity
+                                        maxActivities={partner.maxNumberOfActivities}
+                                        currentActivities={partner.currentNumberOfActivities}
+                                      />
 
-                                    <Typography variant="caption">
-                                      W:
-                                      <strong>{` ${duration.days()} ${
-                                        duration.days() === 1 ? 'day' : 'days'
-                                      }, ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</strong>
-                                    </Typography>
-                                  </Grid>
-                                }
-                              />
-                            </ListItem>
-                          );
-                        })}
-                      </List>
-                      <Divider />
-                      <Typography>
-                        Expires: <strong>{moment(invite.sentOn).toNow()}</strong>
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+                                      <Typography variant="caption">
+                                        W:
+                                        <strong>{` ${duration.days()} ${
+                                          duration.days() === 1 ? 'day' : 'days'
+                                        }, ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</strong>
+                                      </Typography>
+                                    </Grid>
+                                  }
+                                />
+                              </ListItem>
+                            );
+                          })}
+                        </List>
+                        <Divider />
+                        <Typography>
+                          Expires: <strong>{moment(invite.sentOn).toNow()}</strong>
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
+              )}
             </Grid>
           </div>
         </Grid>
