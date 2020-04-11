@@ -16,8 +16,22 @@ const getPartnerQueue = async () => {
   }
 };
 
+const getInvites = async () => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  try {
+    const response: AxiosResponse = await apiChatloopOrg.get('/rest/admin/invites/', requestOptions);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 const invitesService = {
   getPartnerQueue,
+  getInvites,
 };
 
 export default invitesService;

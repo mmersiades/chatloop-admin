@@ -23,6 +23,7 @@ import {
 import invitesContext from '../../contexts/invitesContext';
 import clsx from 'clsx';
 import appPropertiesContext from '../../contexts/appPropertiesContext';
+import { IPartnerInQueue, IPageable, IInvite } from '../../@types/interfaces';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -56,16 +57,12 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
       borderLeft: `1px solid ${palette.grey[50]}`,
       borderRight: `1px solid ${palette.grey[50]}`,
     },
+    noPadding: {
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
   })
 );
-
-interface IPartnerInQueue {
-  id: number;
-  displayName: string;
-  currentNumberOfActivities: number;
-  maxNumberOfActivities: number;
-  lastChatFinished: string;
-}
 
 interface IRefreshButtonProps {
   isRefreshing: boolean;
@@ -83,73 +80,39 @@ interface ISecondaryPartnerListTextProps {
   maxActivities: number;
 }
 
+interface IInviteUser {
+  designation: 'L' | 'P';
+  id: number;
+  displayName: string;
+}
+
+interface ICapacity {
+  maxActivities: number;
+  currentActivities: number;
+}
+
 type invitesState = {
-  content: Array<IPartnerInQueue>;
-  pageable: {
-    sort: {
-      sorted: boolean;
-      unsorted: boolean;
-      empty: boolean;
-    };
-    pageSize: number;
-    pageNumber: number;
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
-  };
-  last: boolean;
-  totalPages: number;
-  totalElement: number;
-  sort: {
-    sorted: boolean;
-    unsorted: boolean;
-    empty: boolean;
-  };
-  first: boolean;
-  number: number;
-  numberOfElements: number;
-  size: number;
-  empty: boolean;
+  partnersQueue?: IPageable<Array<IPartnerInQueue>>;
+  invites?: IPageable<Array<IInvite>>;
 };
 
-type invitesAction = {
-  type: 'SET_QUEUE';
-  payload: invitesState;
-};
+type invitesAction =
+  | {
+      type: 'SET_QUEUE';
+      payload: IPageable<Array<IPartnerInQueue>>;
+    }
+  | { type: 'SET_INVITES'; payload: IPageable<Array<IInvite>> };
 
-const invitesReducerInitialState: invitesState = {
-  content: [],
-  pageable: {
-    sort: {
-      sorted: false,
-      unsorted: false,
-      empty: false,
-    },
-    pageSize: 0,
-    pageNumber: 0,
-    offset: 0,
-    paged: false,
-    unpaged: false,
-  },
-  last: false,
-  totalPages: 0,
-  totalElement: 0,
-  sort: {
-    sorted: false,
-    unsorted: false,
-    empty: false,
-  },
-  first: false,
-  number: 0,
-  numberOfElements: 0,
-  size: 0,
-  empty: false,
-};
+const invitesReducerInitialState: invitesState = {};
 
 const invitesReducer = (state: invitesState, action: invitesAction) => {
   switch (action.type) {
     case 'SET_QUEUE':
-      return { ...state, ...action.payload };
+      return { ...state, partnersQueue: action.payload };
+    case 'SET_INVITES':
+      return { ...state, invites: action.payload };
+    default:
+      return state;
   }
 };
 
@@ -173,7 +136,7 @@ const InvitesPage: FC = () => {
   const fetchQueue = useCallback(async () => {
     setIsFetchingQueue(true);
     const partnerQueue = await Promise.all([invitesService.getPartnerQueue(), wait()]);
-    dispatch({ type: 'SET_QUEUE', payload: partnerQueue[0] as invitesState });
+    dispatch({ type: 'SET_QUEUE', payload: partnerQueue[0] as IPageable<Array<IPartnerInQueue>> });
     setIsFetchingQueue(false);
   }, []);
 
@@ -185,7 +148,8 @@ const InvitesPage: FC = () => {
 
   const fetchInvites = useCallback(async () => {
     setIsFetchingInvites(true);
-    await wait();
+    const invites = await Promise.all([invitesService.getInvites(), wait()]);
+    dispatch({ type: 'SET_INVITES', payload: invites[0] as IPageable<Array<IInvite>> });
     setIsFetchingInvites(false);
   }, []);
 
@@ -238,14 +202,19 @@ const InvitesPage: FC = () => {
     </Grid>
   );
 
-  const inviteArray = [
-    { title: 'Invite 1' },
-    { title: 'Invite 2' },
-    { title: 'Invite 3' },
-    { title: 'Invite 4' },
-    { title: 'Invite 5' },
-    { title: 'Invite 6' },
-  ];
+  const InviteUser: FC<IInviteUser> = ({ designation, id, displayName }) => (
+    <Typography variant="body1" color="primary">
+      <span className={classes.partnerId}>{`[${designation}-${id}] `}</span>
+      <strong>{displayName}</strong>
+    </Typography>
+  );
+
+  const Capacity: FC<ICapacity> = ({ maxActivities, currentActivities }) => (
+    <Typography variant="caption">
+      Capacity:
+      <strong>{` ${maxActivities - currentActivities}`}</strong>
+    </Typography>
+  );
 
   return (
     <invitesContext.Provider value={state}>
@@ -261,7 +230,7 @@ const InvitesPage: FC = () => {
               </ListItem>
               <Divider />
               <div className={classes.queue}>
-                {state.content.map((partner) => {
+                {state.partnersQueue?.content.map((partner: IPartnerInQueue) => {
                   const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
                   return (
                     <ListItem key={uuid()}>
@@ -293,17 +262,75 @@ const InvitesPage: FC = () => {
             </ListItem>
             <Divider />
           </List>
-          <Grid classes={{ root: classes.invitesContainer }} container spacing={2} justify="space-evenly">
-            {inviteArray.map((invite) => (
-              <Grid key={uuid()} item xs={6} md={4} lg={3}>
-                <Card>
-                  <CardContent>
-                    <Typography>{invite.title}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+          <div className={classes.queue}>
+            <Grid classes={{ root: classes.invitesContainer }} container spacing={2} justify="space-evenly">
+              {state.invites?.content.map((invite: IInvite) => (
+                <Grid key={uuid()} item xs={6} md={6} lg={4}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="body1" color="primary">
+                        <span className={classes.partnerId}>{`[${invite.id}] `}</span>
+                        <strong>{invite.topic}</strong>
+                      </Typography>
+                      <Divider />
+                      <List dense disablePadding>
+                        <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                          <ListItemText
+                            disableTypography
+                            primary={
+                              <InviteUser
+                                designation="L"
+                                id={invite.learner.id}
+                                displayName={invite.learner.displayName}
+                              />
+                            }
+                            secondary={
+                              <Capacity
+                                maxActivities={invite.learner.maxNumberOfActivities}
+                                currentActivities={invite.learner.currentNumberOfActivities}
+                              />
+                            }
+                          />
+                        </ListItem>
+                        {invite.partners.map((partner: IPartnerInQueue) => {
+                          const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
+                          return (
+                            <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                              <ListItemText
+                                disableTypography
+                                primary={
+                                  <InviteUser designation="P" id={partner.id} displayName={partner.displayName} />
+                                }
+                                secondary={
+                                  <Grid container justify="space-between">
+                                    <Capacity
+                                      maxActivities={partner.maxNumberOfActivities}
+                                      currentActivities={partner.currentNumberOfActivities}
+                                    />
+
+                                    <Typography variant="caption">
+                                      W:
+                                      <strong>{` ${duration.days()} ${
+                                        duration.days() === 1 ? 'day' : 'days'
+                                      }, ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</strong>
+                                    </Typography>
+                                  </Grid>
+                                }
+                              />
+                            </ListItem>
+                          );
+                        })}
+                      </List>
+                      <Divider />
+                      <Typography>
+                        Expires: <strong>{moment(invite.sentOn).toNow()}</strong>
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </div>
         </Grid>
         <Grid item xs={3} lg={2}>
           <div className={classes.listContainer}>

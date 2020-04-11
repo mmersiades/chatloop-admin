@@ -29,3 +29,53 @@ export interface IApplicationProperty {
 export type appPropertiesState = {
   inviteExpiryInterval?: IApplicationProperty;
 };
+
+export interface IPartnerInQueue {
+  id: number;
+  displayName: string;
+  currentNumberOfActivities: number;
+  maxNumberOfActivities: number;
+  lastChatFinished: string;
+}
+
+export interface IInvite {
+  id: number;
+  learner: {
+    id: number;
+    displayName: string;
+    currentNumberOfActivities: number;
+    maxNumberOfActivities: number;
+  };
+  partners: Array<IPartnerInQueue>;
+  sentOn: string;
+  topic: string;
+}
+
+export type IPageable<T> = {
+  content: T;
+  pageable: {
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+      empty: boolean;
+    };
+    pageSize: number;
+    pageNumber: number;
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  last: boolean;
+  totalPages: number;
+  totalElement: number;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+  first: boolean;
+  number: number;
+  numberOfElements: number;
+  size: number;
+  empty: boolean;
+};
