@@ -2,6 +2,7 @@ import React, { useReducer, useEffect } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import AppRouter from '../routers/AppRouter';
 import appPropertiesContext from '../contexts/appPropertiesContext';
+import { IApplicationProperty, appPropertiesState } from '../@types/interfaces';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -14,15 +15,6 @@ const useStyles = makeStyles(() =>
     },
   })
 );
-
-interface IApplicationProperty {
-  value: number;
-  unit: string; // HOUR, HOURS, SECOND, SECONDS,
-}
-
-type appPropertiesState = {
-  inviteExpiryInterval?: IApplicationProperty;
-};
 
 type appPropertiesAction = { type: 'SET_INVITE_EXPIRY_INTERVAL'; payload: IApplicationProperty };
 

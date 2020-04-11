@@ -18,9 +18,11 @@ import {
   Typography,
   Card,
   CardContent,
+  ListSubheader,
 } from '@material-ui/core';
 import invitesContext from '../../contexts/invitesContext';
 import clsx from 'clsx';
+import appPropertiesContext from '../../contexts/appPropertiesContext';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -41,7 +43,6 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
     },
     // STYLING
     spinner: {
-      color: '#fff',
       marginTop: spacing(0.5),
       marginBottom: spacing(0.5),
       marginRight: spacing(2.75),
@@ -308,15 +309,26 @@ const InvitesPage: FC = () => {
           <div className={classes.listContainer}>
             <List classes={{ root: classes.subListContainer }}>
               <ListItem>
-                <ListItemText primary="Invite Statistics" />
+                <ListItemText primary="Numbers" />
                 <ListItemSecondaryAction>
                   <RefreshButton handleClick={fetchInviteStats} isRefreshing={isFetchingStats} />
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
-              <ListItem>
-                <ListItemText primary="Add stats here" />
-              </ListItem>
+              <ListSubheader>Invite Settings</ListSubheader>
+              <appPropertiesContext.Consumer>
+                {(value) => (
+                  <ListItem>
+                    <ListItemText
+                      primary="Invite expiry interval"
+                      secondary={`${value.inviteExpiryInterval?.value} ${
+                        value.inviteExpiryInterval?.unit === 'HOUR' ? 'hours' : 'seconds'
+                      }`}
+                    />
+                  </ListItem>
+                )}
+              </appPropertiesContext.Consumer>
+              <ListSubheader>Invite Statistics</ListSubheader>
             </List>
           </div>
         </Grid>
