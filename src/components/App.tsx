@@ -1,24 +1,64 @@
-import React from "react";
-import { makeStyles, createStyles } from "@material-ui/core";
-import AppRouter from "../routers/AppRouter";
+import React, { useReducer, useEffect } from 'react';
+import { makeStyles, createStyles } from '@material-ui/core';
+import AppRouter from '../routers/AppRouter';
+import appPropertiesContext from '../contexts/appPropertiesContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
     appContainer: {
-      position: "absolute",
+      position: 'absolute',
       left: 0,
       right: 0,
       top: 0,
-      bottom: 0
-    }
+      bottom: 0,
+    },
   })
 );
 
+interface IApplicationProperty {
+  value: number;
+  unit: string; // HOUR, HOURS, SECOND, SECONDS,
+}
+
+type appPropertiesState = {
+  inviteExpiryInterval?: IApplicationProperty;
+};
+
+type appPropertiesAction = { type: 'SET_INVITE_EXPIRY_INTERVAL'; payload: IApplicationProperty };
+
+const appPropertiesReducerInitialState: appPropertiesState = {};
+
+const appPropertiesReducer = (state: appPropertiesState, action: appPropertiesAction) => {
+  switch (action.type) {
+    case 'SET_INVITE_EXPIRY_INTERVAL':
+      return { ...state, inviteExpiryInterval: action.payload };
+    default:
+      return state;
+  }
+};
+
 const App = () => {
+  // ---------------------------------------- Setting up Material UI ----------------------------------------------- //
   const classes = useStyles();
+
+  // ------------------------------- Setting up application properies context -------------------------------------- //
+  const [state, dispatch] = useReducer(appPropertiesReducer, appPropertiesReducerInitialState);
+
+  // These payloads will be hardcoded for now, until we have endpoints for fetching them from the back-end
+  const setApplicationProperties = () => {
+    dispatch({ type: 'SET_INVITE_EXPIRY_INTERVAL', payload: { value: 3, unit: 'HOUR' } });
+  };
+
+  useEffect(() => {
+    setApplicationProperties();
+  }, []);
+
+  // ---------------------------------------- Rendering component ------------------------------------------------- //
   return (
     <div className={classes.appContainer}>
-      <AppRouter />
+      <appPropertiesContext.Provider value={state}>
+        <AppRouter />
+      </appPropertiesContext.Provider>
     </div>
   );
 };
