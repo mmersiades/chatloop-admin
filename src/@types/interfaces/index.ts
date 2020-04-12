@@ -23,7 +23,35 @@ export interface ITutor extends IUser {
 
 export interface IApplicationProperty {
   value: number;
-  unit: string; // HOUR, HOURS, SECOND, SECONDS,
+  /**
+   * Returned from back-end as Spring time units (eg HOURS, HOUR, SECOND),
+   * but should be converted to match Moment.js's units (moment.d.ts)
+   *  */
+  unit?:
+    | 'year'
+    | 'years'
+    | 'y'
+    | 'month'
+    | 'months'
+    | 'M'
+    | 'week'
+    | 'weeks'
+    | 'w'
+    | 'day'
+    | 'days'
+    | 'd'
+    | 'hour'
+    | 'hours'
+    | 'h'
+    | 'minute'
+    | 'minutes'
+    | 'm'
+    | 'second'
+    | 'seconds'
+    | 's'
+    | 'millisecond'
+    | 'milliseconds'
+    | 'ms';
 }
 
 export type appPropertiesState = {

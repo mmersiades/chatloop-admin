@@ -3,6 +3,7 @@ import { makeStyles, createStyles } from '@material-ui/core';
 import AppRouter from '../routers/AppRouter';
 import appPropertiesContext from '../contexts/appPropertiesContext';
 import { IApplicationProperty, appPropertiesState } from '../@types/interfaces';
+import baseURL from '../serverUrls';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -38,7 +39,14 @@ const App = () => {
 
   // These payloads will be hardcoded for now, until we have endpoints for fetching them from the back-end
   const setApplicationProperties = () => {
-    dispatch({ type: 'SET_INVITE_EXPIRY_INTERVAL', payload: { value: 3, unit: 'HOUR' } });
+    // This if statement allows application properties for local and staging environments
+    if (baseURL === 'https://api.chatloop.org') {
+      // For production environment
+      dispatch({ type: 'SET_INVITE_EXPIRY_INTERVAL', payload: { value: 3, unit: 'hours' } });
+    } else {
+      // For local and staging environments
+      dispatch({ type: 'SET_INVITE_EXPIRY_INTERVAL', payload: { value: 20, unit: 'seconds' } });
+    }
   };
 
   useEffect(() => {

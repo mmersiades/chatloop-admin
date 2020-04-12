@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState, useReducer, useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
 import moment from 'moment';
+import momentTZ from 'moment-timezone';
 import withNavbar from '../../components/WithNavbar';
 import invitesService from '../../services/invitesService';
 import {
@@ -325,9 +326,22 @@ const InvitesPage: FC = () => {
                           })}
                         </List>
                         <Divider />
-                        <Typography>
-                          Expires: <strong>{moment(invite.sentOn).toNow()}</strong>
-                        </Typography>
+                        <appPropertiesContext.Consumer>
+                          {(value) => {
+                            const expiration = momentTZ
+                              .utc(invite.sentOn)
+                              .tz(momentTZ.tz.guess())
+                              .add(value.inviteExpiryInterval?.value, value.inviteExpiryInterval?.unit)
+                              .format('ddd, h:mm:ss a');
+
+                            return (
+                              <Typography>
+                                Expires:
+                                <strong>{` ${expiration}`}</strong>
+                              </Typography>
+                            );
+                          }}
+                        </appPropertiesContext.Consumer>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -353,7 +367,7 @@ const InvitesPage: FC = () => {
                     <ListItemText
                       primary="Invite expiry interval"
                       secondary={`${value.inviteExpiryInterval?.value} ${
-                        value.inviteExpiryInterval?.unit === 'HOUR' ? 'hours' : 'seconds'
+                        value.inviteExpiryInterval?.unit === 'hours' ? 'hours' : 'seconds'
                       }`}
                     />
                   </ListItem>
