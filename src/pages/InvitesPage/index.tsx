@@ -19,11 +19,15 @@ import {
   Card,
   CardContent,
   ListSubheader,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from '@material-ui/core';
 import invitesContext from '../../contexts/invitesContext';
 import clsx from 'clsx';
 import appPropertiesContext from '../../contexts/appPropertiesContext';
 import { IPartnerInQueue, IPageable, IInvite } from '../../@types/interfaces';
+import { AxiosResponse } from 'axios';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -60,6 +64,9 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
     noPadding: {
       paddingLeft: 0,
       paddingRight: 0,
+    },
+    deleteButton: {
+      color: palette.error.dark,
     },
   })
 );
@@ -117,6 +124,10 @@ const invitesReducer = (state: invitesState, action: invitesAction) => {
 };
 
 const InvitesPage: FC = () => {
+  const [showConfirmInviteDelete, setShowConfirmInviteDelete] = useState<{ show: boolean; id: number | null }>({
+    show: false,
+    id: null,
+  });
   const [isFetchingQueue, setIsFetchingQueue] = useState<boolean>(true);
   const [isFetchingStats, setIsFetchingStats] = useState<boolean>(true);
   const [isFetchingInvites, setIsFetchingInvites] = useState<boolean>(true);
@@ -164,6 +175,21 @@ const InvitesPage: FC = () => {
   useEffect(() => {
     fetchInvites();
   }, [fetchInvites]);
+
+  const handleDeleteInvite = async (id: number) => {
+    const response: AxiosResponse | undefined = await invitesService.deleteInvite(id);
+    if (response) {
+      if (response.status === 200 && response.data === 'Invite-Deleted') {
+        fetchQueue();
+        fetchInvites();
+        fetchInviteStats();
+        alert(response.data);
+      } else {
+        alert(`failed to delete invite ${id}`);
+      }
+    }
+    setShowConfirmInviteDelete({ show: false, id: null });
+  };
 
   const RefreshButton: FC<IRefreshButtonProps> = ({ handleClick, isRefreshing }) => (
     <Button variant="text" color="secondary" onClick={() => handleClick()}>
@@ -216,9 +242,28 @@ const InvitesPage: FC = () => {
     </Typography>
   );
 
+  const ConfirmInviteDeleteDialog: FC = () => (
+    <Dialog open={showConfirmInviteDelete.show} onClose={() => setShowConfirmInviteDelete({ show: false, id: null })}>
+      <DialogContent>
+        <Typography>{`Are you sure you want to delete invite ${showConfirmInviteDelete.id}?`}</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setShowConfirmInviteDelete({ show: false, id: null })}>CANCEL</Button>
+        <Button
+          className={classes.deleteButton}
+          variant="outlined"
+          onClick={() => showConfirmInviteDelete.id && handleDeleteInvite(showConfirmInviteDelete.id)}
+        >
+          DELETE
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
   return (
     <invitesContext.Provider value={state}>
       <Grid container>
+        <ConfirmInviteDeleteDialog />
         <Grid item xs={3} lg={2}>
           <div className={classes.listContainer}>
             <List classes={{ root: classes.subListContainer }}>
@@ -325,9 +370,17 @@ const InvitesPage: FC = () => {
                           })}
                         </List>
                         <Divider />
-                        <Typography>
-                          Expires: <strong>{moment(invite.sentOn).toNow()}</strong>
-                        </Typography>
+                        <Grid container justify="space-between" alignItems="center">
+                          <Typography>
+                            Expires: <strong>{moment(invite.sentOn).toNow()}</strong>
+                          </Typography>
+                          <Button
+                            className={classes.deleteButton}
+                            onClick={() => setShowConfirmInviteDelete({ show: true, id: invite.id })}
+                          >
+                            DELETE
+                          </Button>
+                        </Grid>
                       </CardContent>
                     </Card>
                   </Grid>

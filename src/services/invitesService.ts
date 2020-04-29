@@ -39,7 +39,7 @@ const deleteInvite = async (id: number) => {
       `/rest/chatInvites/delete-invite/${id}`,
       requestOptions
     );
-    return response.data;
+    return response;
   } catch (error) {
     handleError(error);
   }
