@@ -23,12 +23,15 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
+  Collapse,
+  IconButton,
 } from '@material-ui/core';
 import invitesContext from '../../contexts/invitesContext';
 import clsx from 'clsx';
 import appPropertiesContext from '../../contexts/appPropertiesContext';
 import { IPartnerInQueue, IPageable, IInvite } from '../../@types/interfaces';
 import { AxiosResponse } from 'axios';
+import { ExpandMoreRounded, ExpandLessRounded } from '@material-ui/icons';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -129,6 +132,7 @@ const InvitesPage: FC = () => {
     show: false,
     id: null,
   });
+  const [expandedInvite, setexpandedInvite] = useState<number | null>();
   const [isFetchingQueue, setIsFetchingQueue] = useState<boolean>(true);
   const [isFetchingStats, setIsFetchingStats] = useState<boolean>(true);
   const [isFetchingInvites, setIsFetchingInvites] = useState<boolean>(true);
@@ -314,63 +318,77 @@ const InvitesPage: FC = () => {
                 <p>No invites</p>
               ) : (
                 state.invites?.content.map((invite: IInvite) => (
-                  <Grid key={uuid()} item xs={6} md={6} lg={4}>
+                  <Grid key={uuid()} item xs={12} md={12} lg={6}>
                     <Card>
                       <CardContent>
-                        <Typography variant="body1" color="primary">
-                          <span className={classes.partnerId}>{`[${invite.id}] `}</span>
-                          <strong>{invite.topic}</strong>
-                        </Typography>
+                        <Grid container justify="space-between" alignItems="center">
+                          <Typography variant="body1" color="primary">
+                            <span className={classes.partnerId}>{`[${invite.id}] `}</span>
+                            <strong>{invite.topic}</strong>
+                          </Typography>
+                          {invite.id === expandedInvite ? (
+                            <IconButton onClick={() => setexpandedInvite(null)} aria-label="show more">
+                              <ExpandLessRounded />
+                            </IconButton>
+                          ) : (
+                            <IconButton onClick={() => setexpandedInvite(invite.id)} aria-label="show more">
+                              <ExpandMoreRounded />
+                            </IconButton>
+                          )}
+                        </Grid>
                         <Divider />
-                        <List dense disablePadding>
-                          <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
-                            <ListItemText
-                              disableTypography
-                              primary={
-                                <InviteUser
-                                  designation="L"
-                                  id={invite.learner.id}
-                                  displayName={invite.learner.displayName}
-                                />
-                              }
-                              secondary={
-                                <Capacity
-                                  maxActivities={invite.learner.maxNumberOfActivities}
-                                  currentActivities={invite.learner.currentNumberOfActivities}
-                                />
-                              }
-                            />
-                          </ListItem>
-                          {invite.partners.map((partner: IPartnerInQueue) => {
-                            const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
-                            return (
-                              <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
-                                <ListItemText
-                                  disableTypography
-                                  primary={
-                                    <InviteUser designation="P" id={partner.id} displayName={partner.displayName} />
-                                  }
-                                  secondary={
-                                    <Grid container justify="space-between">
-                                      <Capacity
-                                        maxActivities={partner.maxNumberOfActivities}
-                                        currentActivities={partner.currentNumberOfActivities}
-                                      />
+                        <Collapse in={invite.id === expandedInvite} timeout="auto">
+                          <List dense disablePadding>
+                            <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                              <ListItemText
+                                disableTypography
+                                primary={
+                                  <InviteUser
+                                    designation="L"
+                                    id={invite.learner.id}
+                                    displayName={invite.learner.displayName}
+                                  />
+                                }
+                                secondary={
+                                  <Capacity
+                                    maxActivities={invite.learner.maxNumberOfActivities}
+                                    currentActivities={invite.learner.currentNumberOfActivities}
+                                  />
+                                }
+                              />
+                            </ListItem>
+                            {invite.partners.map((partner: IPartnerInQueue) => {
+                              const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
+                              return (
+                                <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                                  <ListItemText
+                                    disableTypography
+                                    primary={
+                                      <InviteUser designation="P" id={partner.id} displayName={partner.displayName} />
+                                    }
+                                    secondary={
+                                      <Grid container justify="space-between">
+                                        <Capacity
+                                          maxActivities={partner.maxNumberOfActivities}
+                                          currentActivities={partner.currentNumberOfActivities}
+                                        />
 
-                                      <Typography variant="caption">
-                                        W:
-                                        <strong>{` ${duration.days()} ${
-                                          duration.days() === 1 ? 'day' : 'days'
-                                        }, ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</strong>
-                                      </Typography>
-                                    </Grid>
-                                  }
-                                />
-                              </ListItem>
-                            );
-                          })}
-                        </List>
-                        <Divider />
+                                        <Typography variant="caption">
+                                          W:
+                                          <strong>{` ${duration.days()} ${
+                                            duration.days() === 1 ? 'day' : 'days'
+                                          }, ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</strong>
+                                        </Typography>
+                                      </Grid>
+                                    }
+                                  />
+                                </ListItem>
+                              );
+                            })}
+                          </List>
+                          <Divider />
+                        </Collapse>
+
                         <appPropertiesContext.Consumer>
                           {(value) => {
                             const expiration = momentTZ
