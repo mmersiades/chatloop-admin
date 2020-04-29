@@ -29,9 +29,26 @@ const getInvites = async () => {
   }
 };
 
+const deleteInvite = async (id: number) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  try {
+    const response: AxiosResponse = await apiChatloopOrg.delete(
+      `/rest/chatInvites/delete-invite/${id}`,
+      requestOptions
+    );
+    return response;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 const invitesService = {
   getPartnerQueue,
   getInvites,
+  deleteInvite,
 };
 
 export default invitesService;
