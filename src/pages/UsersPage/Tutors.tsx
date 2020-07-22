@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import UsersTable from './UsersTable';
 import { UserRoles } from '../../@types/enums';
+import UserDrawer from './UserDrawer';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -17,6 +18,7 @@ const Tutors: FC = () => {
   return (
     <div className={classes.tutorsContainer}>
       <UsersTable tableFor={UserRoles.tutor} />
+      <UserDrawer drawerFor={UserRoles.tutor} />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Formik, Form, Field, FieldProps } from 'formik';
 import {
   DialogTitle,
@@ -15,19 +15,14 @@ import { TutorShifts } from '../../@types/enums';
 import usersService from '../../services/usersService';
 import { useUsers } from '../../contexts/usersContext';
 
-interface AssignTutorProps {
-  newLearnerEmail: string;
-  setnewLearnerEmail: (email: string) => void;
-}
-
 interface AssignTutorValues {
   shiftOneTutor: number;
   shiftTwoTutor: number;
 }
 
-export const AssignTutorsDialog = ({ newLearnerEmail, setnewLearnerEmail }: AssignTutorProps) => {
+export const AssignTutorsDialog: FC = () => {
   // From UsersContext
-  const { learners, tutors } = useUsers();
+  const { learners, tutors, newLearnerEmail, setNewLearnerEmail } = useUsers();
 
   // Gets arrays of shift one and shift two Tutors
   const shiftOneTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
@@ -56,7 +51,7 @@ export const AssignTutorsDialog = ({ newLearnerEmail, setnewLearnerEmail }: Assi
           });
           if (response && response.status === 200) {
             actions.resetForm();
-            setnewLearnerEmail('');
+            setNewLearnerEmail('');
           } else {
             console.log('response', response);
           }

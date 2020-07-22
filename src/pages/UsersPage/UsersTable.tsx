@@ -18,19 +18,12 @@ import {
   MenuItem,
   TextField,
   TableHead,
-  Dialog,
   Paper,
   makeStyles,
   Theme,
   createStyles,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  DialogActions,
 } from '@material-ui/core';
-import AssignTutorsDialog from './AssignTutorsDialog';
 import { handleError } from '../../helpers/handleError';
-import { AxiosResponse } from 'axios';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 import clsx from 'clsx';
 import { useAppNav } from '../../contexts/appNavContext';
@@ -65,9 +58,6 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
     deleteButton: {
       color: palette.error.main,
     },
-    highlightSpan: {
-      color: palette.secondary.main,
-    },
   })
 );
 
@@ -93,8 +83,6 @@ interface RoleParams {
 const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   const classes = useStyles();
   const { showUserDrawer, setShowUserDrawer } = useAppNav();
-  // The email address of a newly added Learner. Used for adding Tutors to the new Learner
-  const [newLearnerEmail, setnewLearnerEmail] = useState<string>('');
 
   // The current table page (for table pagination)
   const [page, setPage] = React.useState(0);
@@ -102,10 +90,8 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   // The number of rows per table page (for table pagination)
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [emailForPasswordReset, setEmailForPasswordReset] = useState<string>('');
-
   // From UsersContext
-  const { fetchLearners, fetchPartners, fetchTutors, learners, partners, tutors, usersDispatch } = useUsers();
+  const { learners, partners, tutors, usersDispatch, setNewLearnerEmail } = useUsers();
 
   const handleChangePage = (event: any, newPage: any) => {
     setPage(newPage);
@@ -114,38 +100,6 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleDelete = async (userId: number, userRole: UserRoles) => {
-    const response = await usersService.deleteUser(userId);
-    if (response && response.status === 200) {
-      alert(response.data);
-      switch (userRole) {
-        case UserRoles.learner:
-          fetchLearners();
-          break;
-        case UserRoles.partner:
-          fetchPartners();
-          break;
-        case UserRoles.tutor:
-          fetchTutors();
-          break;
-        default:
-      }
-    }
-  };
-
-  const handlePasswordReset = async (email: string) => {
-    const response: AxiosResponse | undefined = await usersService.resetPassword(email);
-
-    if (response && response.status === 200) {
-      alert(`${response.data.status}. ${response.data.message}`);
-    } else {
-      alert('Password NOT reset. Something went wrong');
-      console.log('response', response);
-    }
-
-    setEmailForPasswordReset('');
   };
 
   const getRoleParams = (): RoleParams => {
@@ -215,28 +169,6 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
 
   return (
     <>
-      {newLearnerEmail && (
-        <Dialog open={!!tutors && !!newLearnerEmail}>
-          <AssignTutorsDialog newLearnerEmail={newLearnerEmail} setnewLearnerEmail={setnewLearnerEmail} />
-        </Dialog>
-      )}
-      {!!emailForPasswordReset && (
-        <Dialog open={!!emailForPasswordReset} onClose={() => setEmailForPasswordReset('')}>
-          <DialogTitle>Reset Password?</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Are you sure you want to reset <span className={classes.highlightSpan}>{emailForPasswordReset}</span>'s
-              password?
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setEmailForPasswordReset('')}>CANCEL</Button>
-            <Button color="secondary" variant="contained" onClick={() => handlePasswordReset(emailForPasswordReset)}>
-              RESET
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
       <Formik
         initialValues={newUserFormInitialValues}
         validationSchema={newUserSchema}
@@ -255,7 +187,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
               handleError(error);
             }
             actions.resetForm();
-            tableFor === UserRoles.learner && setnewLearnerEmail(values.email);
+            tableFor === UserRoles.learner && setNewLearnerEmail(values.email);
             await roleParams.getUser();
           } else {
             throw new Error('Submit called without values');
@@ -288,8 +220,6 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                           shift
                         </TableCell>
                       )}
-                      <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -365,41 +295,13 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                           );
                         }}
                       </Field>
-                      <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
                     </TableRow>
                     {roleParams.rows.map((user: any) => (
-                      <TableRow key={user.id}>
-                        <TableCell align="center" onClick={() => setShowUserDrawer(user.id)}>
-                          {user.id}
-                        </TableCell>
-                        <TableCell align="center" onClick={() => setShowUserDrawer(user.id)}>
-                          {user.displayName}
-                        </TableCell>
-                        <TableCell align="center" onClick={() => setShowUserDrawer(user.id)}>
-                          {user.email}
-                        </TableCell>
+                      <TableRow key={user.id} hover onClick={() => setShowUserDrawer(user.id)}>
+                        <TableCell align="center">{user.id}</TableCell>
+                        <TableCell align="center">{user.displayName}</TableCell>
+                        <TableCell align="center">{user.email}</TableCell>
                         {tableFor === UserRoles.tutor && <TableCell align="center">{user.shift}</TableCell>}
-                        <TableCell align="center">
-                          <Button
-                            color="secondary"
-                            onClick={() => setEmailForPasswordReset(user.email)}
-                            data-test="reset-password-button"
-                            size="small"
-                          >
-                            RESET PASSWORD
-                          </Button>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Button
-                            classes={{ root: classes.deleteButton }}
-                            onClick={() => handleDelete(user.id, tableFor)}
-                            data-test="add-user-button"
-                            size="small"
-                          >
-                            DELETE
-                          </Button>
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

@@ -1,5 +1,17 @@
 import React, { useReducer, useEffect, FC } from 'react';
-import { Tabs, Tab, Theme, makeStyles, createStyles } from '@material-ui/core';
+import {
+  Tabs,
+  Tab,
+  Theme,
+  makeStyles,
+  createStyles,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  DialogActions,
+  Button,
+} from '@material-ui/core';
 import { UsersContext } from '../../contexts/usersContext';
 import { useAppNav } from '../../contexts/appNavContext';
 import Learners from './Learners';
@@ -8,6 +20,8 @@ import Tutors from './Tutors';
 import WithNavbar from '../../components/WithNavbar';
 import { Learner, Partner, Tutor } from '../../@types/interfaces';
 import usersService from '../../services/usersService';
+import { AxiosResponse } from 'axios';
+import AssignTutorsDialog from './AssignTutorsDialog';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -18,6 +32,9 @@ const useStyles = makeStyles(({ palette }: Theme) =>
     tabs: {
       width: '100%',
       backgroundColor: palette.common.white,
+    },
+    highlightSpan: {
+      color: palette.secondary.main,
     },
   })
 );
@@ -65,6 +82,11 @@ const UsersPage: FC = () => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
   const [tab, setTab] = React.useState(0);
+  // The email address of a newly added Learner. Used for adding Tutors to the new Learner
+  const [newLearnerEmail, setNewLearnerEmail] = React.useState<string>('');
+
+  const [emailForPasswordReset, setEmailForPasswordReset] = React.useState<string>('');
+
   const { setShowUserDrawer } = useAppNav();
 
   const fetchTutors = async () => {
@@ -91,8 +113,33 @@ const UsersPage: FC = () => {
     fetchTutors();
   }, []);
 
+  const handlePasswordReset = async (email: string) => {
+    const response: AxiosResponse | undefined = await usersService.resetPassword(email);
+
+    if (response && response.status === 200) {
+      alert(`${response.data.status}. ${response.data.message}`);
+    } else {
+      alert('Password NOT reset. Something went wrong');
+      console.log('response', response);
+    }
+
+    setEmailForPasswordReset('');
+  };
+
   return (
-    <UsersContext.Provider value={{ ...state, fetchLearners, fetchPartners, fetchTutors, usersDispatch: dispatch }}>
+    <UsersContext.Provider
+      value={{
+        ...state,
+        newLearnerEmail,
+        emailForPasswordReset,
+        usersDispatch: dispatch,
+        fetchLearners,
+        fetchPartners,
+        fetchTutors,
+        setNewLearnerEmail,
+        setEmailForPasswordReset,
+      }}
+    >
       <div className={classes.usersContainer}>
         <div className={classes.tabs}>
           <Tabs
@@ -113,7 +160,28 @@ const UsersPage: FC = () => {
             <Tab label="Tutors" />
           </Tabs>
         </div>
-
+        {newLearnerEmail && (
+          <Dialog open={!!state.tutors && !!newLearnerEmail}>
+            <AssignTutorsDialog />
+          </Dialog>
+        )}
+        {!!emailForPasswordReset && (
+          <Dialog open={!!emailForPasswordReset} onClose={() => setEmailForPasswordReset('')}>
+            <DialogTitle>Reset Password?</DialogTitle>
+            <DialogContent>
+              <Typography>
+                Are you sure you want to reset <span className={classes.highlightSpan}>{emailForPasswordReset}</span>
+                's password?
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setEmailForPasswordReset('')}>CANCEL</Button>
+              <Button color="secondary" variant="contained" onClick={() => handlePasswordReset(emailForPasswordReset)}>
+                RESET
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
         {tab === 0 && <Learners />}
         {tab === 1 && <Partners />}
         {tab === 2 && <Tutors />}

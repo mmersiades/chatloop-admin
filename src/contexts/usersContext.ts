@@ -6,10 +6,14 @@ interface UsersContext {
   learners?: Array<Learner>;
   partners?: Array<Partner>;
   tutors?: Array<Tutor>;
+  newLearnerEmail: string;
+  emailForPasswordReset: string;
+  usersDispatch: React.Dispatch<usersAction>;
   fetchLearners: () => void;
   fetchPartners: () => void;
   fetchTutors: () => void;
-  usersDispatch: React.Dispatch<usersAction>;
+  setNewLearnerEmail: (email: string) => void;
+  setEmailForPasswordReset: (email: string) => void;
 }
 
 export const UsersContext = React.createContext<UsersContext>({} as UsersContext);
