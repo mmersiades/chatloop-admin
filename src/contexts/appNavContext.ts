@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 
 interface AppNavContext {
   showMenuDrawer: boolean;
-  showUserDrawer: boolean;
+  showUserDrawer: number | null;
   setShowMenuDrawer: (showMenuDrawer: boolean) => void;
-  setShowUserDrawer: (showUserDrawer: boolean) => void;
+  setShowUserDrawer: (user: number | null) => void;
 }
 
 export const AppNavContext = React.createContext<AppNavContext>({} as AppNavContext);

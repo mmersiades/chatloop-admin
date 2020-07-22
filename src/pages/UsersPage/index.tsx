@@ -1,14 +1,13 @@
 import React, { useReducer, useEffect, FC } from 'react';
-import WithNavbar from '../../components/WithNavbar';
-import { UsersContext } from '../../contexts/usersContext';
-import usersService from '../../services/usersService';
-import { Learner, Partner, Tutor } from '../../@types/interfaces';
 import { Tabs, Tab, Theme, makeStyles, createStyles } from '@material-ui/core';
-import { UserRoles } from '../../@types/enums';
+import { UsersContext } from '../../contexts/usersContext';
+import { useAppNav } from '../../contexts/appNavContext';
 import Learners from './Learners';
 import Partners from './Partners';
 import Tutors from './Tutors';
-import { useAppNav } from '../../contexts/appNavContext';
+import WithNavbar from '../../components/WithNavbar';
+import { Learner, Partner, Tutor } from '../../@types/interfaces';
+import usersService from '../../services/usersService';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -42,22 +41,6 @@ export type usersAction =
       type: 'SET_TUTORS';
       payload?: Array<Tutor>;
     };
-
-interface FormikValues {
-  email: string;
-  displayName: string;
-  shift: string;
-}
-
-/** An object of params passed to `tableGenerator` based on the role of Users the table is for */
-interface RoleParams {
-  userRole: UserRoles;
-  role: string;
-  getUser: any;
-  action: 'SET_LEARNERS' | 'SET_PARTNERS' | 'SET_TUTORS' | '';
-  count: number;
-  rows: Array<any>;
-}
 
 const usersReducerInitialState: usersState = {
   learners: [],
@@ -116,7 +99,7 @@ const UsersPage: FC = () => {
             value={tab}
             onChange={(event, newValue) => {
               setTab(newValue);
-              setShowUserDrawer(false);
+              setShowUserDrawer(null);
             }}
             indicatorColor="primary"
             textColor="primary"

@@ -370,13 +370,13 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                     </TableRow>
                     {roleParams.rows.map((user: any) => (
                       <TableRow key={user.id}>
-                        <TableCell align="center" onClick={() => setShowUserDrawer(true)}>
+                        <TableCell align="center" onClick={() => setShowUserDrawer(user.id)}>
                           {user.id}
                         </TableCell>
-                        <TableCell align="center" onClick={() => setShowUserDrawer(true)}>
+                        <TableCell align="center" onClick={() => setShowUserDrawer(user.id)}>
                           {user.displayName}
                         </TableCell>
-                        <TableCell align="center" onClick={() => setShowUserDrawer(true)}>
+                        <TableCell align="center" onClick={() => setShowUserDrawer(user.id)}>
                           {user.email}
                         </TableCell>
                         {tableFor === UserRoles.tutor && <TableCell align="center">{user.shift}</TableCell>}

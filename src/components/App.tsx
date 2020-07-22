@@ -33,7 +33,7 @@ const appPropertiesReducer = (state: appPropertiesState, action: appPropertiesAc
 
 const App = () => {
   const [showMenuDrawer, setShowMenuDrawer] = useState(true);
-  const [showUserDrawer, setShowUserDrawer] = useState(false);
+  const [showUserDrawer, setShowUserDrawer] = useState<number | null>(null);
 
   // ---------------------------------------- Setting up Material UI ----------------------------------------------- //
   const classes = useStyles();

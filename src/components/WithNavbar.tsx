@@ -31,10 +31,10 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   })
 );
 
-interface IWithNavbarProps {}
+interface WithNavbarProps {}
 
 const withNavbar = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
-  const WithNavbar = (props: IWithNavbarProps) => {
+  const WithNavbar = (props: WithNavbarProps) => {
     const classes = useStyles();
     const { showMenuDrawer } = useAppNav();
 
