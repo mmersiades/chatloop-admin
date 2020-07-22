@@ -1,5 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Pageable, PartnerInQueue, Invite } from '../@types/interfaces';
 
-const defaultValue = {};
+interface InvitesContext {
+  partnersQueue?: Pageable<Array<PartnerInQueue>>;
+  invites?: Pageable<Array<Invite>>;
+}
 
-export default React.createContext(defaultValue);
+export const InvitesContext = React.createContext<InvitesContext>({} as InvitesContext);
+
+export const useInvites = () => {
+  return useContext(InvitesContext);
+};

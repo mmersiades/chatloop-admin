@@ -26,12 +26,12 @@ import {
   Collapse,
   IconButton,
 } from '@material-ui/core';
-import invitesContext from '../../contexts/invitesContext';
 import clsx from 'clsx';
-import appPropertiesContext from '../../contexts/appPropertiesContext';
-import { IPartnerInQueue, IPageable, IInvite } from '../../@types/interfaces';
+import { PartnerInQueue, Pageable, Invite } from '../../@types/interfaces';
 import { AxiosResponse } from 'axios';
 import { ExpandMoreRounded, ExpandLessRounded } from '@material-ui/icons';
+import { useAppProperties } from '../../contexts/appPropertiesContext';
+import { InvitesContext } from '../../contexts/invitesContext';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -75,44 +75,44 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   })
 );
 
-interface IRefreshButtonProps {
+interface RefreshButtonProps {
   isRefreshing: boolean;
   handleClick: () => void;
 }
 
-interface IPrimaryPartnerListText {
+interface PrimaryPartnerListText {
   id: number;
   displayName: string;
 }
 
-interface ISecondaryPartnerListTextProps {
+interface SecondaryPartnerListTextProps {
   duration: { days: () => number; hours: () => number };
   currentActivities: number;
   maxActivities: number;
 }
 
-interface IInviteUser {
+interface InviteUser {
   designation: 'L' | 'P';
   id: number;
   displayName: string;
 }
 
-interface ICapacity {
+interface Capacity {
   maxActivities: number;
   currentActivities: number;
 }
 
 type invitesState = {
-  partnersQueue?: IPageable<Array<IPartnerInQueue>>;
-  invites?: IPageable<Array<IInvite>>;
+  partnersQueue?: Pageable<Array<PartnerInQueue>>;
+  invites?: Pageable<Array<Invite>>;
 };
 
 type invitesAction =
   | {
       type: 'SET_QUEUE';
-      payload: IPageable<Array<IPartnerInQueue>>;
+      payload: Pageable<Array<PartnerInQueue>>;
     }
-  | { type: 'SET_INVITES'; payload: IPageable<Array<IInvite>> };
+  | { type: 'SET_INVITES'; payload: Pageable<Array<Invite>> };
 
 const invitesReducerInitialState: invitesState = {};
 
@@ -140,6 +140,15 @@ const InvitesPage: FC = () => {
 
   const classes = useStyles();
 
+  const { inviteExpiryInterval } = useAppProperties();
+
+  const getExpiration = (invite: Invite) =>
+    momentTZ
+      .utc(invite.sentOn)
+      .tz(momentTZ.tz.guess())
+      .add(inviteExpiryInterval?.value, inviteExpiryInterval?.unit)
+      .format('ddd, h:mm:ss a');
+
   /**
    * Adds a 1s delay in fetching so Users can see the refresh,
    * even on really fast networks
@@ -152,7 +161,7 @@ const InvitesPage: FC = () => {
   const fetchQueue = useCallback(async () => {
     setIsFetchingQueue(true);
     const partnerQueue = await Promise.all([invitesService.getPartnerQueue(), wait()]);
-    dispatch({ type: 'SET_QUEUE', payload: partnerQueue[0] as IPageable<Array<IPartnerInQueue>> });
+    dispatch({ type: 'SET_QUEUE', payload: partnerQueue[0] as Pageable<Array<PartnerInQueue>> });
     setIsFetchingQueue(false);
   }, []);
 
@@ -165,7 +174,7 @@ const InvitesPage: FC = () => {
   const fetchInvites = useCallback(async () => {
     setIsFetchingInvites(true);
     const invites = await Promise.all([invitesService.getInvites(), wait()]);
-    dispatch({ type: 'SET_INVITES', payload: invites[0] as IPageable<Array<IInvite>> });
+    dispatch({ type: 'SET_INVITES', payload: invites[0] as Pageable<Array<Invite>> });
     setIsFetchingInvites(false);
   }, []);
 
@@ -196,20 +205,20 @@ const InvitesPage: FC = () => {
     setShowConfirmInviteDelete({ show: false, id: null });
   };
 
-  const RefreshButton: FC<IRefreshButtonProps> = ({ handleClick, isRefreshing }) => (
+  const RefreshButton: FC<RefreshButtonProps> = ({ handleClick, isRefreshing }) => (
     <Button variant="text" color="secondary" onClick={() => handleClick()}>
       {isRefreshing ? <CircularProgress classes={{ root: classes.spinner }} size="1rem" thickness={2.4} /> : 'REFRESH'}
     </Button>
   );
 
-  const PrimaryPartnerListText: FC<IPrimaryPartnerListText> = ({ id, displayName }) => (
+  const PrimaryPartnerListText: FC<PrimaryPartnerListText> = ({ id, displayName }) => (
     <Typography variant="body1" color="primary">
       <span className={classes.partnerId}>{`[${id}] `}</span>
       <strong>{displayName}</strong>
     </Typography>
   );
 
-  const SecondaryPartnerListText: FC<ISecondaryPartnerListTextProps> = ({
+  const SecondaryPartnerListText: FC<SecondaryPartnerListTextProps> = ({
     duration,
     currentActivities,
     maxActivities,
@@ -233,14 +242,14 @@ const InvitesPage: FC = () => {
     </Grid>
   );
 
-  const InviteUser: FC<IInviteUser> = ({ designation, id, displayName }) => (
+  const InviteUser: FC<InviteUser> = ({ designation, id, displayName }) => (
     <Typography variant="body1" color="primary">
       <span className={classes.partnerId}>{`[${designation}-${id}] `}</span>
       <strong>{displayName}</strong>
     </Typography>
   );
 
-  const Capacity: FC<ICapacity> = ({ maxActivities, currentActivities }) => (
+  const Capacity: FC<Capacity> = ({ maxActivities, currentActivities }) => (
     <Typography variant="caption">
       Capacity:
       <strong>{` ${maxActivities - currentActivities}`}</strong>
@@ -266,7 +275,7 @@ const InvitesPage: FC = () => {
   );
 
   return (
-    <invitesContext.Provider value={state}>
+    <InvitesContext.Provider value={state}>
       <Grid container>
         <ConfirmInviteDeleteDialog />
         <Grid item xs={3} lg={2}>
@@ -280,7 +289,7 @@ const InvitesPage: FC = () => {
               </ListItem>
               <Divider />
               <div className={classes.queue}>
-                {state.partnersQueue?.content.map((partner: IPartnerInQueue) => {
+                {state.partnersQueue?.content.map((partner: PartnerInQueue) => {
                   const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
                   return (
                     <ListItem key={uuid()}>
@@ -317,7 +326,7 @@ const InvitesPage: FC = () => {
               {state.invites?.content.length === 0 ? (
                 <p>No invites</p>
               ) : (
-                state.invites?.content.map((invite: IInvite) => (
+                state.invites?.content.map((invite: Invite) => (
                   <Grid key={uuid()} item xs={12} md={12} lg={6}>
                     <Card>
                       <CardContent>
@@ -357,7 +366,7 @@ const InvitesPage: FC = () => {
                                 }
                               />
                             </ListItem>
-                            {invite.partners.map((partner: IPartnerInQueue) => {
+                            {invite.partners.map((partner: PartnerInQueue) => {
                               const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
                               return (
                                 <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
@@ -389,29 +398,17 @@ const InvitesPage: FC = () => {
                           <Divider />
                         </Collapse>
 
-                        <appPropertiesContext.Consumer>
-                          {(value) => {
-                            const expiration = momentTZ
-                              .utc(invite.sentOn)
-                              .tz(momentTZ.tz.guess())
-                              .add(value.inviteExpiryInterval?.value, value.inviteExpiryInterval?.unit)
-                              .format('ddd, h:mm:ss a');
-
-                            return (
-                              <Grid container justify="space-between" alignItems="center">
-                                <Typography>
-                                  Expires: <strong>{` ${expiration}`}</strong>
-                                </Typography>
-                                <Button
-                                  className={classes.deleteButton}
-                                  onClick={() => setShowConfirmInviteDelete({ show: true, id: invite.id })}
-                                >
-                                  DELETE
-                                </Button>
-                              </Grid>
-                            );
-                          }}
-                        </appPropertiesContext.Consumer>
+                        <Grid container justify="space-between" alignItems="center">
+                          <Typography>
+                            Expires: <strong>{` ${getExpiration(invite)}`}</strong>
+                          </Typography>
+                          <Button
+                            className={classes.deleteButton}
+                            onClick={() => setShowConfirmInviteDelete({ show: true, id: invite.id })}
+                          >
+                            DELETE
+                          </Button>
+                        </Grid>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -431,24 +428,20 @@ const InvitesPage: FC = () => {
               </ListItem>
               <Divider />
               <ListSubheader>Invite Settings</ListSubheader>
-              <appPropertiesContext.Consumer>
-                {(value) => (
-                  <ListItem>
-                    <ListItemText
-                      primary="Invite expiry interval"
-                      secondary={`${value.inviteExpiryInterval?.value} ${
-                        value.inviteExpiryInterval?.unit === 'hours' ? 'hours' : 'seconds'
-                      }`}
-                    />
-                  </ListItem>
-                )}
-              </appPropertiesContext.Consumer>
+              <ListItem>
+                <ListItemText
+                  primary="Invite expiry interval"
+                  secondary={`${inviteExpiryInterval?.value} ${
+                    inviteExpiryInterval?.unit === 'hours' ? 'hours' : 'seconds'
+                  }`}
+                />
+              </ListItem>
               <ListSubheader>Invite Statistics</ListSubheader>
             </List>
           </div>
         </Grid>
       </Grid>
-    </invitesContext.Provider>
+    </InvitesContext.Provider>
   );
 };
 

@@ -21,7 +21,7 @@ export interface Tutor extends User {
   shift: TutorShifts;
 }
 
-export interface IApplicationProperty {
+export interface ExpiryInterval {
   value: number;
   /**
    * Returned from back-end as Spring time units (eg HOURS, HOUR, SECOND),
@@ -55,10 +55,10 @@ export interface IApplicationProperty {
 }
 
 export type appPropertiesState = {
-  inviteExpiryInterval?: IApplicationProperty;
+  inviteExpiryInterval?: ExpiryInterval;
 };
 
-export interface IPartnerInQueue {
+export interface PartnerInQueue {
   id: number;
   displayName: string;
   currentNumberOfActivities: number;
@@ -66,7 +66,7 @@ export interface IPartnerInQueue {
   lastChatFinished: string;
 }
 
-export interface IInvite {
+export interface Invite {
   id: number;
   learner: {
     id: number;
@@ -74,12 +74,12 @@ export interface IInvite {
     currentNumberOfActivities: number;
     maxNumberOfActivities: number;
   };
-  partners: Array<IPartnerInQueue>;
+  partners: Array<PartnerInQueue>;
   sentOn: string;
   topic: string;
 }
 
-export type IPageable<T> = {
+export type Pageable<T> = {
   content: T;
   pageable: {
     sort: {
