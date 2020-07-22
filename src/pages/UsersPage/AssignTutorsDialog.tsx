@@ -8,35 +8,35 @@ import {
   Select,
   MenuItem,
   Grid,
-  Typography
+  Typography,
 } from '@material-ui/core';
-import { ITutor, ILearner } from '../../@types/interfaces';
+import { Tutor, Learner } from '../../@types/interfaces';
 import { TutorShifts } from '../../@types/enums';
 import usersService from '../../services/usersService';
 
-interface IAssignTutorProps {
-  tutors?: Array<ITutor>;
+interface AssignTutorProps {
+  tutors?: Array<Tutor>;
   newLearnerEmail: string;
-  learners: Array<ILearner>;
+  learners: Array<Learner>;
   setnewLearnerEmail: (email: string) => void;
 }
 
-interface IAssignTutorValues {
+interface AssignTutorValues {
   shiftOneTutor: number;
   shiftTwoTutor: number;
 }
 
-export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLearnerEmail }: IAssignTutorProps) => {
+export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLearnerEmail }: AssignTutorProps) => {
   const shiftOneTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
   const shiftTwoTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.two);
-  let learner: ILearner;
+  let learner: Learner;
   if (newLearnerEmail && learners) {
     learner = learners.filter((learner) => learner.email.toLowerCase() === newLearnerEmail.toLowerCase())[0];
   }
 
-  const assignTutorsInitialValues: IAssignTutorValues = {
+  const assignTutorsInitialValues: AssignTutorValues = {
     shiftOneTutor: shiftOneTutors ? shiftOneTutors[0].id : 999999,
-    shiftTwoTutor: shiftTwoTutors ? shiftTwoTutors[0].id : 999999
+    shiftTwoTutor: shiftTwoTutors ? shiftTwoTutors[0].id : 999999,
   };
   if (newLearnerEmail && learners) {
     return (
@@ -46,7 +46,7 @@ export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLe
           const response = await usersService.assignTutors({
             shiftOneTutor: values.shiftOneTutor,
             shiftTwoTutor: values.shiftTwoTutor,
-            learner: learner.id
+            learner: learner.id,
           });
           if (response && response.status === 200) {
             actions.resetForm();
@@ -64,7 +64,7 @@ export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLe
               <DialogContent>
                 <Grid container direction="column">
                   <Field name="shiftOneTutor" value="values.shiftOneTutor">
-                    {({ field }: FieldProps<IAssignTutorValues>) => {
+                    {({ field }: FieldProps<AssignTutorValues>) => {
                       return (
                         <Select {...field} label="Shift One Tutor" fullWidth>
                           <MenuItem value="">Select</MenuItem>;
@@ -81,7 +81,7 @@ export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLe
                     }}
                   </Field>
                   <Field name="shiftTwoTutor" value="values.shiftTwoTutor">
-                    {({ field }: FieldProps<IAssignTutorValues>) => {
+                    {({ field }: FieldProps<AssignTutorValues>) => {
                       return (
                         <Select {...field} label="Shift Two Tutor" fullWidth>
                           <MenuItem value="">Select</MenuItem>;

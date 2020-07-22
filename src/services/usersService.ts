@@ -1,6 +1,6 @@
 import apiChatloopOrg from '../config/axiosConfig';
 import { authHeader } from '../helpers/getAuthHeader';
-import { ILearner, IPartner, ITutor } from '../@types/interfaces';
+import { Learner, Partner, Tutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
 
@@ -11,7 +11,7 @@ const getLearners = async (dispatch: any) => {
 
   try {
     const response = await apiChatloopOrg.get('/rest/user/filter-users?role=ROLE_LEARNER', requestOptions);
-    const learners: Array<ILearner> = response.data.users.map((learner: any) => learner);
+    const learners: Array<Learner> = response.data.users.map((learner: any) => learner);
     dispatch({ type: 'SET_LEARNERS', payload: learners });
   } catch (error) {
     handleError(error);
@@ -25,7 +25,7 @@ const getPartners = async (dispatch: any) => {
 
   try {
     const response = await apiChatloopOrg.get('/rest/user/filter-users?role=ROLE_PARTNER', requestOptions);
-    const partners: Array<IPartner> = response.data.users.map((partner: any) => partner);
+    const partners: Array<Partner> = response.data.users.map((partner: any) => partner);
     dispatch({ type: 'SET_PARTNERS', payload: partners });
   } catch (error) {
     handleError(error);
@@ -33,8 +33,8 @@ const getPartners = async (dispatch: any) => {
 };
 
 const getTutors = async (dispatch: any) => {
-  let shiftOneTutors: Array<ITutor> = [];
-  let shiftTwoTutors: Array<ITutor> = [];
+  let shiftOneTutors: Array<Tutor> = [];
+  let shiftTwoTutors: Array<Tutor> = [];
   const requestOptions = {
     headers: { authorization: authHeader() },
   };

@@ -2,7 +2,7 @@ import React, { useReducer, useEffect, useState } from 'react';
 import WithNavbar from '../../components/WithNavbar';
 import usersContext from '../../contexts/usersContext';
 import usersService from '../../services/usersService';
-import { ILearner, IPartner, ITutor } from '../../@types/interfaces';
+import { Learner, Partner, Tutor } from '../../@types/interfaces';
 import {
   Tabs,
   Tab,
@@ -70,33 +70,33 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
 );
 
 type usersState = {
-  learners?: Array<ILearner>;
-  partners?: Array<IPartner>;
-  tutors?: Array<ITutor>;
+  learners?: Array<Learner>;
+  partners?: Array<Partner>;
+  tutors?: Array<Tutor>;
 };
 
 type usersAction =
   | {
       type: 'SET_LEARNERS';
-      payload?: Array<ILearner>;
+      payload?: Array<Learner>;
     }
   | {
       type: 'SET_PARTNERS';
-      payload?: Array<IPartner>;
+      payload?: Array<Partner>;
     }
   | {
       type: 'SET_TUTORS';
-      payload?: Array<ITutor>;
+      payload?: Array<Tutor>;
     };
 
-interface IFormikValues {
+interface FormikValues {
   email: string;
   displayName: string;
   shift: string;
 }
 
 /** An object of params passed to `tableGenerator` based on the role of Users the table is for */
-interface IRoleParams {
+interface RoleParams {
   userRole: UserRoles;
   role: string;
   getUser: any;
@@ -172,7 +172,7 @@ const UsersPage = () => {
 
   const generateTable = () => {
     if (state.learners && state.partners && state.tutors) {
-      const formikInitialValues: IFormikValues = {
+      const formikInitialValues: FormikValues = {
         email: '',
         displayName: '',
         shift: '',
@@ -206,7 +206,7 @@ const UsersPage = () => {
         }
       };
 
-      let role: IRoleParams = {
+      let role: RoleParams = {
         userRole: '' as UserRoles,
         role: '',
         getUser: () => {},
@@ -305,7 +305,7 @@ const UsersPage = () => {
               }
             }}
           >
-            {(props: FormikProps<IFormikValues>) => {
+            {(props: FormikProps<FormikValues>) => {
               const disableButton =
                 props.isSubmitting || !!props.errors.displayName || !!props.errors.email || !!props.errors.shift;
               return (
@@ -342,7 +342,7 @@ const UsersPage = () => {
                             <div className={classes.helperTextSpacer} />
                           </TableCell>
                           <Field name="displayName" value="values.displayName">
-                            {({ field }: FieldProps<IFormikValues>) => {
+                            {({ field }: FieldProps<FormikValues>) => {
                               return (
                                 <TableCell align="center">
                                   <div className={classes.helperTextSpacer} />
@@ -364,7 +364,7 @@ const UsersPage = () => {
                             }}
                           </Field>
                           <Field name="email" value="values.email">
-                            {({ field }: FieldProps<IFormikValues>) => {
+                            {({ field }: FieldProps<FormikValues>) => {
                               return (
                                 <TableCell align="center">
                                   <div className={classes.helperTextSpacer} />
@@ -386,7 +386,7 @@ const UsersPage = () => {
                             }}
                           </Field>
                           <Field name="shift" value="values.shift">
-                            {({ field }: FieldProps<IFormikValues>) => {
+                            {({ field }: FieldProps<FormikValues>) => {
                               return (
                                 tab === 2 && (
                                   <TableCell classes={{ root: classes.tableCell }} align="center">

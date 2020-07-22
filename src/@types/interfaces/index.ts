@@ -1,22 +1,22 @@
 import { UserRoles, TutorShifts } from '../enums';
 
-export interface IUser {
+export interface User {
   id: number;
   displayName: string;
   email: string;
   roles: Array<UserRoles>;
 }
 
-export interface ILearner extends IUser {
+export interface Learner extends User {
   roles: [UserRoles.learner];
   showNewActivityDrawer: false;
 }
 
-export interface IPartner extends IUser {
+export interface Partner extends User {
   roles: [UserRoles.partner];
 }
 
-export interface ITutor extends IUser {
+export interface Tutor extends User {
   roles: [UserRoles.tutor];
   shift: TutorShifts;
 }
