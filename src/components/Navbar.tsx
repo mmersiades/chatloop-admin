@@ -1,9 +1,10 @@
-import React, { FC, Dispatch, SetStateAction } from 'react';
+import React, { FC } from 'react';
 import { AppBar, Toolbar, Typography, makeStyles, createStyles, Theme, IconButton, Grid } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import connectedUrl from '../serverUrls';
+import { useAppNav } from '../contexts/appNavContext';
 
 const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   createStyles({
@@ -11,16 +12,19 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
       minHeight: 48,
     },
     appbar: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      width: 'unset',
       backgroundColor: palette.common.black,
-      transition: transitions.create(['margin', 'width'], {
+      transition: transitions.create('left', {
         easing: transitions.easing.sharp,
         duration: transitions.duration.leavingScreen,
       }),
     },
     appbarShift: {
-      width: `calc(100% - 150px)`,
-      marginLeft: 150,
-      transition: transitions.create(['margin', 'width'], {
+      left: 150,
+      transition: transitions.create('left', {
         easing: transitions.easing.easeOut,
         duration: transitions.duration.enteringScreen,
       }),
@@ -34,22 +38,19 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   })
 );
 
-interface INavbarProps {
-  showMenuDrawer: boolean;
-  setShowMenuDrawer: Dispatch<SetStateAction<boolean>>;
-}
-
-const Navbar: FC<INavbarProps> = ({ showMenuDrawer, setShowMenuDrawer }: INavbarProps) => {
+const Navbar: FC = () => {
   const classes = useStyles();
   const location = useLocation();
+  const { showMenuDrawer, setShowMenuDrawer } = useAppNav();
   // @ts-ignore
   const title = location.state ? location.state : 'Chatloop Admin';
 
   return (
     <>
       <AppBar
+        position="absolute"
         classes={{
-          root: clsx(classes.appbar, {
+          positionAbsolute: clsx(classes.appbar, {
             [classes.appbarShift]: showMenuDrawer,
           }),
         }}

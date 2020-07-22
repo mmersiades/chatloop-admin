@@ -3,8 +3,9 @@ import { authHeader } from '../helpers/getAuthHeader';
 import { Learner, Partner, Tutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
+import { usersAction } from '../pages/UsersPage';
 
-const getLearners = async (dispatch: any) => {
+const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -18,7 +19,7 @@ const getLearners = async (dispatch: any) => {
   }
 };
 
-const getPartners = async (dispatch: any) => {
+const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -32,7 +33,7 @@ const getPartners = async (dispatch: any) => {
   }
 };
 
-const getTutors = async (dispatch: any) => {
+const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
   let shiftOneTutors: Array<Tutor> = [];
   let shiftTwoTutors: Array<Tutor> = [];
   const requestOptions = {

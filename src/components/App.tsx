@@ -1,9 +1,10 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import AppRouter from '../routers/AppRouter';
 import appPropertiesContext from '../contexts/appPropertiesContext';
 import { IApplicationProperty, appPropertiesState } from '../@types/interfaces';
 import baseURL from '../serverUrls';
+import { AppNavContext } from '../contexts/appNavContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -31,6 +32,9 @@ const appPropertiesReducer = (state: appPropertiesState, action: appPropertiesAc
 };
 
 const App = () => {
+  const [showMenuDrawer, setShowMenuDrawer] = useState(true);
+  const [showUserDrawer, setShowUserDrawer] = useState(false);
+
   // ---------------------------------------- Setting up Material UI ----------------------------------------------- //
   const classes = useStyles();
 
@@ -57,7 +61,9 @@ const App = () => {
   return (
     <div className={classes.appContainer}>
       <appPropertiesContext.Provider value={state}>
-        <AppRouter />
+        <AppNavContext.Provider value={{ showMenuDrawer, showUserDrawer, setShowMenuDrawer, setShowUserDrawer }}>
+          <AppRouter />
+        </AppNavContext.Provider>
       </appPropertiesContext.Provider>
     </div>
   );

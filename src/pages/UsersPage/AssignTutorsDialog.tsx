@@ -10,14 +10,13 @@ import {
   Grid,
   Typography,
 } from '@material-ui/core';
-import { Tutor, Learner } from '../../@types/interfaces';
+import { Learner } from '../../@types/interfaces';
 import { TutorShifts } from '../../@types/enums';
 import usersService from '../../services/usersService';
+import { useUsers } from '../../contexts/usersContext';
 
 interface AssignTutorProps {
-  tutors?: Array<Tutor>;
   newLearnerEmail: string;
-  learners: Array<Learner>;
   setnewLearnerEmail: (email: string) => void;
 }
 
@@ -26,9 +25,15 @@ interface AssignTutorValues {
   shiftTwoTutor: number;
 }
 
-export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLearnerEmail }: AssignTutorProps) => {
+export const AssignTutorsDialog = ({ newLearnerEmail, setnewLearnerEmail }: AssignTutorProps) => {
+  // From UsersContext
+  const { learners, tutors } = useUsers();
+
+  // Gets arrays of shift one and shift two Tutors
   const shiftOneTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
   const shiftTwoTutors = tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.two);
+
+  // Get the Learner to assignthe Tutors to
   let learner: Learner;
   if (newLearnerEmail && learners) {
     learner = learners.filter((learner) => learner.email.toLowerCase() === newLearnerEmail.toLowerCase())[0];
@@ -38,6 +43,7 @@ export const AssignTutorsDialog = ({ tutors, newLearnerEmail, learners, setnewLe
     shiftOneTutor: shiftOneTutors ? shiftOneTutors[0].id : 999999,
     shiftTwoTutor: shiftTwoTutors ? shiftTwoTutors[0].id : 999999,
   };
+
   if (newLearnerEmail && learners) {
     return (
       <Formik
