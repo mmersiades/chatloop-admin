@@ -31,7 +31,7 @@ import { useAppNav } from '../../contexts/appNavContext';
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
     tableContainer: {
-      maxHeight: 'calc(100vh - 160px)',
+      height: 'calc(100vh - 96px)',
       borderRadius: '0px',
       width: '100%',
       transition: transitions.create('width', {
@@ -48,6 +48,16 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
     },
     tableHead: {
       backgroundColor: palette.primary.main,
+    },
+    tableBody: {
+      height: 'calc(100vh - 184px)',
+      display: 'block',
+      overflow: 'auto',
+    },
+    tableRow: {
+      display: 'table',
+      width: '100%',
+      tableLayout: 'fixed',
     },
     tableCell: {
       color: palette.common.white,
@@ -88,7 +98,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   const [page, setPage] = React.useState(0);
 
   // The number of rows per table page (for table pagination)
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   // From UsersContext
   const { learners, partners, tutors, usersDispatch, setNewLearnerEmail } = useUsers();
@@ -205,7 +215,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
               >
                 <Table size="small">
                   <TableHead classes={{ root: classes.tableHead }}>
-                    <TableRow>
+                    <TableRow classes={{ root: classes.tableRow }}>
                       <TableCell classes={{ root: classes.tableCell }} align="center">
                         id
                       </TableCell>
@@ -222,8 +232,8 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                       )}
                     </TableRow>
                   </TableHead>
-                  <TableBody>
-                    <TableRow>
+                  <TableBody classes={{ root: classes.tableBody }}>
+                    <TableRow classes={{ root: classes.tableRow }}>
                       <TableCell align="center">
                         <div className={classes.helperTextSpacer} />
                         <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
@@ -297,7 +307,12 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                       </Field>
                     </TableRow>
                     {roleParams.rows.map((user: any) => (
-                      <TableRow key={user.id} hover onClick={() => setShowUserDrawer(user.id)}>
+                      <TableRow
+                        classes={{ root: classes.tableRow }}
+                        key={user.id}
+                        hover
+                        onClick={() => setShowUserDrawer(user.id)}
+                      >
                         <TableCell align="center">{user.id}</TableCell>
                         <TableCell align="center">{user.displayName}</TableCell>
                         <TableCell align="center">{user.email}</TableCell>
