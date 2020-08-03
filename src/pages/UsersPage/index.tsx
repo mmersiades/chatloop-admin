@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, FC } from 'react';
+import React, { useReducer, useEffect, FC, useState } from 'react';
 import {
   Tabs,
   Tab,
@@ -81,11 +81,11 @@ const usersReducer = (state: usersState, action: usersAction) => {
 const UsersPage: FC = () => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
-  const [tab, setTab] = React.useState(0);
+  const [tab, setTab] = useState(0);
   // The email address of a newly added Learner. Used for adding Tutors to the new Learner
-  const [newLearnerEmail, setNewLearnerEmail] = React.useState<string>('');
+  const [newLearnerEmail, setNewLearnerEmail] = useState<string>('');
 
-  const [emailForPasswordReset, setEmailForPasswordReset] = React.useState<string>('');
+  const [emailForPasswordReset, setEmailForPasswordReset] = useState<string>('');
 
   const { setShowUserDrawer } = useAppNav();
 

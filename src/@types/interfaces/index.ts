@@ -5,6 +5,7 @@ export interface User {
   displayName: string;
   email: string;
   roles: Array<UserRoles>;
+  uiLanguage: string;
 }
 
 export interface Learner extends User {
@@ -12,13 +13,45 @@ export interface Learner extends User {
   showNewActivityDrawer: false;
 }
 
+export interface ExtendedLearner extends Learner {
+  userRole: UserRoles.learner;
+  id: number; // Learner's id
+  firstLanguages: UserLanguageObject[];
+  numberOfActivities: number;
+  maxNumberOfActivities: number;
+  shiftOneTutor: number; // Tutor's id
+  shiftTwoTutor: number; // Tutor's id
+}
+
 export interface Partner extends User {
   roles: [UserRoles.partner];
+}
+
+export interface ExtendedPartner extends Partner {
+  userRole: UserRoles.partner;
+  id: number; // Partner's id
+  firstLanguages: UserLanguageObject[];
+  numberOfActivities: number;
+  maxNumberOfActivities: number;
 }
 
 export interface Tutor extends User {
   roles: [UserRoles.tutor];
   shift: TutorShifts;
+}
+
+export interface ExtendedTutor extends Tutor {
+  userRole: UserRoles.tutor;
+  id: number; // Tutor's id
+  firstLanguages: UserLanguageObject[];
+  numberOfLearners: number;
+  maxNumberOfLearners: number;
+  assignedLearners: number[]; // array of Learner ids
+}
+
+export interface UserLanguageObject {
+  code: string;
+  language: string;
 }
 
 export interface ExpiryInterval {

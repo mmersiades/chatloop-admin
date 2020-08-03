@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState, useCallback } from 'react';
 import { UserRoles } from '../../@types/enums';
 import {
   Drawer,
@@ -18,8 +18,17 @@ import { useAppNav } from '../../contexts/appNavContext';
 import { CloseRounded } from '@material-ui/icons';
 import clsx from 'clsx';
 import { useUsers } from '../../contexts/usersContext';
-import { Learner, Partner, Tutor } from '../../@types/interfaces';
+import {
+  Learner,
+  Partner,
+  Tutor,
+  ExtendedLearner,
+  ExtendedPartner,
+  ExtendedTutor,
+  UserLanguageObject,
+} from '../../@types/interfaces';
 import usersService from '../../services/usersService';
+import ReplaceTutorForm from './ReplaceTutorForm';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
@@ -50,6 +59,7 @@ interface UserDrawerProps {
 }
 
 const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
+  const [extendedUser, setExtendedUser] = useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
   const classes = useStyles();
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
   const {
@@ -62,21 +72,29 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
     fetchLearners,
   } = useUsers();
 
-  let user: Learner | Partner | Tutor | undefined = undefined;
-  if (showUserDrawer != null) {
-    switch (drawerFor) {
-      case UserRoles.learner:
-        user = learners?.filter((learner) => learner.id === showUserDrawer)[0];
-        break;
-      case UserRoles.partner:
-        user = partners?.filter((partner) => partner.id === showUserDrawer)[0];
-        break;
-      case UserRoles.tutor:
-        user = tutors?.filter((tutor) => tutor.id === showUserDrawer)[0];
-        break;
-      default:
+  const getExtendedUser = useCallback(async (user: Learner | Partner | Tutor) => {
+    const response = await usersService.getUser(user);
+    response.status === 200 && setExtendedUser({ ...user, ...response.data });
+  }, []);
+
+  useEffect(() => {
+    let user: Learner | Partner | Tutor | undefined = undefined;
+    if (showUserDrawer != null) {
+      switch (drawerFor) {
+        case UserRoles.learner:
+          user = learners?.filter((learner) => learner.id === showUserDrawer)[0];
+          break;
+        case UserRoles.partner:
+          user = partners?.filter((partner) => partner.id === showUserDrawer)[0];
+          break;
+        case UserRoles.tutor:
+          user = tutors?.filter((tutor) => tutor.id === showUserDrawer)[0];
+          break;
+        default:
+      }
     }
-  }
+    !!user && getExtendedUser(user);
+  }, [showUserDrawer, drawerFor, learners, partners, tutors, getExtendedUser]);
 
   const handleDelete = async (userId: number, userRole: UserRoles) => {
     const response = await usersService.deleteUser(userId);
@@ -98,6 +116,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
     }
   };
 
+  console.log('extendedUser', extendedUser);
+
+  const stringifyLanguages = (languages: UserLanguageObject[]) => {
+    const languagesArray = languages.map((language) => language.language);
+    return languagesArray.join(', ');
+  };
+
   return (
     <Drawer
       classes={{ paperAnchorDockedRight: clsx(classes.docked, { [classes.dockedWithMenuDrawer]: showMenuDrawer }) }}
@@ -116,23 +141,41 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
           >
             <CloseRounded />
           </IconButton>
-          <Typography>{!!user ? user.id : '...'}</Typography>
+          <Typography>{!!extendedUser ? extendedUser.id : '...'}</Typography>
         </Toolbar>
       </AppBar>
       <List>
         <ListItem>
-          <ListItemText primary="Display name" secondary={user ? user.displayName : '...'} />
+          <ListItemText primary="Display name" secondary={extendedUser ? extendedUser.displayName : '...'} />
         </ListItem>
         <ListItem>
-          <ListItemText primary="Email" secondary={user ? user.email : '...'} />
+          <ListItemText primary="Email" secondary={extendedUser ? extendedUser.email : '...'} />
         </ListItem>
-        {!!user && (
+        <ListItem>
+          <ListItemText
+            primary="First language"
+            secondary={extendedUser ? stringifyLanguages(extendedUser.firstLanguages) : '...'}
+          />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Interface language" secondary={extendedUser ? extendedUser.uiLanguage : '...'} />
+        </ListItem>
+        {!!extendedUser && extendedUser.userRole !== UserRoles.tutor && (
+          <ListItem>
+            <ListItemText
+              primary="Current Activities"
+              secondary={extendedUser ? extendedUser.numberOfActivities : '...'}
+            />
+          </ListItem>
+        )}
+        {!!extendedUser && <ReplaceTutorForm />}
+        {!!extendedUser && (
           <ListItem>
             <Button
               fullWidth
               color="secondary"
               variant="outlined"
-              onClick={() => !!user && setEmailForPasswordReset(user.email)}
+              onClick={() => !!extendedUser && setEmailForPasswordReset(extendedUser.email)}
               data-test="reset-password-button"
             >
               RESET PASSWORD
@@ -140,13 +183,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
           </ListItem>
         )}
 
-        {!!user && (
+        {!!extendedUser && (
           <ListItem>
             <Button
               fullWidth
               variant="outlined"
               classes={{ root: classes.deleteButton }}
-              onClick={() => !!user && handleDelete(user.id, drawerFor)}
+              onClick={() => !!extendedUser && handleDelete(extendedUser.id, drawerFor)}
               data-test="add-user-button"
             >
               DELETE

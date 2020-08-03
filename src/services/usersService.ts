@@ -4,6 +4,20 @@ import { Learner, Partner, Tutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
 import { usersAction } from '../pages/UsersPage';
+import { AxiosResponse } from 'axios';
+
+const getUser = async (user: Learner | Partner | Tutor): Promise<AxiosResponse> => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  try {
+    return await apiChatloopOrg.get(`/rest/admin/get-user/${user.id}`, requestOptions);
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+};
 
 const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
@@ -125,6 +139,7 @@ const resetPassword = async (email: string) => {
 };
 
 const usersService = {
+  getUser,
   getLearners,
   getPartners,
   getTutors,
