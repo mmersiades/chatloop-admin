@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemText,
   Button,
+  Grid,
 } from '@material-ui/core';
 import { useAppNav } from '../../contexts/appNavContext';
 import { CloseRounded } from '@material-ui/icons';
@@ -28,7 +29,6 @@ import {
   UserLanguageObject,
 } from '../../@types/interfaces';
 import usersService from '../../services/usersService';
-import ReplaceTutorForm from './ReplaceTutorForm';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
@@ -56,9 +56,10 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
 
 interface UserDrawerProps {
   drawerFor: UserRoles;
+  showDialog?: (show: 'NONE' | 'SHIFT_ONE' | 'SHIFT_TWO') => void;
 }
 
-const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
+const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, showDialog }) => {
   const [extendedUser, setExtendedUser] = useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
   const classes = useStyles();
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
@@ -123,6 +124,23 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
     return languagesArray.join(', ');
   };
 
+  const getTutor = (id: number) => {
+    let tutor = {
+      id: '...',
+      displayName: '...',
+      email: '...',
+    };
+    const tutorFromContext = tutors?.filter((tutor: Tutor) => tutor.id === id)[0];
+
+    if (!!tutorFromContext) {
+      tutor.id = tutorFromContext.id.toString();
+      tutor.displayName = tutorFromContext.displayName;
+      tutor.email = tutorFromContext.email;
+    }
+
+    return tutor;
+  };
+
   return (
     <Drawer
       classes={{ paperAnchorDockedRight: clsx(classes.docked, { [classes.dockedWithMenuDrawer]: showMenuDrawer }) }}
@@ -168,7 +186,74 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor }) => {
             />
           </ListItem>
         )}
-        {!!extendedUser && <ReplaceTutorForm />}
+        {!!extendedUser && extendedUser.userRole === UserRoles.learner && tutors && (
+          <ListItem>
+            <ListItemText
+              primary={<Typography>Shift One Tutor</Typography>}
+              disableTypography
+              secondary={
+                !!extendedUser && !!extendedUser.shiftOneTutor ? (
+                  <Grid container direction="row" justify="space-between">
+                    <Typography variant="body2" color="textSecondary">
+                      {getTutor(extendedUser.shiftOneTutor).id}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {getTutor(extendedUser.shiftOneTutor).displayName}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {getTutor(extendedUser.shiftOneTutor).email}
+                    </Typography>
+                    <Button
+                      fullWidth
+                      color="secondary"
+                      variant="outlined"
+                      onClick={() => showDialog && showDialog('SHIFT_ONE')}
+                      data-test="replace-tutor-button"
+                    >
+                      REPLACE TUTOR
+                    </Button>
+                  </Grid>
+                ) : (
+                  '...'
+                )
+              }
+            />
+          </ListItem>
+        )}
+        {!!extendedUser && extendedUser.userRole === UserRoles.learner && tutors && (
+          <ListItem divider>
+            <ListItemText
+              primary={<Typography>Shift Two Tutor</Typography>}
+              disableTypography
+              secondary={
+                !!extendedUser && !!extendedUser.shiftTwoTutor ? (
+                  <Grid container direction="row" justify="space-between">
+                    <Typography variant="body2" color="textSecondary">
+                      {getTutor(extendedUser.shiftTwoTutor).id}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {getTutor(extendedUser.shiftTwoTutor).displayName}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {getTutor(extendedUser.shiftTwoTutor).email}
+                    </Typography>
+                    <Button
+                      fullWidth
+                      color="secondary"
+                      variant="outlined"
+                      onClick={() => showDialog && showDialog('SHIFT_TWO')}
+                      data-test="replace-tutor-button"
+                    >
+                      REPLACE TUTOR
+                    </Button>
+                  </Grid>
+                ) : (
+                  '...'
+                )
+              }
+            />
+          </ListItem>
+        )}
         {!!extendedUser && (
           <ListItem>
             <Button
