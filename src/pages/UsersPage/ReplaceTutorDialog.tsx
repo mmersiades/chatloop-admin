@@ -118,7 +118,7 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
         refreshExtendedUser(showDialog.learner);
         setShowDialog({ showDialog: false, oldTutor: undefined, learner: undefined });
       } else {
-        alert('Tutor not replaced. Somethign went wrong');
+        alert('Tutor not replaced. Something went wrong');
         console.log('response', response);
       }
     }

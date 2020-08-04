@@ -141,6 +141,11 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, extendedUser, setShowDialo
             />
           </ListItem>
         )}
+        {!!extendedUser && extendedUser.userRole === UserRoles.tutor && (
+          <ListItem>
+            <ListItemText primary="Current Learners" secondary={extendedUser ? extendedUser.numberOfLearners : '...'} />
+          </ListItem>
+        )}
         {!!extendedUser && extendedUser.userRole === UserRoles.learner && tutors && (
           <ListItem>
             <ListItemText
