@@ -4,6 +4,7 @@ import UsersTable from './UsersTable';
 import { UserRoles } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
 import ReplaceTutorDialog from './ReplaceTutorDialog';
+import { ExtendedLearner } from '../../@types/interfaces';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -14,17 +15,32 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const Learners: FC = () => {
-  const [showReplaceTutorDialog, setShowReplaceTutorDialog] = useState<'NONE' | 'SHIFT_ONE' | 'SHIFT_TWO'>('NONE');
+export interface ShowReplaceTutorDialog {
+  showDialog: boolean;
+  oldTutor?: number;
+  learner?: number;
+}
+
+interface LearnersPageProps {
+  extendedUser: ExtendedLearner;
+  refreshExtendedUser: (id: number) => void;
+}
+
+const Learners: FC<LearnersPageProps> = ({ extendedUser, refreshExtendedUser }) => {
+  const [showReplaceTutorDialog, setShowReplaceTutorDialog] = useState<ShowReplaceTutorDialog>({ showDialog: false });
   const classes = useStyles();
 
   return (
     <div className={classes.learnersContainer}>
-      {showReplaceTutorDialog !== 'NONE' && (
-        <ReplaceTutorDialog showDialog={showReplaceTutorDialog} setShowDialog={setShowReplaceTutorDialog} />
+      {showReplaceTutorDialog.showDialog && (
+        <ReplaceTutorDialog
+          showDialog={showReplaceTutorDialog}
+          setShowDialog={setShowReplaceTutorDialog}
+          refreshExtendedUser={refreshExtendedUser}
+        />
       )}
       <UsersTable tableFor={UserRoles.learner} />
-      <UserDrawer drawerFor={UserRoles.learner} showDialog={setShowReplaceTutorDialog} />
+      <UserDrawer drawerFor={UserRoles.learner} setShowDialog={setShowReplaceTutorDialog} extendedUser={extendedUser} />
     </div>
   );
 };

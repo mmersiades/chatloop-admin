@@ -3,6 +3,7 @@ import { makeStyles, createStyles } from '@material-ui/core';
 import UsersTable from './UsersTable';
 import { UserRoles } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
+import { ExtendedPartner } from '../../@types/interfaces';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -13,12 +14,16 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const Partners: FC = () => {
+interface PartnersPageProps {
+  extendedUser: ExtendedPartner;
+}
+
+const Partners: FC<PartnersPageProps> = ({ extendedUser }) => {
   const classes = useStyles();
   return (
     <div className={classes.partnersContainer}>
       <UsersTable tableFor={UserRoles.partner} />
-      <UserDrawer drawerFor={UserRoles.partner} />
+      <UserDrawer drawerFor={UserRoles.partner} extendedUser={extendedUser} />
     </div>
   );
 };

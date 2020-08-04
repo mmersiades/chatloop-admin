@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, useCallback } from 'react';
+import React, { FC } from 'react';
 import { UserRoles } from '../../@types/enums';
 import {
   Drawer,
@@ -19,16 +19,10 @@ import { useAppNav } from '../../contexts/appNavContext';
 import { CloseRounded } from '@material-ui/icons';
 import clsx from 'clsx';
 import { useUsers } from '../../contexts/usersContext';
-import {
-  Learner,
-  Partner,
-  Tutor,
-  ExtendedLearner,
-  ExtendedPartner,
-  ExtendedTutor,
-  UserLanguageObject,
-} from '../../@types/interfaces';
-import usersService from '../../services/usersService';
+import { Tutor, ExtendedLearner, ExtendedPartner, ExtendedTutor } from '../../@types/interfaces';
+import { ShowReplaceTutorDialog } from './Learners';
+import stringifyLanguages from '../../helpers/stringifyLanguages';
+import { deleteUser } from '../../services/usersService';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
@@ -56,49 +50,17 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
 
 interface UserDrawerProps {
   drawerFor: UserRoles;
-  showDialog?: (show: 'NONE' | 'SHIFT_ONE' | 'SHIFT_TWO') => void;
+  extendedUser?: ExtendedLearner | ExtendedPartner | ExtendedTutor;
+  setShowDialog?: (params: ShowReplaceTutorDialog) => void;
 }
 
-const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, showDialog }) => {
-  const [extendedUser, setExtendedUser] = useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
+const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, extendedUser, setShowDialog }) => {
   const classes = useStyles();
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
-  const {
-    learners,
-    partners,
-    tutors,
-    setEmailForPasswordReset,
-    fetchTutors,
-    fetchPartners,
-    fetchLearners,
-  } = useUsers();
-
-  const getExtendedUser = useCallback(async (user: Learner | Partner | Tutor) => {
-    const response = await usersService.getUser(user);
-    response.status === 200 && setExtendedUser({ ...user, ...response.data });
-  }, []);
-
-  useEffect(() => {
-    let user: Learner | Partner | Tutor | undefined = undefined;
-    if (showUserDrawer != null) {
-      switch (drawerFor) {
-        case UserRoles.learner:
-          user = learners?.filter((learner) => learner.id === showUserDrawer)[0];
-          break;
-        case UserRoles.partner:
-          user = partners?.filter((partner) => partner.id === showUserDrawer)[0];
-          break;
-        case UserRoles.tutor:
-          user = tutors?.filter((tutor) => tutor.id === showUserDrawer)[0];
-          break;
-        default:
-      }
-    }
-    !!user && getExtendedUser(user);
-  }, [showUserDrawer, drawerFor, learners, partners, tutors, getExtendedUser]);
+  const { tutors, setEmailForPasswordReset, fetchTutors, fetchPartners, fetchLearners } = useUsers();
 
   const handleDelete = async (userId: number, userRole: UserRoles) => {
-    const response = await usersService.deleteUser(userId);
+    const response = await deleteUser(userId);
     if (response && response.status === 200) {
       alert(response.data);
       setShowUserDrawer(null);
@@ -115,13 +77,6 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, showDialog }) => {
         default:
       }
     }
-  };
-
-  console.log('extendedUser', extendedUser);
-
-  const stringifyLanguages = (languages: UserLanguageObject[]) => {
-    const languagesArray = languages.map((language) => language.language);
-    return languagesArray.join(', ');
   };
 
   const getTutor = (id: number) => {
@@ -207,7 +162,14 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, showDialog }) => {
                       fullWidth
                       color="secondary"
                       variant="outlined"
-                      onClick={() => showDialog && showDialog('SHIFT_ONE')}
+                      onClick={() => {
+                        setShowDialog &&
+                          setShowDialog({
+                            showDialog: true,
+                            oldTutor: parseInt(getTutor(extendedUser.shiftOneTutor).id),
+                            learner: extendedUser.id,
+                          });
+                      }}
                       data-test="replace-tutor-button"
                     >
                       REPLACE TUTOR
@@ -241,7 +203,14 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, showDialog }) => {
                       fullWidth
                       color="secondary"
                       variant="outlined"
-                      onClick={() => showDialog && showDialog('SHIFT_TWO')}
+                      onClick={() =>
+                        setShowDialog &&
+                        setShowDialog({
+                          showDialog: true,
+                          oldTutor: parseInt(getTutor(extendedUser.shiftTwoTutor).id),
+                          learner: extendedUser.id,
+                        })
+                      }
                       data-test="replace-tutor-button"
                     >
                       REPLACE TUTOR

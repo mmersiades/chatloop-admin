@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, FC, useState } from 'react';
+import React, { useReducer, useEffect, FC, useState, useCallback } from 'react';
 import {
   Tabs,
   Tab,
@@ -18,10 +18,10 @@ import Learners from './Learners';
 import Partners from './Partners';
 import Tutors from './Tutors';
 import WithNavbar from '../../components/WithNavbar';
-import { Learner, Partner, Tutor } from '../../@types/interfaces';
-import usersService from '../../services/usersService';
+import { Learner, Partner, Tutor, ExtendedLearner, ExtendedPartner, ExtendedTutor } from '../../@types/interfaces';
 import { AxiosResponse } from 'axios';
 import AssignTutorsDialog from './AssignTutorsDialog';
+import { getTutors, getPartners, getLearners, resetPassword, getUser } from '../../services/usersService';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -86,19 +86,20 @@ const UsersPage: FC = () => {
   const [newLearnerEmail, setNewLearnerEmail] = useState<string>('');
 
   const [emailForPasswordReset, setEmailForPasswordReset] = useState<string>('');
+  const [extendedUser, setExtendedUser] = useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
 
-  const { setShowUserDrawer } = useAppNav();
+  const { showUserDrawer, setShowUserDrawer } = useAppNav();
 
   const fetchTutors = async () => {
-    await usersService.getTutors(dispatch);
+    await getTutors(dispatch);
   };
 
   const fetchPartners = async () => {
-    await usersService.getPartners(dispatch);
+    await getPartners(dispatch);
   };
 
   const fetchLearners = async () => {
-    await usersService.getLearners(dispatch);
+    await getLearners(dispatch);
   };
 
   useEffect(() => {
@@ -113,8 +114,32 @@ const UsersPage: FC = () => {
     fetchTutors();
   }, []);
 
+  const getExtendedUser = useCallback(async (user: Learner | Partner | Tutor) => {
+    const response = await getUser(user.id);
+    response.status === 200 && setExtendedUser({ ...user, ...response.data });
+  }, []);
+
+  useEffect(() => {
+    let user: Learner | Partner | Tutor | undefined = undefined;
+    if (showUserDrawer != null) {
+      switch (tab) {
+        case 0:
+          user = state.learners?.filter((learner) => learner.id === showUserDrawer)[0];
+          break;
+        case 1:
+          user = state.partners?.filter((partner) => partner.id === showUserDrawer)[0];
+          break;
+        case 2:
+          user = state.tutors?.filter((tutor) => tutor.id === showUserDrawer)[0];
+          break;
+        default:
+      }
+      !!user && getExtendedUser(user);
+    }
+  }, [showUserDrawer, tab, state, getExtendedUser]);
+
   const handlePasswordReset = async (email: string) => {
-    const response: AxiosResponse | undefined = await usersService.resetPassword(email);
+    const response: AxiosResponse | undefined = await resetPassword(email);
 
     if (response && response.status === 200) {
       alert(`${response.data.status}. ${response.data.message}`);
@@ -124,6 +149,11 @@ const UsersPage: FC = () => {
     }
 
     setEmailForPasswordReset('');
+  };
+
+  const refreshExtendedUser = async (userId: number) => {
+    const response = await getUser(userId);
+    response.status === 200 && setExtendedUser({ ...extendedUser, ...response.data });
   };
 
   return (
@@ -182,9 +212,11 @@ const UsersPage: FC = () => {
             </DialogActions>
           </Dialog>
         )}
-        {tab === 0 && <Learners />}
-        {tab === 1 && <Partners />}
-        {tab === 2 && <Tutors />}
+        {tab === 0 && (
+          <Learners extendedUser={extendedUser as ExtendedLearner} refreshExtendedUser={refreshExtendedUser} />
+        )}
+        {tab === 1 && <Partners extendedUser={extendedUser as ExtendedPartner} />}
+        {tab === 2 && <Tutors extendedUser={extendedUser as ExtendedTutor} />}
       </div>
     </UsersContext.Provider>
   );

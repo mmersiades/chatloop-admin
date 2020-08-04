@@ -6,20 +6,20 @@ import { handleError } from '../helpers/handleError';
 import { usersAction } from '../pages/UsersPage';
 import { AxiosResponse } from 'axios';
 
-const getUser = async (user: Learner | Partner | Tutor): Promise<AxiosResponse> => {
+export const getUser = async (userId: number): Promise<AxiosResponse> => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
 
   try {
-    return await apiChatloopOrg.get(`/rest/admin/get-user/${user.id}`, requestOptions);
+    return await apiChatloopOrg.get(`/rest/admin/get-user/${userId}`, requestOptions);
   } catch (error) {
     handleError(error);
   }
   return Promise.reject();
 };
 
-const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
+export const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -33,7 +33,7 @@ const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
   }
 };
 
-const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
+export const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -47,7 +47,7 @@ const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
   }
 };
 
-const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
+export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
   let shiftOneTutors: Array<Tutor> = [];
   let shiftTwoTutors: Array<Tutor> = [];
   const requestOptions = {
@@ -78,7 +78,12 @@ const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
   }
 };
 
-const createUser = async (newUser: { email: string; displayName: string; userRole: UserRoles; shift: TutorShifts }) => {
+export const createUser = async (newUser: {
+  email: string;
+  displayName: string;
+  userRole: UserRoles;
+  shift: TutorShifts;
+}) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -98,7 +103,7 @@ const createUser = async (newUser: { email: string; displayName: string; userRol
   }
 };
 
-const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number; learner: number }) => {
+export const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number; learner: number }) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -110,7 +115,21 @@ const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number
   }
 };
 
-const deleteUser = async (userId: number) => {
+export const replaceTutor = async (oldTutor: number, newTutor: number, learner: number) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  const body = { oldTutor, newTutor, learner };
+
+  try {
+    return await apiChatloopOrg.post('/rest/admin/reassign-tutors-for-learner', body, requestOptions);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const deleteUser = async (userId: number) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -123,7 +142,7 @@ const deleteUser = async (userId: number) => {
   }
 };
 
-const resetPassword = async (email: string) => {
+export const resetPassword = async (email: string) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -137,16 +156,3 @@ const resetPassword = async (email: string) => {
     handleError(error);
   }
 };
-
-const usersService = {
-  getUser,
-  getLearners,
-  getPartners,
-  getTutors,
-  createUser,
-  assignTutors,
-  deleteUser,
-  resetPassword,
-};
-
-export default usersService;

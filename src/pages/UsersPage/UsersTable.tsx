@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 import { FormikValues, Formik, Form, Field, FieldProps, FormikProps } from 'formik';
 import { UserRoles, TutorShifts } from '../../@types/enums';
-import usersService from '../../services/usersService';
 import { useUsers } from '../../contexts/usersContext';
 import {
   TableContainer,
@@ -27,6 +26,7 @@ import { handleError } from '../../helpers/handleError';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 import clsx from 'clsx';
 import { useAppNav } from '../../contexts/appNavContext';
+import { getLearners, getPartners, getTutors, createUser } from '../../services/usersService';
 
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
@@ -125,7 +125,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
       case UserRoles.learner:
         roleParams = {
           role: 'learner',
-          getUser: () => usersService.getLearners(usersDispatch),
+          getUser: () => getLearners(usersDispatch),
           action: 'SET_LEARNERS',
           count: learners?.length || 0,
           rows:
@@ -137,7 +137,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
       case UserRoles.partner:
         roleParams = {
           role: 'partner',
-          getUser: () => usersService.getPartners(usersDispatch),
+          getUser: () => getPartners(usersDispatch),
           action: 'SET_PARTNERS',
           count: partners?.length || 0,
           rows:
@@ -149,7 +149,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
       case UserRoles.tutor:
         roleParams = {
           role: 'tutor',
-          getUser: () => usersService.getTutors(usersDispatch),
+          getUser: () => getTutors(usersDispatch),
           action: 'SET_TUTORS',
           count: tutors?.length || 0,
           rows:
@@ -192,7 +192,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
             };
 
             try {
-              await usersService.createUser(newUser);
+              await createUser(newUser);
             } catch (error) {
               handleError(error);
             }

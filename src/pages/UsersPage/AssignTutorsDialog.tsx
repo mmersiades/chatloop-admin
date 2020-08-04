@@ -12,8 +12,8 @@ import {
 } from '@material-ui/core';
 import { Learner } from '../../@types/interfaces';
 import { TutorShifts } from '../../@types/enums';
-import usersService from '../../services/usersService';
 import { useUsers } from '../../contexts/usersContext';
+import { assignTutors } from '../../services/usersService';
 
 interface AssignTutorValues {
   shiftOneTutor: number;
@@ -44,7 +44,7 @@ export const AssignTutorsDialog: FC = () => {
       <Formik
         initialValues={assignTutorsInitialValues}
         onSubmit={async (values, actions) => {
-          const response = await usersService.assignTutors({
+          const response = await assignTutors({
             shiftOneTutor: values.shiftOneTutor,
             shiftTwoTutor: values.shiftTwoTutor,
             learner: learner.id,
