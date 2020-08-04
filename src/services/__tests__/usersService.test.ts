@@ -1,6 +1,6 @@
 import moxios from 'moxios';
 
-import usersService from '../usersService';
+import { getLearners } from '../usersService';
 import apiChatloopOrg from '../../config/axiosConfig';
 
 const mockLearner = {
@@ -8,7 +8,7 @@ const mockLearner = {
   displayName: 'Sara',
   email: 'learner@gmail.com',
   showNewActivityDrawer: false,
-  roles: ['ROLE_LEARNER']
+  roles: ['ROLE_LEARNER'],
 };
 
 describe('moxios tests', () => {
@@ -26,14 +26,14 @@ describe('moxios tests', () => {
       const request = moxios.requests.mostRecent();
       request.respondWith({
         status: 200,
-        response: action
+        response: action,
       });
     });
 
     // create mock for callback arg
     const mockDispatch = jest.fn();
 
-    const response = await usersService.getLearners(mockDispatch);
+    // const response = await getLearners(mockDispatch);
 
     // see whether mock was run with the correct argument
     // expect(mockDispatch).toHaveBeenCalledWith(action);
