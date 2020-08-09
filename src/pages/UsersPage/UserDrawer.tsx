@@ -29,9 +29,14 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
     docked: {
       top: 96,
       width: '30%',
+      overflowY: 'unset',
+      height: 'calc(100vh - 96px)',
     },
     dockedWithMenuDrawer: {
       width: 'calc((100vw - 150px) * 0.3)',
+    },
+    list: {
+      overflowY: 'auto',
     },
     closeButton: {
       marginRight: spacing(2),
@@ -117,7 +122,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ drawerFor, extendedUser, setShowDialo
           <Typography>{!!extendedUser ? extendedUser.id : '...'}</Typography>
         </Toolbar>
       </AppBar>
-      <List>
+      <List classes={{ root: classes.list }}>
         <ListItem>
           <ListItemText primary="Display name" secondary={extendedUser ? extendedUser.displayName : '...'} />
         </ListItem>
