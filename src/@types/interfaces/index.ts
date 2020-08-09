@@ -1,27 +1,60 @@
 import { UserRoles, TutorShifts } from '../enums';
 
-export interface IUser {
+export interface User {
   id: number;
   displayName: string;
   email: string;
   roles: Array<UserRoles>;
+  uiLanguage: string;
 }
 
-export interface ILearner extends IUser {
+export interface Learner extends User {
   roles: [UserRoles.learner];
   showNewActivityDrawer: false;
 }
 
-export interface IPartner extends IUser {
+export interface ExtendedLearner extends Learner {
+  userRole: UserRoles.learner;
+  id: number; // Learner's id
+  firstLanguages: UserLanguageObject[];
+  numberOfActivities: number;
+  maxNumberOfActivities: number;
+  shiftOneTutor: number; // Tutor's id
+  shiftTwoTutor: number; // Tutor's id
+}
+
+export interface Partner extends User {
   roles: [UserRoles.partner];
 }
 
-export interface ITutor extends IUser {
+export interface ExtendedPartner extends Partner {
+  userRole: UserRoles.partner;
+  id: number; // Partner's id
+  firstLanguages: UserLanguageObject[];
+  numberOfActivities: number;
+  maxNumberOfActivities: number;
+}
+
+export interface Tutor extends User {
   roles: [UserRoles.tutor];
   shift: TutorShifts;
 }
 
-export interface IApplicationProperty {
+export interface ExtendedTutor extends Tutor {
+  userRole: UserRoles.tutor;
+  id: number; // Tutor's id
+  firstLanguages: UserLanguageObject[];
+  numberOfLearners: number;
+  maxNumberOfLearners: number;
+  assignedLearners: number[]; // array of Learner ids
+}
+
+export interface UserLanguageObject {
+  code: string;
+  language: string;
+}
+
+export interface ExpiryInterval {
   value: number;
   /**
    * Returned from back-end as Spring time units (eg HOURS, HOUR, SECOND),
@@ -55,10 +88,10 @@ export interface IApplicationProperty {
 }
 
 export type appPropertiesState = {
-  inviteExpiryInterval?: IApplicationProperty;
+  inviteExpiryInterval?: ExpiryInterval;
 };
 
-export interface IPartnerInQueue {
+export interface PartnerInQueue {
   id: number;
   displayName: string;
   currentNumberOfActivities: number;
@@ -66,7 +99,7 @@ export interface IPartnerInQueue {
   lastChatFinished: string;
 }
 
-export interface IInvite {
+export interface Invite {
   id: number;
   learner: {
     id: number;
@@ -74,12 +107,12 @@ export interface IInvite {
     currentNumberOfActivities: number;
     maxNumberOfActivities: number;
   };
-  partners: Array<IPartnerInQueue>;
+  partners: Array<PartnerInQueue>;
   sentOn: string;
   topic: string;
 }
 
-export type IPageable<T> = {
+export type Pageable<T> = {
   content: T;
   pageable: {
     sort: {

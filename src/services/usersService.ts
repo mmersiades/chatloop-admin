@@ -1,40 +1,55 @@
 import apiChatloopOrg from '../config/axiosConfig';
 import { authHeader } from '../helpers/getAuthHeader';
-import { ILearner, IPartner, ITutor } from '../@types/interfaces';
+import { Learner, Partner, Tutor } from '../@types/interfaces';
 import { TutorShifts, UserRoles } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
+import { usersAction } from '../pages/UsersPage';
+import { AxiosResponse } from 'axios';
 
-const getLearners = async (dispatch: any) => {
+export const getUser = async (userId: number): Promise<AxiosResponse> => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  try {
+    return await apiChatloopOrg.get(`/rest/admin/get-user/${userId}`, requestOptions);
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+};
+
+export const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
 
   try {
     const response = await apiChatloopOrg.get('/rest/user/filter-users?role=ROLE_LEARNER', requestOptions);
-    const learners: Array<ILearner> = response.data.users.map((learner: any) => learner);
+    const learners: Array<Learner> = response.data.users.map((learner: any) => learner);
     dispatch({ type: 'SET_LEARNERS', payload: learners });
   } catch (error) {
     handleError(error);
   }
 };
 
-const getPartners = async (dispatch: any) => {
+export const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
 
   try {
     const response = await apiChatloopOrg.get('/rest/user/filter-users?role=ROLE_PARTNER', requestOptions);
-    const partners: Array<IPartner> = response.data.users.map((partner: any) => partner);
+    const partners: Array<Partner> = response.data.users.map((partner: any) => partner);
     dispatch({ type: 'SET_PARTNERS', payload: partners });
   } catch (error) {
     handleError(error);
   }
 };
 
-const getTutors = async (dispatch: any) => {
-  let shiftOneTutors: Array<ITutor> = [];
-  let shiftTwoTutors: Array<ITutor> = [];
+export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
+  let shiftOneTutors: Array<Tutor> = [];
+  let shiftTwoTutors: Array<Tutor> = [];
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -63,7 +78,12 @@ const getTutors = async (dispatch: any) => {
   }
 };
 
-const createUser = async (newUser: { email: string; displayName: string; userRole: UserRoles; shift: TutorShifts }) => {
+export const createUser = async (newUser: {
+  email: string;
+  displayName: string;
+  userRole: UserRoles;
+  shift: TutorShifts;
+}) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -83,7 +103,7 @@ const createUser = async (newUser: { email: string; displayName: string; userRol
   }
 };
 
-const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number; learner: number }) => {
+export const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number; learner: number }) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -95,7 +115,21 @@ const assignTutors = async (body: { shiftOneTutor: number; shiftTwoTutor: number
   }
 };
 
-const deleteUser = async (userId: number) => {
+export const replaceTutor = async (oldTutor: number, newTutor: number, learner: number) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  const body = { oldTutor, newTutor, learner };
+
+  try {
+    return await apiChatloopOrg.post('/rest/admin/reassign-tutors-for-learner', body, requestOptions);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const deleteUser = async (userId: number) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -108,7 +142,7 @@ const deleteUser = async (userId: number) => {
   }
 };
 
-const resetPassword = async (email: string) => {
+export const resetPassword = async (email: string) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -122,15 +156,3 @@ const resetPassword = async (email: string) => {
     handleError(error);
   }
 };
-
-const usersService = {
-  getLearners,
-  getPartners,
-  getTutors,
-  createUser,
-  assignTutors,
-  deleteUser,
-  resetPassword,
-};
-
-export default usersService;

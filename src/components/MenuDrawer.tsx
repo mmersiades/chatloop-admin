@@ -1,4 +1,4 @@
-import React, { FC, Dispatch, SetStateAction } from 'react';
+import React, { FC } from 'react';
 import {
   makeStyles,
   createStyles,
@@ -15,8 +15,9 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useLocation, Link } from 'react-router-dom';
 import authService from '../services/authServices';
+import { useAppNav } from '../contexts/appNavContext';
 
-const useStyles = makeStyles(({ mixins, palette }: Theme) =>
+const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
     drawerHeader: {
       display: 'flex',
@@ -38,15 +39,11 @@ const useStyles = makeStyles(({ mixins, palette }: Theme) =>
   })
 );
 
-interface IMenuDrawerProps {
-  showMenuDrawer: boolean;
-  setShowMenuDrawer: Dispatch<SetStateAction<boolean>>;
-}
-
-const MenuDrawer: FC<IMenuDrawerProps> = ({ showMenuDrawer, setShowMenuDrawer }) => {
+const MenuDrawer: FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();
+  const { showMenuDrawer, setShowMenuDrawer } = useAppNav();
 
   return (
     <Drawer classes={{ paper: classes.drawerPaper }} variant="persistent" anchor="left" open={showMenuDrawer}>

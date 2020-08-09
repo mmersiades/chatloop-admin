@@ -1,9 +1,10 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import AppRouter from '../routers/AppRouter';
-import appPropertiesContext from '../contexts/appPropertiesContext';
-import { IApplicationProperty, appPropertiesState } from '../@types/interfaces';
+import { AppPropertiesContext } from '../contexts/appPropertiesContext';
+import { ExpiryInterval, appPropertiesState } from '../@types/interfaces';
 import baseURL from '../serverUrls';
+import { AppNavContext } from '../contexts/appNavContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -17,9 +18,14 @@ const useStyles = makeStyles(() =>
   })
 );
 
-type appPropertiesAction = { type: 'SET_INVITE_EXPIRY_INTERVAL'; payload: IApplicationProperty };
+type appPropertiesAction = { type: 'SET_INVITE_EXPIRY_INTERVAL'; payload: ExpiryInterval };
 
-const appPropertiesReducerInitialState: appPropertiesState = {};
+const appPropertiesReducerInitialState: appPropertiesState = {
+  inviteExpiryInterval: {
+    value: 3,
+    unit: 'hours',
+  },
+};
 
 const appPropertiesReducer = (state: appPropertiesState, action: appPropertiesAction) => {
   switch (action.type) {
@@ -31,6 +37,9 @@ const appPropertiesReducer = (state: appPropertiesState, action: appPropertiesAc
 };
 
 const App = () => {
+  const [showMenuDrawer, setShowMenuDrawer] = useState(true);
+  const [showUserDrawer, setShowUserDrawer] = useState<number | null>(null);
+
   // ---------------------------------------- Setting up Material UI ----------------------------------------------- //
   const classes = useStyles();
 
@@ -56,9 +65,11 @@ const App = () => {
   // ---------------------------------------- Rendering component ------------------------------------------------- //
   return (
     <div className={classes.appContainer}>
-      <appPropertiesContext.Provider value={state}>
-        <AppRouter />
-      </appPropertiesContext.Provider>
+      <AppPropertiesContext.Provider value={{ inviteExpiryInterval: state.inviteExpiryInterval }}>
+        <AppNavContext.Provider value={{ showMenuDrawer, showUserDrawer, setShowMenuDrawer, setShowUserDrawer }}>
+          <AppRouter />
+        </AppNavContext.Provider>
+      </AppPropertiesContext.Provider>
     </div>
   );
 };

@@ -1,6 +1,12 @@
-import React from 'react';
-import { appPropertiesState } from '../@types/interfaces';
+import React, { useContext } from 'react';
+import { ExpiryInterval } from '../@types/interfaces';
 
-const defaultValue: appPropertiesState = {};
+interface AppPropertiesContext {
+  inviteExpiryInterval?: ExpiryInterval;
+}
 
-export default React.createContext(defaultValue);
+export const AppPropertiesContext = React.createContext<AppPropertiesContext>({} as AppPropertiesContext);
+
+export const useAppProperties = () => {
+  return useContext(AppPropertiesContext);
+};
