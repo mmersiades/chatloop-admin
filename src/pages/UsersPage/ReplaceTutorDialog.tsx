@@ -16,6 +16,7 @@ import {
   Button,
   Grid,
   Radio,
+  CircularProgress,
 } from '@material-ui/core';
 import { Tutor, ExtendedTutor } from '../../@types/interfaces';
 import { useUsers } from '../../contexts/usersContext';
@@ -71,6 +72,11 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
         marginLeft: spacing(2),
       },
     },
+    spinner: {
+      color: '#fff',
+      marginLeft: spacing(2.125),
+      marginRight: spacing(2.25),
+    },
   })
 );
 
@@ -86,6 +92,7 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
   const [selectedTutor, setSelectedTutor] = useState<ExtendedTutor | undefined>();
   const [oldTutor, setOldTutor] = useState<Tutor | undefined>();
   const [value, setValue] = useState<number | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { tutors } = useUsers();
 
@@ -113,6 +120,7 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!!showDialog.oldTutor && !!showDialog.learner && !!value) {
+      setIsSubmitting(true);
       const response = await replaceTutor(showDialog.oldTutor, value, showDialog.learner);
       if (response?.status === 200) {
         refreshExtendedUser(showDialog.learner);
@@ -121,6 +129,7 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
         alert('Tutor not replaced. Something went wrong');
         console.log('response', response);
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -133,7 +142,7 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
         <>
           <DialogTitle>{`Replace ${oldTutor.displayName}`}</DialogTitle>
           <DialogContent>
-            <form onSubmit={(e) => handleSubmit(e)}>
+            <form onSubmit={(e) => !isSubmitting && handleSubmit(e)}>
               <TableContainer>
                 <Table size="small">
                   <TableHead classes={{ root: classes.tableHead }}>
@@ -187,8 +196,12 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
                   <Button onClick={() => setShowDialog({ showDialog: false, oldTutor: undefined, learner: undefined })}>
                     CANCEL
                   </Button>
-                  <Button type="submit" variant="contained" color="secondary" disabled={!value}>
-                    REPLACE
+                  <Button type="submit" variant="contained" color="secondary" disabled={!value || isSubmitting}>
+                    {isSubmitting ? (
+                      <CircularProgress classes={{ root: classes.spinner }} size={24} thickness={3} />
+                    ) : (
+                      'REPLACE'
+                    )}
                   </Button>
                 </Grid>
               </TableContainer>
