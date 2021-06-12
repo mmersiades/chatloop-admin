@@ -10,17 +10,17 @@ const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
     // LAYOUT
     pageContainer: {
-      height: '100%'
+      height: '100%',
     },
     formContainer: {
       minWidth: spacing(30),
       width: '25vw',
-      marginLeft: spacing(5)
+      marginLeft: spacing(5),
     },
     contentHeight: {
       minHeight: spacing(20),
-      height: '20vh'
-    }
+      height: '20vh',
+    },
     // STYLING
   })
 );
@@ -36,7 +36,7 @@ const LoginPage = () => {
 
   const formikInitialValues: IFormikValues = {
     email: '',
-    password: ''
+    password: '',
   };
 
   return (
@@ -51,7 +51,7 @@ const LoginPage = () => {
           if (!response.isAuthError) {
             history.push({
               pathname: '/dashboard',
-              state: 'Dashboard'
+              state: 'Dashboard',
             });
           }
         }}
@@ -61,7 +61,7 @@ const LoginPage = () => {
             <Form>
               <Grid
                 classes={{
-                  root: clsx(classes.formContainer, classes.contentHeight)
+                  root: clsx(classes.formContainer, classes.contentHeight),
                 }}
                 container
                 direction="column"
@@ -70,12 +70,31 @@ const LoginPage = () => {
               >
                 <Field name="email" value="values.email">
                   {({ field }: FieldProps<IFormikValues>) => {
-                    return <TextField {...field} autoFocus variant="outlined" label="Email" type="email" fullWidth />;
+                    return (
+                      <TextField
+                        {...field}
+                        inputProps={{ 'aria-label': 'email field' }}
+                        autoFocus
+                        variant="outlined"
+                        label="Email"
+                        type="email"
+                        fullWidth
+                      />
+                    );
                   }}
                 </Field>
                 <Field name="password" value="values.password">
                   {({ field }: FieldProps<IFormikValues>) => {
-                    return <TextField {...field} variant="outlined" label="Password" type="password" fullWidth />;
+                    return (
+                      <TextField
+                        {...field}
+                        inputProps={{ 'aria-label': 'password field' }}
+                        variant="outlined"
+                        label="Password"
+                        type="password"
+                        fullWidth
+                      />
+                    );
                   }}
                 </Field>
                 <Button type="submit" color="secondary" disabled={isSubmitting} variant="contained">
