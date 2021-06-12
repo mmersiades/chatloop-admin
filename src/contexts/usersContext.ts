@@ -16,6 +16,7 @@ interface UsersContext {
   setEmailForPasswordReset: (email: string) => void;
 }
 
+// eslint-disable-next-line
 export const UsersContext = React.createContext<UsersContext>({} as UsersContext);
 
 export const useUsers = () => {

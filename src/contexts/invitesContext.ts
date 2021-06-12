@@ -6,6 +6,7 @@ interface InvitesContext {
   invites?: Pageable<Array<Invite>>;
 }
 
+// eslint-disable-next-line
 export const InvitesContext = React.createContext<InvitesContext>({} as InvitesContext);
 
 export const useInvites = () => {

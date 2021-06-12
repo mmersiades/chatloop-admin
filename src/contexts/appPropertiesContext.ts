@@ -5,6 +5,7 @@ interface AppPropertiesContext {
   inviteExpiryInterval?: ExpiryInterval;
 }
 
+// eslint-disable-next-line
 export const AppPropertiesContext = React.createContext<AppPropertiesContext>({} as AppPropertiesContext);
 
 export const useAppProperties = () => {

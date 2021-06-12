@@ -7,6 +7,7 @@ interface AppNavContext {
   setShowUserDrawer: (user: number | null) => void;
 }
 
+// eslint-disable-next-line
 export const AppNavContext = React.createContext<AppNavContext>({} as AppNavContext);
 
 export const useAppNav = () => {
