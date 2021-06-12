@@ -20,13 +20,8 @@ pipelines:
           script: # Modify the commands below to build your repository.
             - npm install
             - npm run build
-            - pwd
-            - ls
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
-            - pwd
-            - ls
-            - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://dev-chatloop-admin/
             - aws cloudfront create-invalidation --distribution-id EB299TW0BQQ5S --paths '/*'
 
     # Build & deploy app to production environment, manually via pipeline web interface
@@ -42,7 +37,6 @@ pipelines:
             - npm run build
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
-            - aws s3 cp --cache-control max-age=0 ./build/service-worker.js s3://chatloop-admin/
             - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'
 
   # Runs tests on commits to all branches ( excpet master and dev)
