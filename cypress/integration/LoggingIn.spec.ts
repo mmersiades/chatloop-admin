@@ -11,12 +11,13 @@ describe('Logging in as existing user', () => {
     cy.url().should('equal', `${Cypress.config().baseUrl}/`);
   });
 
-  // it('should prevent logging in with bad username', () => {
-  //   cy.get('#username').type('wrong-username');
-  //   cy.get('#password').type(dave.password);
-  //   cy.get('input[name="login"]').click();
-  //   cy.contains('Invalid username or password.').should('exist');
-  // });
+  it.only('should prevent logging in with bad username', () => {
+    cy.getAuthTokens(admin.email, admin.password);
+    // cy.get('#username').type('wrong-username');
+    // cy.get('#password').type(dave.password);
+    // cy.get('input[name="login"]').click();
+    // cy.contains('Invalid username or password.').should('exist');
+  });
   // it('should log an existing user in and then log out', () => {
   //   cy.get('#username').type(dave.username);
   //   cy.get('#password').type(dave.password);

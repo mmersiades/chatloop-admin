@@ -13,5 +13,6 @@ declare namespace Cypress {
     // dataCy(value: string): Chainable<Element>
     getToken(): Promise<any>; // Actually a response from Keycloak
     resetDb(): Promise<any>; // Actually a graphql response
+    getAuthTokens(username: string, password: string): Promise<any>;
   }
 }
