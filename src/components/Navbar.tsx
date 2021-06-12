@@ -42,8 +42,7 @@ const Navbar: FC = () => {
   const classes = useStyles();
   const location = useLocation();
   const { showMenuDrawer, setShowMenuDrawer } = useAppNav();
-  // @ts-ignore
-  const title = location.state ? location.state : 'Chatloop Admin';
+  const title = location.state ? (location.state as string) : 'Chatloop Admin';
 
   return (
     <>

@@ -8,4 +8,4 @@ export const baseUrl = {
   local,
 };
 
-export default baseUrl.production;
+export default baseUrl.staging;
