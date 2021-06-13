@@ -9,5 +9,6 @@
     "./**/*.ts",
     "support/commands.ts",
     "support/index.js"
-  ]
+  ],
+  "typeRoots": ["./support"]
 }

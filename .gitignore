@@ -13,6 +13,7 @@
 /cypress/screenshots
 /reports
 /.nyc_output
+cypress.env.json
 
 # production
 /build

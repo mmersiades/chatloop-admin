@@ -1,29 +1,16 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+/// <reference types="cypress" />
 import 'cypress-localstorage-commands';
+import { AxiosResponse } from 'axios';
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      // resetDb(): Promise<any>; // Actually a graphql response
+      getAuthTokens(username: string, password: string): Promise<AxiosResponse>;
+      getE2eTokens(): Promise<AxiosResponse>;
+    }
+  }
+}
 
 Cypress.Commands.add('getAuthTokens', (username: string, password: string) => {
   cy.request({
@@ -37,5 +24,21 @@ Cypress.Commands.add('getAuthTokens', (username: string, password: string) => {
     cy.setLocalStorage('authToken', body.token);
     cy.setLocalStorage('loginToken', body.refreshToken);
     cy.setLocalStorage('tokensAddedAt', new Date().toString());
+  });
+});
+
+Cypress.Commands.add('getE2eTokens', () => {
+  cy.request({
+    method: 'POST',
+    url: `${Cypress.env('API_HOST')}/rest/login`,
+    body: {
+      username: Cypress.env('E2E_USERNAME'),
+      password: Cypress.env('E2E_PASSWORD'),
+    },
+  }).then(({ body }) => {
+    console.log(`body`, body);
+    cy.setLocalStorage('e2eAuthToken', body.token);
+    cy.setLocalStorage('e2eLoginToken', body.refreshToken);
+    cy.setLocalStorage('e2eTokensAddedAt', new Date().toString());
   });
 });
