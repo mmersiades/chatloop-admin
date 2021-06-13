@@ -15,6 +15,14 @@ export const USERS_TITLE = 'Manage Users';
 
 // InvitesPage
 export const INVITES_TITLE = 'Manage Invites';
+export const PARTNER_QUEUE = 'Partner queue';
+export const NUMBERS = 'Numbers';
+export const INVITE_SETTINGS = 'Invite settings';
+export const INVITE_INTERVAL = 'Invite expiry interval';
+export const INVITE_STATISTICS = 'Invite statistics';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';
+
+// Dashboard
+export const DASHBOARD_TITLE = 'Chatloop Admin';

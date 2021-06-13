@@ -78,7 +78,7 @@ const MenuDrawer: FC = () => {
           }
           button
           component={Link}
-          to={{ pathname: '/dashboard', state: 'Dashboard' }}
+          to={{ pathname: '/dashboard' }}
         >
           <ListItemText primary={DASHBOARD} />
         </ListItem>
@@ -88,7 +88,7 @@ const MenuDrawer: FC = () => {
           }
           button
           component={Link}
-          to={{ pathname: '/users', state: 'Manage Users' }}
+          to={{ pathname: '/users' }}
         >
           <ListItemText primary={USERS} />
         </ListItem>
@@ -100,7 +100,7 @@ const MenuDrawer: FC = () => {
           }
           button
           component={Link}
-          to={{ pathname: '/invites', state: 'Manage Invites' }}
+          to={{ pathname: '/invites' }}
         >
           <ListItemText primary={INVITES} />
         </ListItem>
@@ -115,7 +115,7 @@ const MenuDrawer: FC = () => {
           }
           button
           component={Link}
-          to={{ pathname: '/account-settings', state: 'Account Settings' }}
+          to={{ pathname: '/account-settings' }}
         >
           <ListItemText primary={ACCOUNT_SETTINGS} />
         </ListItem>

@@ -32,6 +32,7 @@ import { AxiosResponse } from 'axios';
 import { ExpandMoreRounded, ExpandLessRounded } from '@material-ui/icons';
 import { useAppProperties } from '../../contexts/appPropertiesContext';
 import { InvitesContext } from '../../contexts/invitesContext';
+import { NUMBERS, PARTNER_QUEUE } from '../../config/textConstants';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -128,7 +129,10 @@ const invitesReducer = (state: invitesState, action: invitesAction) => {
 };
 
 const InvitesPage: FC = () => {
-  const [showConfirmInviteDelete, setShowConfirmInviteDelete] = useState<{ show: boolean; id: number | null }>({
+  const [showConfirmInviteDelete, setShowConfirmInviteDelete] = useState<{
+    show: boolean;
+    id: number | null;
+  }>({
     show: false,
     id: null,
   });
@@ -136,7 +140,10 @@ const InvitesPage: FC = () => {
   const [isFetchingQueue, setIsFetchingQueue] = useState<boolean>(true);
   const [isFetchingStats, setIsFetchingStats] = useState<boolean>(true);
   const [isFetchingInvites, setIsFetchingInvites] = useState<boolean>(true);
-  const [state, dispatch] = useReducer(invitesReducer, invitesReducerInitialState);
+  const [state, dispatch] = useReducer(
+    invitesReducer,
+    invitesReducerInitialState
+  );
 
   const classes = useStyles();
 
@@ -160,8 +167,14 @@ const InvitesPage: FC = () => {
 
   const fetchQueue = useCallback(async () => {
     setIsFetchingQueue(true);
-    const partnerQueue = await Promise.all([invitesService.getPartnerQueue(), wait()]);
-    dispatch({ type: 'SET_QUEUE', payload: partnerQueue[0] as Pageable<Array<PartnerInQueue>> });
+    const partnerQueue = await Promise.all([
+      invitesService.getPartnerQueue(),
+      wait(),
+    ]);
+    dispatch({
+      type: 'SET_QUEUE',
+      payload: partnerQueue[0] as Pageable<Array<PartnerInQueue>>,
+    });
     setIsFetchingQueue(false);
   }, []);
 
@@ -174,7 +187,10 @@ const InvitesPage: FC = () => {
   const fetchInvites = useCallback(async () => {
     setIsFetchingInvites(true);
     const invites = await Promise.all([invitesService.getInvites(), wait()]);
-    dispatch({ type: 'SET_INVITES', payload: invites[0] as Pageable<Array<Invite>> });
+    dispatch({
+      type: 'SET_INVITES',
+      payload: invites[0] as Pageable<Array<Invite>>,
+    });
     setIsFetchingInvites(false);
   }, []);
 
@@ -191,7 +207,8 @@ const InvitesPage: FC = () => {
   }, [fetchInvites]);
 
   const handleDeleteInvite = async (id: number) => {
-    const response: AxiosResponse | undefined = await invitesService.deleteInvite(id);
+    const response: AxiosResponse | undefined =
+      await invitesService.deleteInvite(id);
     if (response) {
       if (response.status === 200 && response.data === 'Invite-Deleted') {
         fetchQueue();
@@ -205,13 +222,27 @@ const InvitesPage: FC = () => {
     setShowConfirmInviteDelete({ show: false, id: null });
   };
 
-  const RefreshButton: FC<RefreshButtonProps> = ({ handleClick, isRefreshing }) => (
+  const RefreshButton: FC<RefreshButtonProps> = ({
+    handleClick,
+    isRefreshing,
+  }) => (
     <Button variant="text" color="secondary" onClick={() => handleClick()}>
-      {isRefreshing ? <CircularProgress classes={{ root: classes.spinner }} size="1rem" thickness={2.4} /> : 'REFRESH'}
+      {isRefreshing ? (
+        <CircularProgress
+          classes={{ root: classes.spinner }}
+          size="1rem"
+          thickness={2.4}
+        />
+      ) : (
+        'REFRESH'
+      )}
     </Button>
   );
 
-  const PrimaryPartnerListText: FC<PrimaryPartnerListText> = ({ id, displayName }) => (
+  const PrimaryPartnerListText: FC<PrimaryPartnerListText> = ({
+    id,
+    displayName,
+  }) => (
     <Typography variant="body1" color="primary">
       <span className={classes.partnerId}>{`[${id}] `}</span>
       <strong>{displayName}</strong>
@@ -227,7 +258,9 @@ const InvitesPage: FC = () => {
       <Grid item xs={12}>
         <Typography variant="caption">{`Waiting: ${duration.days()} ${
           duration.days() === 1 ? 'day' : 'days'
-        } and ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</Typography>
+        } and ${duration.hours()} ${
+          duration.hours() === 1 ? 'hour' : 'hours'
+        }`}</Typography>
       </Grid>
       <Grid item xs={6}>
         <Typography variant="caption">
@@ -257,16 +290,26 @@ const InvitesPage: FC = () => {
   );
 
   const ConfirmInviteDeleteDialog: FC = () => (
-    <Dialog open={showConfirmInviteDelete.show} onClose={() => setShowConfirmInviteDelete({ show: false, id: null })}>
+    <Dialog
+      open={showConfirmInviteDelete.show}
+      onClose={() => setShowConfirmInviteDelete({ show: false, id: null })}
+    >
       <DialogContent>
         <Typography>{`Are you sure you want to delete invite ${showConfirmInviteDelete.id}?`}</Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setShowConfirmInviteDelete({ show: false, id: null })}>CANCEL</Button>
+        <Button
+          onClick={() => setShowConfirmInviteDelete({ show: false, id: null })}
+        >
+          CANCEL
+        </Button>
         <Button
           className={classes.deleteButton}
           variant="outlined"
-          onClick={() => showConfirmInviteDelete.id && handleDeleteInvite(showConfirmInviteDelete.id)}
+          onClick={() =>
+            showConfirmInviteDelete.id &&
+            handleDeleteInvite(showConfirmInviteDelete.id)
+          }
         >
           DELETE
         </Button>
@@ -282,24 +325,39 @@ const InvitesPage: FC = () => {
           <div className={classes.listContainer}>
             <List classes={{ root: classes.subListContainer }}>
               <ListItem>
-                <ListItemText primary="Partner Queue" />
+                <ListItemText primary={PARTNER_QUEUE} />
                 <ListItemSecondaryAction>
-                  <RefreshButton handleClick={fetchQueue} isRefreshing={isFetchingQueue} />
+                  <RefreshButton
+                    handleClick={fetchQueue}
+                    isRefreshing={isFetchingQueue}
+                  />
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
               <div className={classes.queue}>
                 {state.partnersQueue?.content.map((partner: PartnerInQueue) => {
-                  const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
+                  const duration = moment.duration(
+                    moment().diff(moment(partner.lastChatFinished))
+                  );
                   return (
-                    <ListItem key={uuid()}>
+                    <ListItem
+                      key={partner.id}
+                      data-testid="partner-queue-list-item"
+                    >
                       <ListItemText
                         disableTypography
-                        primary={<PrimaryPartnerListText id={partner.id} displayName={partner.displayName} />}
+                        primary={
+                          <PrimaryPartnerListText
+                            id={partner.id}
+                            displayName={partner.displayName}
+                          />
+                        }
                         secondary={
                           <SecondaryPartnerListText
                             duration={duration}
-                            currentActivities={partner.currentNumberOfActivities}
+                            currentActivities={
+                              partner.currentNumberOfActivities
+                            }
                             maxActivities={partner.maxNumberOfActivities}
                           />
                         }
@@ -312,17 +370,29 @@ const InvitesPage: FC = () => {
           </div>
         </Grid>
         <Grid item xs={6} lg={8}>
-          <List classes={{ root: clsx(classes.subListContainer, classes.invitesHeader) }}>
+          <List
+            classes={{
+              root: clsx(classes.subListContainer, classes.invitesHeader),
+            }}
+          >
             <ListItem>
               <ListItemText primary="Invites" />
               <ListItemSecondaryAction>
-                <RefreshButton handleClick={fetchInvites} isRefreshing={isFetchingInvites} />
+                <RefreshButton
+                  handleClick={fetchInvites}
+                  isRefreshing={isFetchingInvites}
+                />
               </ListItemSecondaryAction>
             </ListItem>
             <Divider />
           </List>
           <div className={classes.queue}>
-            <Grid classes={{ root: classes.invitesContainer }} container spacing={2} justify="space-evenly">
+            <Grid
+              classes={{ root: classes.invitesContainer }}
+              container
+              spacing={2}
+              justify="space-evenly"
+            >
               {state.invites?.content.length === 0 ? (
                 <p>No invites</p>
               ) : (
@@ -330,25 +400,43 @@ const InvitesPage: FC = () => {
                   <Grid key={uuid()} item xs={12} md={12} lg={6}>
                     <Card>
                       <CardContent>
-                        <Grid container justify="space-between" alignItems="center">
+                        <Grid
+                          container
+                          justify="space-between"
+                          alignItems="center"
+                        >
                           <Typography variant="body1" color="primary">
-                            <span className={classes.partnerId}>{`[${invite.id}] `}</span>
+                            <span
+                              className={classes.partnerId}
+                            >{`[${invite.id}] `}</span>
                             <strong>{invite.topic}</strong>
                           </Typography>
                           {invite.id === expandedInvite ? (
-                            <IconButton onClick={() => setexpandedInvite(null)} aria-label="show more">
+                            <IconButton
+                              onClick={() => setexpandedInvite(null)}
+                              aria-label="show more"
+                            >
                               <ExpandLessRounded />
                             </IconButton>
                           ) : (
-                            <IconButton onClick={() => setexpandedInvite(invite.id)} aria-label="show more">
+                            <IconButton
+                              onClick={() => setexpandedInvite(invite.id)}
+                              aria-label="show more"
+                            >
                               <ExpandMoreRounded />
                             </IconButton>
                           )}
                         </Grid>
                         <Divider />
-                        <Collapse in={invite.id === expandedInvite} timeout="auto">
+                        <Collapse
+                          in={invite.id === expandedInvite}
+                          timeout="auto"
+                        >
                           <List dense disablePadding>
-                            <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                            <ListItem
+                              key={uuid()}
+                              classes={{ root: classes.noPadding }}
+                            >
                               <ListItemText
                                 disableTypography
                                 primary={
@@ -360,33 +448,56 @@ const InvitesPage: FC = () => {
                                 }
                                 secondary={
                                   <Capacity
-                                    maxActivities={invite.learner.maxNumberOfActivities}
-                                    currentActivities={invite.learner.currentNumberOfActivities}
+                                    maxActivities={
+                                      invite.learner.maxNumberOfActivities
+                                    }
+                                    currentActivities={
+                                      invite.learner.currentNumberOfActivities
+                                    }
                                   />
                                 }
                               />
                             </ListItem>
                             {invite.partners.map((partner: PartnerInQueue) => {
-                              const duration = moment.duration(moment().diff(moment(partner.lastChatFinished)));
+                              const duration = moment.duration(
+                                moment().diff(moment(partner.lastChatFinished))
+                              );
                               return (
-                                <ListItem key={uuid()} classes={{ root: classes.noPadding }}>
+                                <ListItem
+                                  key={uuid()}
+                                  classes={{ root: classes.noPadding }}
+                                >
                                   <ListItemText
                                     disableTypography
                                     primary={
-                                      <InviteUser designation="P" id={partner.id} displayName={partner.displayName} />
+                                      <InviteUser
+                                        designation="P"
+                                        id={partner.id}
+                                        displayName={partner.displayName}
+                                      />
                                     }
                                     secondary={
                                       <Grid container justify="space-between">
                                         <Capacity
-                                          maxActivities={partner.maxNumberOfActivities}
-                                          currentActivities={partner.currentNumberOfActivities}
+                                          maxActivities={
+                                            partner.maxNumberOfActivities
+                                          }
+                                          currentActivities={
+                                            partner.currentNumberOfActivities
+                                          }
                                         />
 
                                         <Typography variant="caption">
                                           W:
                                           <strong>{` ${duration.days()} ${
-                                            duration.days() === 1 ? 'day' : 'days'
-                                          }, ${duration.hours()} ${duration.hours() === 1 ? 'hour' : 'hours'}`}</strong>
+                                            duration.days() === 1
+                                              ? 'day'
+                                              : 'days'
+                                          }, ${duration.hours()} ${
+                                            duration.hours() === 1
+                                              ? 'hour'
+                                              : 'hours'
+                                          }`}</strong>
                                         </Typography>
                                       </Grid>
                                     }
@@ -398,13 +509,23 @@ const InvitesPage: FC = () => {
                           <Divider />
                         </Collapse>
 
-                        <Grid container justify="space-between" alignItems="center">
+                        <Grid
+                          container
+                          justify="space-between"
+                          alignItems="center"
+                        >
                           <Typography>
-                            Expires: <strong>{` ${getExpiration(invite)}`}</strong>
+                            Expires:{' '}
+                            <strong>{` ${getExpiration(invite)}`}</strong>
                           </Typography>
                           <Button
                             className={classes.deleteButton}
-                            onClick={() => setShowConfirmInviteDelete({ show: true, id: invite.id })}
+                            onClick={() =>
+                              setShowConfirmInviteDelete({
+                                show: true,
+                                id: invite.id,
+                              })
+                            }
                           >
                             DELETE
                           </Button>
@@ -421,9 +542,12 @@ const InvitesPage: FC = () => {
           <div className={classes.listContainer}>
             <List classes={{ root: classes.subListContainer }}>
               <ListItem>
-                <ListItemText primary="Numbers" />
+                <ListItemText primary={NUMBERS} />
                 <ListItemSecondaryAction>
-                  <RefreshButton handleClick={fetchInviteStats} isRefreshing={isFetchingStats} />
+                  <RefreshButton
+                    handleClick={fetchInviteStats}
+                    isRefreshing={isFetchingStats}
+                  />
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
