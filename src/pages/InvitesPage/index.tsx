@@ -217,23 +217,20 @@ const InvitesPage: FC = () => {
   const handleDeleteInvite = async (id: number) => {
     const response: AxiosResponse | undefined =
       await invitesService.deleteInvite(id);
-    console.log(`response`, response);
     if (response) {
-      console.log(`response.status === 200`, response.status === 200);
-      console.log(
-        `response.data === 'Invite-Deleted'`,
-        response.data === 'Invite-Deleted'
-      );
       if (response.status === 200 && response.data === 'Invite-Deleted') {
         fetchQueue();
-        fetchInvites();
+        await fetchInvites();
         fetchInviteStats();
+        setShowConfirmInviteDelete({ show: false, id: null });
         alert(response.data);
       } else {
+        setShowConfirmInviteDelete({ show: false, id: null });
         alert(`failed to delete invite ${id}`);
       }
+    } else {
+      setShowConfirmInviteDelete({ show: false, id: null });
     }
-    setShowConfirmInviteDelete({ show: false, id: null });
   };
 
   const PrimaryPartnerListText: FC<PrimaryPartnerListText> = ({
@@ -309,7 +306,15 @@ const InvitesPage: FC = () => {
             handleDeleteInvite(showConfirmInviteDelete.id)
           }
         >
-          DELETE
+          {isFetchingInvites ? (
+            <CircularProgress
+              className={classes.spinner}
+              size="1rem"
+              thickness={2.4}
+            />
+          ) : (
+            'DELETE'
+          )}
         </Button>
       </DialogActions>
     </Dialog>

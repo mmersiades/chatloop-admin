@@ -24,6 +24,7 @@ export const NO_INVITES = 'No invites';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';
+export const PASSWORD_LABEL = 'Password';
 
 // Dashboard
 export const DASHBOARD_TITLE = 'Chatloop Admin';

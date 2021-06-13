@@ -12,26 +12,27 @@ import {
   IconButton,
   Typography,
   Grid,
-  Theme
+  Theme,
 } from '@material-ui/core';
 import { EditRounded } from '@material-ui/icons';
 import WithNavbar from '../../components/WithNavbar';
 import ChangePasswordForm from './ChangePasswordForm';
+import { PASSWORD_LABEL } from '../../config/textConstants';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
     listContainer: {
       width: '80%',
       backgroundColor: '#fff',
-      border: `1px solid ${palette.grey[100]}`
+      border: `1px solid ${palette.grey[100]}`,
     },
     root: { width: '100%' },
     popover: {
-      padding: spacing(2)
+      padding: spacing(2),
     },
     infoIcon: {
-      color: palette.grey[300]
-    }
+      color: palette.grey[300],
+    },
   })
 );
 
@@ -55,7 +56,7 @@ const AccountSettingsPage = () => {
       duration: 300,
       delay: 50,
       smooth: true,
-      offset: -130
+      offset: -130,
     });
   };
 
@@ -68,11 +69,14 @@ const AccountSettingsPage = () => {
         </Grid>
         <Element name="password">
           {showPasswordForm ? (
-            <ChangePasswordForm showForm={showPasswordForm} closeForm={() => setShowPasswordForm(false)} />
+            <ChangePasswordForm
+              showForm={showPasswordForm}
+              closeForm={() => setShowPasswordForm(false)}
+            />
           ) : (
             <ListItem alignItems="flex-start">
               <ListItemText
-                primary="Password"
+                primary={PASSWORD_LABEL}
                 secondary={
                   <React.Fragment>
                     <Typography component={'span'} variant="h6">
@@ -82,7 +86,10 @@ const AccountSettingsPage = () => {
                 }
               />
               <ListItemSecondaryAction>
-                <IconButton data-test="edit-password-button" onClick={() => handleOpenForm('password')}>
+                <IconButton
+                  aria-label="edit-password-button"
+                  onClick={() => handleOpenForm('password')}
+                >
                   <EditRounded />
                 </IconButton>
               </ListItemSecondaryAction>

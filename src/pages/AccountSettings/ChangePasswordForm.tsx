@@ -9,7 +9,14 @@
 
 /** */
 import React, { FC, useState } from 'react';
-import { Formik, Form, Field, ErrorMessage, FormikProps, FieldProps } from 'formik';
+import {
+  Formik,
+  Form,
+  Field,
+  ErrorMessage,
+  FormikProps,
+  FieldProps,
+} from 'formik';
 import * as Yup from 'yup';
 
 import {
@@ -23,9 +30,14 @@ import {
   TextField,
   FormHelperText,
   Fade,
-  Theme
+  Theme,
 } from '@material-ui/core';
-import { CheckRounded, CloseRounded, Visibility, VisibilityOff } from '@material-ui/icons';
+import {
+  CheckRounded,
+  CloseRounded,
+  Visibility,
+  VisibilityOff,
+} from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import authService from '../../services/authServices';
 import { AxiosResponse } from 'axios';
@@ -35,18 +47,18 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
     textField: {
       width: '100%',
-      paddingTop: spacing()
+      paddingTop: spacing(),
     },
     closeForm: { color: palette.grey[200] },
     listItem: {
       paddingLeft: spacing(2),
       paddingRight: spacing(2),
-      backgroundColor: fade(palette.grey[50], 0.25)
+      backgroundColor: fade(palette.grey[50], 0.25),
     },
     listItemText: {
-      marginTop: spacing(0.75)
+      marginTop: spacing(0.75),
     },
-    formControlRoot: { display: 'block' }
+    formControlRoot: { display: 'block' },
   })
 );
 
@@ -60,7 +72,7 @@ const validationSchema = Yup.object().shape({
     .required('Please enter a new password'),
   confirmPassword: Yup.string()
     .min(8, 'Passwords must be 8 characters or more')
-    .required('Please re-enter your new password')
+    .required('Please re-enter your new password'),
 });
 
 interface IChangePasswordFormProps {
@@ -91,16 +103,21 @@ interface IChangePasswordFormValues {
  * * new passoword
  * * confirm password
  */
-const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm }) => {
+const ChangePasswordForm: FC<IChangePasswordFormProps> = ({
+  showForm,
+  closeForm,
+}) => {
   // -------------------------------- Setting up component state ------------------------------------------ //
   /** Should the current password be shown as text or masking dots? */
-  const [showCurrentPassword, setShowCurrentPassword] = useState<boolean>(false);
+  const [showCurrentPassword, setShowCurrentPassword] =
+    useState<boolean>(false);
 
   /** Should the new password be shown as text or masking dots? */
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
 
   /** Should the confirmation password be shown as text or masking dots? */
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
 
   // -------------------------------- Setting up Material-UI styling ---------------------------------------- //
   const theme = useTheme();
@@ -153,13 +170,16 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
     <Fade in={showForm}>
       <Grid className={classes.listItem} container>
         <Grid item xs={12}>
-          <ListItemText classes={{ root: classes.listItemText }} primary="Password" />
+          <ListItemText
+            classes={{ root: classes.listItemText }}
+            primary="Password"
+          />
         </Grid>
         <Formik
           initialValues={{
             currentPassword: '',
             newPassword: '',
-            confirmPassword: ''
+            confirmPassword: '',
           }}
           onSubmit={async (values: IChangePasswordFormValues) => {
             const response: AxiosResponse = await authService.updatePassword(
@@ -180,7 +200,8 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
           {(props: FormikProps<IChangePasswordFormValues>) => {
             let noMatch: boolean = false;
             if (props.touched.newPassword && props.touched.confirmPassword) {
-              noMatch = props.values.newPassword !== props.values.confirmPassword;
+              noMatch =
+                props.values.newPassword !== props.values.confirmPassword;
             }
 
             const disableSubmit: boolean =
@@ -202,7 +223,10 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                               placeholder="Current password"
                               type={showCurrentPassword ? 'text' : 'password'}
                               variant="outlined"
-                              error={!!props.errors.currentPassword && props.touched.currentPassword}
+                              error={
+                                !!props.errors.currentPassword &&
+                                props.touched.currentPassword
+                              }
                               classes={{ root: classes.textField }}
                               InputProps={{
                                 style: { height: 32, width: '100%' },
@@ -214,10 +238,14 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                                         toggleShowPassword(field.name);
                                       }}
                                     >
-                                      {showCurrentPassword ? <Visibility /> : <VisibilityOff />}
+                                      {showCurrentPassword ? (
+                                        <Visibility />
+                                      ) : (
+                                        <VisibilityOff />
+                                      )}
                                     </IconButton>
                                   </InputAdornment>
-                                )
+                                ),
                               }}
                             />
                           );
@@ -232,7 +260,10 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                               placeholder="New password"
                               type={showNewPassword ? 'text' : 'password'}
                               variant="outlined"
-                              error={!!props.errors.newPassword && props.touched.newPassword}
+                              error={
+                                !!props.errors.newPassword &&
+                                props.touched.newPassword
+                              }
                               classes={{ root: classes.textField }}
                               InputProps={{
                                 style: { height: 32, width: '100%' },
@@ -244,10 +275,14 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                                         toggleShowPassword(field.name);
                                       }}
                                     >
-                                      {showNewPassword ? <Visibility /> : <VisibilityOff />}
+                                      {showNewPassword ? (
+                                        <Visibility />
+                                      ) : (
+                                        <VisibilityOff />
+                                      )}
                                     </IconButton>
                                   </InputAdornment>
-                                )
+                                ),
                               }}
                             />
                           );
@@ -262,7 +297,10 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                               placeholder="Confirm password"
                               type={showConfirmPassword ? 'text' : 'password'}
                               variant="outlined"
-                              error={!!props.errors.confirmPassword && props.touched.confirmPassword}
+                              error={
+                                !!props.errors.confirmPassword &&
+                                props.touched.confirmPassword
+                              }
                               classes={{ root: classes.textField }}
                               InputProps={{
                                 style: { height: 32, width: '100%' },
@@ -274,10 +312,14 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                                         toggleShowPassword(field.name);
                                       }}
                                     >
-                                      {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                                      {showConfirmPassword ? (
+                                        <Visibility />
+                                      ) : (
+                                        <VisibilityOff />
+                                      )}
                                     </IconButton>
                                   </InputAdornment>
-                                )
+                                ),
                               }}
                             />
                           );
@@ -286,13 +328,21 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({ showForm, closeForm 
                     </Grid>
                   </Grid>
                   <Grid item xs>
-                    <Grid container wrap="nowrap" justify="flex-end" alignItems="center">
+                    <Grid
+                      container
+                      wrap="nowrap"
+                      justify="flex-end"
+                      alignItems="center"
+                    >
                       {renderErrorMessage(noMatch)}
-                      <IconButton data-test="close-form-button" onClick={closeForm}>
+                      <IconButton
+                        aria-label="close-form-button"
+                        onClick={closeForm}
+                      >
                         <CloseRounded className={classes.closeForm} />
                       </IconButton>
                       <IconButton
-                        data-test="submit-form-button"
+                        aria-label="submit-form-button"
                         onClick={() => props.submitForm()}
                         disabled={disableSubmit}
                         color="secondary"
