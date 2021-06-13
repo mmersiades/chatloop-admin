@@ -1,0 +1,17 @@
+{
+  "email": "learner@gmail.com",
+  "password": "password",
+  "displayName": "Sara",
+  "id": 112957,
+  "userRole": "ROLE_LEARNER",
+  "firstLanguages": [
+    {
+      "code": "ara",
+      "language": "Arabic"
+    }
+  ],
+  "numberOfActivities": 3,
+  "maxNumberOfActivities": 3,
+  "shiftOneTutor": 112974,
+  "shiftTwoTutor": 112976
+}

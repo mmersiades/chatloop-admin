@@ -4,7 +4,7 @@ import {
 } from '../../src/config/textConstants';
 import admin from '../fixtures/users/admin.json';
 
-describe('Using the Dashboard', () => {
+describe('Using the AccountSettings', () => {
   beforeEach(() => {
     cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/account-settings');

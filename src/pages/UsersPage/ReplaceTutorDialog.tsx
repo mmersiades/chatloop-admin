@@ -86,10 +86,15 @@ interface ReplaceTutorDialogProps {
   refreshExtendedUser: (id: number) => void;
 }
 
-const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDialog, refreshExtendedUser }) => {
+const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
+  showDialog,
+  setShowDialog,
+  refreshExtendedUser,
+}) => {
   const classes = useStyles();
   const [shiftTutors, setShiftTutors] = useState<Array<Tutor> | undefined>();
-  const [selectedTutor, setSelectedTutor] = useState<ExtendedTutor | undefined>();
+  const [selectedTutor, setSelectedTutor] =
+    useState<ExtendedTutor | undefined>();
   const [oldTutor, setOldTutor] = useState<Tutor | undefined>();
   const [value, setValue] = useState<number | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,14 +105,20 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
     if (!!tutors && !!oldTutor) {
       const filteredTutors = tutors.filter((tutor) => tutor.id !== oldTutor.id);
       oldTutor.shift === TutorShifts.one
-        ? setShiftTutors(filteredTutors.filter((tutor) => tutor.shift === TutorShifts.one))
-        : setShiftTutors(filteredTutors.filter((tutor) => tutor.shift === TutorShifts.two));
+        ? setShiftTutors(
+            filteredTutors.filter((tutor) => tutor.shift === TutorShifts.one)
+          )
+        : setShiftTutors(
+            filteredTutors.filter((tutor) => tutor.shift === TutorShifts.two)
+          );
     }
   }, [tutors, showDialog, oldTutor]);
 
   useEffect(() => {
     if (!!tutors && !!showDialog.oldTutor) {
-      setOldTutor(tutors.filter((tutor) => tutor.id === showDialog.oldTutor)[0]);
+      setOldTutor(
+        tutors.filter((tutor) => tutor.id === showDialog.oldTutor)[0]
+      );
     }
   }, [tutors, showDialog.oldTutor]);
 
@@ -121,10 +132,18 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
     e.preventDefault();
     if (!!showDialog.oldTutor && !!showDialog.learner && !!value) {
       setIsSubmitting(true);
-      const response = await replaceTutor(showDialog.oldTutor, value, showDialog.learner);
+      const response = await replaceTutor(
+        showDialog.oldTutor,
+        value,
+        showDialog.learner
+      );
       if (response?.status === 200) {
         refreshExtendedUser(showDialog.learner);
-        setShowDialog({ showDialog: false, oldTutor: undefined, learner: undefined });
+        setShowDialog({
+          showDialog: false,
+          oldTutor: undefined,
+          learner: undefined,
+        });
       } else {
         alert('Tutor not replaced. Something went wrong');
         console.log('response', response);
@@ -136,7 +155,13 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
   return (
     <Dialog
       open={showDialog.showDialog}
-      onClose={() => setShowDialog({ showDialog: false, oldTutor: undefined, learner: undefined })}
+      onClose={() =>
+        setShowDialog({
+          showDialog: false,
+          oldTutor: undefined,
+          learner: undefined,
+        })
+      }
     >
       {!!oldTutor && (
         <>
@@ -147,20 +172,38 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
                 <Table size="small">
                   <TableHead classes={{ root: classes.tableHead }}>
                     <TableRow classes={{ root: classes.tableRow }}>
-                      <TableCell classes={{ root: classes.tableCell }} align="center"></TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      ></TableCell>
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         ID
                       </TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         Display name
                       </TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         Current learners
                       </TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         Max learners
                       </TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         First language
                       </TableCell>
                     </TableRow>
@@ -168,17 +211,30 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
                   <TableBody classes={{ root: classes.tableBody }}>
                     {shiftTutors &&
                       shiftTutors.map((tutor) => (
-                        <TableRow key={tutor.id} classes={{ root: classes.tableRow }}>
+                        <TableRow
+                          key={tutor.id}
+                          classes={{ root: classes.tableRow }}
+                        >
                           <TableCell align="center">
-                            <Radio checked={value === tutor.id} onChange={() => handleSelect(tutor)} value={value} />
+                            <Radio
+                              checked={value === tutor.id}
+                              onChange={() => handleSelect(tutor)}
+                              value={value}
+                            />
                           </TableCell>
                           <TableCell align="center">{tutor.id}</TableCell>
-                          <TableCell align="center">{tutor.displayName}</TableCell>
                           <TableCell align="center">
-                            {selectedTutor && value === tutor.id ? selectedTutor.numberOfLearners : ''}
+                            {tutor.displayName}
                           </TableCell>
                           <TableCell align="center">
-                            {selectedTutor && value === tutor.id ? selectedTutor.maxNumberOfLearners : ''}
+                            {selectedTutor && value === tutor.id
+                              ? selectedTutor.numberOfLearners
+                              : ''}
+                          </TableCell>
+                          <TableCell align="center">
+                            {selectedTutor && value === tutor.id
+                              ? selectedTutor.maxNumberOfLearners
+                              : ''}
                           </TableCell>
                           <TableCell align="center">
                             {selectedTutor && value === tutor.id
@@ -189,16 +245,39 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({ showDialog, setShowDi
                       ))}
                   </TableBody>
                 </Table>
-                <Grid classes={{ root: classes.footerRoot }} container justify="flex-end" alignItems="center">
+                <Grid
+                  classes={{ root: classes.footerRoot }}
+                  container
+                  justify="flex-end"
+                  alignItems="center"
+                >
                   {!!selectedTutor && (
                     <Typography>{`Replace ${oldTutor.displayName} with ${selectedTutor.displayName}?`}</Typography>
                   )}
-                  <Button onClick={() => setShowDialog({ showDialog: false, oldTutor: undefined, learner: undefined })}>
+                  <Button
+                    onClick={() =>
+                      setShowDialog({
+                        showDialog: false,
+                        oldTutor: undefined,
+                        learner: undefined,
+                      })
+                    }
+                  >
                     CANCEL
                   </Button>
-                  <Button type="submit" variant="contained" color="secondary" disabled={!value || isSubmitting}>
+                  <Button
+                    aria-label="confirm-replace-button"
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    disabled={!value || isSubmitting}
+                  >
                     {isSubmitting ? (
-                      <CircularProgress classes={{ root: classes.spinner }} size={24} thickness={3} />
+                      <CircularProgress
+                        classes={{ root: classes.spinner }}
+                        size={24}
+                        thickness={3}
+                      />
                     ) : (
                       'REPLACE'
                     )}

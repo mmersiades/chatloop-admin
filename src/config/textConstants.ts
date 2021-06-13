@@ -12,6 +12,20 @@ export const DASHBOARD = 'Dashboard';
 
 // UsersPage
 export const USERS_TITLE = 'Manage Users';
+export const LEARNERS_TAB = 'LEARNERS';
+export const PARTNERS_TAB = 'PARTNERS';
+export const TUTORS_TAB = 'TUTORS';
+export const DISPLAY_NAME = 'Display name';
+export const EMAIL = 'Email';
+export const FIRST_LANGUAGE = 'First language';
+export const INTERFACE_LANGUAGE = 'Interface language';
+export const CURRENT_ACTIVITIES = 'Current activities';
+export const CURRENT_LEARNERS = 'Current learners';
+export const SHIFT_ONE_TUTOR = 'Shift one tutor';
+export const SHIFT_TWO_TUTOR = 'Shift two tutor';
+export const REPLACE_TUTOR = 'REPLACE TUTOR';
+export const RESET_PASSWORD = 'RESET PASSWORD';
+export const DELETE = 'DELETE';
 
 // InvitesPage
 export const INVITES_TITLE = 'Manage Invites';

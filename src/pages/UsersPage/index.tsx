@@ -18,10 +18,28 @@ import Learners from './Learners';
 import Partners from './Partners';
 import Tutors from './Tutors';
 import WithNavbar from '../../components/WithNavbar';
-import { Learner, Partner, Tutor, ExtendedLearner, ExtendedPartner, ExtendedTutor } from '../../@types/interfaces';
+import {
+  Learner,
+  Partner,
+  Tutor,
+  ExtendedLearner,
+  ExtendedPartner,
+  ExtendedTutor,
+} from '../../@types/interfaces';
 import { AxiosResponse } from 'axios';
 import AssignTutorsDialog from './AssignTutorsDialog';
-import { getTutors, getPartners, getLearners, resetPassword, getUser } from '../../services/usersService';
+import {
+  getTutors,
+  getPartners,
+  getLearners,
+  resetPassword,
+  getUser,
+} from '../../services/usersService';
+import {
+  LEARNERS_TAB,
+  PARTNERS_TAB,
+  TUTORS_TAB,
+} from '../../config/textConstants';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -85,8 +103,10 @@ const UsersPage: FC = () => {
   // The email address of a newly added Learner. Used for adding Tutors to the new Learner
   const [newLearnerEmail, setNewLearnerEmail] = useState<string>('');
 
-  const [emailForPasswordReset, setEmailForPasswordReset] = useState<string>('');
-  const [extendedUser, setExtendedUser] = useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
+  const [emailForPasswordReset, setEmailForPasswordReset] =
+    useState<string>('');
+  const [extendedUser, setExtendedUser] =
+    useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
 
   const { showUserDrawer, setShowUserDrawer } = useAppNav();
 
@@ -114,23 +134,32 @@ const UsersPage: FC = () => {
     fetchTutors();
   }, []);
 
-  const getExtendedUser = useCallback(async (user: Learner | Partner | Tutor) => {
-    const response = await getUser(user.id);
-    response.status === 200 && setExtendedUser({ ...user, ...response.data });
-  }, []);
+  const getExtendedUser = useCallback(
+    async (user: Learner | Partner | Tutor) => {
+      const response = await getUser(user.id);
+      response.status === 200 && setExtendedUser({ ...user, ...response.data });
+    },
+    []
+  );
 
   useEffect(() => {
     let user: Learner | Partner | Tutor | undefined = undefined;
     if (showUserDrawer != null) {
       switch (tab) {
         case 0:
-          user = state.learners?.filter((learner) => learner.id === showUserDrawer)[0];
+          user = state.learners?.filter(
+            (learner) => learner.id === showUserDrawer
+          )[0];
           break;
         case 1:
-          user = state.partners?.filter((partner) => partner.id === showUserDrawer)[0];
+          user = state.partners?.filter(
+            (partner) => partner.id === showUserDrawer
+          )[0];
           break;
         case 2:
-          user = state.tutors?.filter((tutor) => tutor.id === showUserDrawer)[0];
+          user = state.tutors?.filter(
+            (tutor) => tutor.id === showUserDrawer
+          )[0];
           break;
         default:
       }
@@ -153,7 +182,8 @@ const UsersPage: FC = () => {
 
   const refreshExtendedUser = async (userId: number) => {
     const response = await getUser(userId);
-    response.status === 200 && setExtendedUser({ ...extendedUser, ...response.data });
+    response.status === 200 &&
+      setExtendedUser({ ...extendedUser, ...response.data });
   };
 
   return (
@@ -185,9 +215,9 @@ const UsersPage: FC = () => {
               style: { backgroundColor: '#45ecff', height: '8px' },
             }}
           >
-            <Tab label="Learners" />
-            <Tab label="Partners" />
-            <Tab label="Tutors" />
+            <Tab label={LEARNERS_TAB} />
+            <Tab label={PARTNERS_TAB} />
+            <Tab label={TUTORS_TAB} />
           </Tabs>
         </div>
         {newLearnerEmail && (
@@ -196,26 +226,43 @@ const UsersPage: FC = () => {
           </Dialog>
         )}
         {!!emailForPasswordReset && (
-          <Dialog open={!!emailForPasswordReset} onClose={() => setEmailForPasswordReset('')}>
+          <Dialog
+            open={!!emailForPasswordReset}
+            onClose={() => setEmailForPasswordReset('')}
+          >
             <DialogTitle>Reset Password?</DialogTitle>
             <DialogContent>
               <Typography>
-                Are you sure you want to reset <span className={classes.highlightSpan}>{emailForPasswordReset}</span>
+                Are you sure you want to reset{' '}
+                <span className={classes.highlightSpan}>
+                  {emailForPasswordReset}
+                </span>
                 's password?
               </Typography>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setEmailForPasswordReset('')}>CANCEL</Button>
-              <Button color="secondary" variant="contained" onClick={() => handlePasswordReset(emailForPasswordReset)}>
+              <Button onClick={() => setEmailForPasswordReset('')}>
+                CANCEL
+              </Button>
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={() => handlePasswordReset(emailForPasswordReset)}
+              >
                 RESET
               </Button>
             </DialogActions>
           </Dialog>
         )}
         {tab === 0 && (
-          <Learners extendedUser={extendedUser as ExtendedLearner} refreshExtendedUser={refreshExtendedUser} />
+          <Learners
+            extendedUser={extendedUser as ExtendedLearner}
+            refreshExtendedUser={refreshExtendedUser}
+          />
         )}
-        {tab === 1 && <Partners extendedUser={extendedUser as ExtendedPartner} />}
+        {tab === 1 && (
+          <Partners extendedUser={extendedUser as ExtendedPartner} />
+        )}
         {tab === 2 && <Tutors extendedUser={extendedUser as ExtendedTutor} />}
       </div>
     </UsersContext.Provider>
