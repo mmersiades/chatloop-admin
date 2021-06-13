@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { Formik, FormikProps, Form, Field, FieldProps } from 'formik';
-import { makeStyles, Theme, createStyles, Grid, TextField, Button } from '@material-ui/core';
+import {
+  makeStyles,
+  Theme,
+  createStyles,
+  Grid,
+  TextField,
+  Button,
+  FormHelperText,
+} from '@material-ui/core';
 import logo from '../../assets/splashLogo.svg';
 import authService from '../../services/authServices';
 import { useHistory } from 'react-router-dom';
+import { LOGIN_ERROR } from '../../config/textConstants';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -19,7 +28,7 @@ const useStyles = makeStyles(({ spacing }: Theme) =>
     },
     contentHeight: {
       minHeight: spacing(20),
-      height: '20vh',
+      height: '30vh',
     },
     // STYLING
   })
@@ -31,6 +40,7 @@ interface IFormikValues {
 }
 
 const LoginPage = () => {
+  const [errors, setErrors] = useState<string[]>([]);
   const classes = useStyles();
   const history = useHistory();
 
@@ -40,19 +50,33 @@ const LoginPage = () => {
   };
 
   return (
-    <Grid classes={{ root: classes.pageContainer }} container alignItems="center" justify="center">
-      <img className={classes.contentHeight} src={logo} alt="The Chatloop logo" />
+    <Grid
+      classes={{ root: classes.pageContainer }}
+      container
+      alignItems="center"
+      justify="center"
+    >
+      <img
+        className={classes.contentHeight}
+        src={logo}
+        alt="The Chatloop logo"
+      />
       <Formik
         initialValues={formikInitialValues}
         onSubmit={async (values, actions) => {
-          const response = await authService.loginWithCredentials(values.email, values.password);
-          actions.resetForm();
-          console.log('response', response);
+          const response = await authService.loginWithCredentials(
+            values.email,
+            values.password
+          );
+
           if (!response.isAuthError) {
+            actions.resetForm();
             history.push({
               pathname: '/dashboard',
               state: 'Dashboard',
             });
+          } else {
+            setErrors((prevState) => [...prevState, LOGIN_ERROR]);
           }
         }}
       >
@@ -68,6 +92,19 @@ const LoginPage = () => {
                 justify="space-between"
                 alignItems="flex-end"
               >
+                {errors.length > 0 ? (
+                  errors.map((error, index) => (
+                    <FormHelperText
+                      key={index + error}
+                      error
+                      style={{ alignSelf: 'center' }}
+                    >
+                      {error}
+                    </FormHelperText>
+                  ))
+                ) : (
+                  <FormHelperText> </FormHelperText>
+                )}
                 <Field name="email" value="values.email">
                   {({ field }: FieldProps<IFormikValues>) => {
                     return (
@@ -79,6 +116,7 @@ const LoginPage = () => {
                         label="Email"
                         type="email"
                         fullWidth
+                        onFocus={() => setErrors([])}
                       />
                     );
                   }}
@@ -93,11 +131,17 @@ const LoginPage = () => {
                         label="Password"
                         type="password"
                         fullWidth
+                        onFocus={() => setErrors([])}
                       />
                     );
                   }}
                 </Field>
-                <Button type="submit" color="secondary" disabled={isSubmitting} variant="contained">
+                <Button
+                  type="submit"
+                  color="secondary"
+                  disabled={isSubmitting}
+                  variant="contained"
+                >
                   Log In
                 </Button>
               </Grid>

@@ -16,6 +16,13 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useLocation, Link } from 'react-router-dom';
 import authService from '../services/authServices';
 import { useAppNav } from '../contexts/appNavContext';
+import {
+  ACCOUNT_SETTINGS,
+  DASHBOARD,
+  INVITES,
+  LOG_OUT,
+  USERS,
+} from '../config/textConstants';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -46,51 +53,79 @@ const MenuDrawer: FC = () => {
   const { showMenuDrawer, setShowMenuDrawer } = useAppNav();
 
   return (
-    <Drawer classes={{ paper: classes.drawerPaper }} variant="persistent" anchor="left" open={showMenuDrawer}>
+    <Drawer
+      classes={{ paper: classes.drawerPaper }}
+      variant="persistent"
+      anchor="left"
+      open={showMenuDrawer}
+    >
       <div className={classes.drawerHeader}>
         <IconButton onClick={() => setShowMenuDrawer(false)}>
-          {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          {theme.direction === 'ltr' ? (
+            <ChevronLeftIcon />
+          ) : (
+            <ChevronRightIcon />
+          )}
         </IconButton>
       </div>
       <Divider />
       <List dense>
         <ListItem
-          classes={location.pathname === '/dashboard' ? { root: classes.selectedItem } : {}}
+          classes={
+            location.pathname === '/dashboard'
+              ? { root: classes.selectedItem }
+              : {}
+          }
           button
           component={Link}
           to={{ pathname: '/dashboard', state: 'Dashboard' }}
         >
-          <ListItemText primary="Dashboard" />
+          <ListItemText primary={DASHBOARD} />
         </ListItem>
         <ListItem
-          classes={location.pathname === '/users' ? { root: classes.selectedItem } : {}}
+          classes={
+            location.pathname === '/users' ? { root: classes.selectedItem } : {}
+          }
           button
           component={Link}
           to={{ pathname: '/users', state: 'Manage Users' }}
         >
-          <ListItemText primary="Users" />
+          <ListItemText primary={USERS} />
         </ListItem>
         <ListItem
-          classes={location.pathname === '/invites' ? { root: classes.selectedItem } : {}}
+          classes={
+            location.pathname === '/invites'
+              ? { root: classes.selectedItem }
+              : {}
+          }
           button
           component={Link}
           to={{ pathname: '/invites', state: 'Manage Invites' }}
         >
-          <ListItemText primary="Invites" />
+          <ListItemText primary={INVITES} />
         </ListItem>
       </List>
       <Divider />
       <List dense>
         <ListItem
-          classes={location.pathname === '/account-settings' ? { root: classes.selectedItem } : {}}
+          classes={
+            location.pathname === '/account-settings'
+              ? { root: classes.selectedItem }
+              : {}
+          }
           button
           component={Link}
           to={{ pathname: '/account-settings', state: 'Account Settings' }}
         >
-          <ListItemText primary="Account Settings" />
+          <ListItemText primary={ACCOUNT_SETTINGS} />
         </ListItem>
-        <ListItem button component={Link} to={{ pathname: '/' }} onClick={(e: any) => authService.logout()}>
-          <ListItemText primary="Log out" />
+        <ListItem
+          button
+          component={Link}
+          to={{ pathname: '/' }}
+          onClick={(e: any) => authService.logout()}
+        >
+          <ListItemText primary={LOG_OUT} />
         </ListItem>
       </List>
     </Drawer>
