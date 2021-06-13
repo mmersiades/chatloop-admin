@@ -17,13 +17,9 @@
 import './commands';
 import '@cypress/code-coverage/support';
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
-
 before(() => {
   cy.clearLocalStorageSnapshot();
-  cy.getE2eTokens();
-  cy.saveLocalStorage(); // To save the e2e token
+  cy.resetDb();
 });
 
 beforeEach(() => {
