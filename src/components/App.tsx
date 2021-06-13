@@ -18,16 +18,23 @@ const useStyles = makeStyles(() =>
   })
 );
 
-type appPropertiesAction = { type: 'SET_INVITE_EXPIRY_INTERVAL'; payload: ExpiryInterval };
+type appPropertiesAction = {
+  type: 'SET_INVITE_EXPIRY_INTERVAL';
+  payload: ExpiryInterval;
+};
 
 const appPropertiesReducerInitialState: appPropertiesState = {
   inviteExpiryInterval: {
     value: 3,
     unit: 'hours',
+    ms: 10800000,
   },
 };
 
-const appPropertiesReducer = (state: appPropertiesState, action: appPropertiesAction) => {
+const appPropertiesReducer = (
+  state: appPropertiesState,
+  action: appPropertiesAction
+) => {
   switch (action.type) {
     case 'SET_INVITE_EXPIRY_INTERVAL':
       return { ...state, inviteExpiryInterval: action.payload };
@@ -44,17 +51,26 @@ const App = () => {
   const classes = useStyles();
 
   // ------------------------------- Setting up application properies context -------------------------------------- //
-  const [state, dispatch] = useReducer(appPropertiesReducer, appPropertiesReducerInitialState);
+  const [state, dispatch] = useReducer(
+    appPropertiesReducer,
+    appPropertiesReducerInitialState
+  );
 
   // These payloads will be hardcoded for now, until we have endpoints for fetching them from the back-end
   const setApplicationProperties = () => {
     // This if statement allows application properties for local and staging environments
     if (baseURL === 'https://api.chatloop.org') {
       // For production environment
-      dispatch({ type: 'SET_INVITE_EXPIRY_INTERVAL', payload: { value: 3, unit: 'hours' } });
+      dispatch({
+        type: 'SET_INVITE_EXPIRY_INTERVAL',
+        payload: { value: 3, unit: 'hours', ms: 10800000 },
+      });
     } else {
       // For local and staging environments
-      dispatch({ type: 'SET_INVITE_EXPIRY_INTERVAL', payload: { value: 20, unit: 'seconds' } });
+      dispatch({
+        type: 'SET_INVITE_EXPIRY_INTERVAL',
+        payload: { value: 20, unit: 'seconds', ms: 20000 },
+      });
     }
   };
 
@@ -65,8 +81,17 @@ const App = () => {
   // ---------------------------------------- Rendering component ------------------------------------------------- //
   return (
     <div className={classes.appContainer}>
-      <AppPropertiesContext.Provider value={{ inviteExpiryInterval: state.inviteExpiryInterval }}>
-        <AppNavContext.Provider value={{ showMenuDrawer, showUserDrawer, setShowMenuDrawer, setShowUserDrawer }}>
+      <AppPropertiesContext.Provider
+        value={{ inviteExpiryInterval: state.inviteExpiryInterval }}
+      >
+        <AppNavContext.Provider
+          value={{
+            showMenuDrawer,
+            showUserDrawer,
+            setShowMenuDrawer,
+            setShowUserDrawer,
+          }}
+        >
           <AppRouter />
         </AppNavContext.Provider>
       </AppPropertiesContext.Provider>

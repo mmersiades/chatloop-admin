@@ -85,6 +85,9 @@ export interface ExpiryInterval {
     | 'millisecond'
     | 'milliseconds'
     | 'ms';
+
+  // Interval in milliseconds
+  ms: number;
 }
 
 export type appPropertiesState = {

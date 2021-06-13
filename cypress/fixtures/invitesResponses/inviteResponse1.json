@@ -1,0 +1,72 @@
+{
+  "content": [
+    {
+      "id": 314890,
+      "learner": {
+        "id": 158150,
+        "displayName": "Sara",
+        "currentNumberOfActivities": 0,
+        "maxNumberOfActivities": 1
+      },
+      "partners": [
+        {
+          "id": 103780,
+          "displayName": "Partner1",
+          "currentNumberOfActivities": 0,
+          "maxNumberOfActivities": 1
+        },
+        {
+          "id": 103781,
+          "displayName": "Partner2",
+          "currentNumberOfActivities": 0,
+          "maxNumberOfActivities": 1
+        },
+        {
+          "id": 103782,
+          "displayName": "Partner3",
+          "currentNumberOfActivities": 0,
+          "maxNumberOfActivities": 1
+        },
+        {
+          "id": 103783,
+          "displayName": "Partner4",
+          "currentNumberOfActivities": 0,
+          "maxNumberOfActivities": 1
+        },
+        {
+          "id": 103784,
+          "displayName": "Partner5",
+          "currentNumberOfActivities": 0,
+          "maxNumberOfActivities": 1
+        }
+      ],
+      "sentOn": "2021-06-13T03:50:20.084039",
+      "topic": "Sport"
+    }
+  ],
+  "pageable": {
+    "sort": {
+      "sorted": false,
+      "unsorted": true,
+      "empty": true
+    },
+    "pageNumber": 0,
+    "pageSize": 10,
+    "offset": 0,
+    "paged": true,
+    "unpaged": false
+  },
+  "totalPages": 0,
+  "totalElements": 0,
+  "last": true,
+  "first": true,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "numberOfElements": 0,
+  "size": 10,
+  "empty": true
+}

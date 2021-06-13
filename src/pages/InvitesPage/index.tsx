@@ -32,7 +32,7 @@ import { AxiosResponse } from 'axios';
 import { ExpandMoreRounded, ExpandLessRounded } from '@material-ui/icons';
 import { useAppProperties } from '../../contexts/appPropertiesContext';
 import { InvitesContext } from '../../contexts/invitesContext';
-import { NUMBERS, PARTNER_QUEUE } from '../../config/textConstants';
+import { NO_INVITES, NUMBERS, PARTNER_QUEUE } from '../../config/textConstants';
 
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
@@ -75,11 +75,6 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
     },
   })
 );
-
-interface RefreshButtonProps {
-  isRefreshing: boolean;
-  handleClick: () => void;
-}
 
 interface PrimaryPartnerListText {
   id: number;
@@ -206,10 +201,29 @@ const InvitesPage: FC = () => {
     fetchInvites();
   }, [fetchInvites]);
 
+  useEffect(() => {
+    let interval: number | undefined;
+    if (!!inviteExpiryInterval) {
+      interval = window.setInterval(() => {
+        console.log('polled');
+        fetchQueue();
+        fetchInviteStats();
+        fetchInvites();
+      }, inviteExpiryInterval.ms / 2);
+    }
+    return () => window.clearInterval(interval);
+  }, [inviteExpiryInterval, fetchQueue, fetchInviteStats, fetchInvites]);
+
   const handleDeleteInvite = async (id: number) => {
     const response: AxiosResponse | undefined =
       await invitesService.deleteInvite(id);
+    console.log(`response`, response);
     if (response) {
+      console.log(`response.status === 200`, response.status === 200);
+      console.log(
+        `response.data === 'Invite-Deleted'`,
+        response.data === 'Invite-Deleted'
+      );
       if (response.status === 200 && response.data === 'Invite-Deleted') {
         fetchQueue();
         fetchInvites();
@@ -221,23 +235,6 @@ const InvitesPage: FC = () => {
     }
     setShowConfirmInviteDelete({ show: false, id: null });
   };
-
-  const RefreshButton: FC<RefreshButtonProps> = ({
-    handleClick,
-    isRefreshing,
-  }) => (
-    <Button variant="text" color="secondary" onClick={() => handleClick()}>
-      {isRefreshing ? (
-        <CircularProgress
-          classes={{ root: classes.spinner }}
-          size="1rem"
-          thickness={2.4}
-        />
-      ) : (
-        'REFRESH'
-      )}
-    </Button>
-  );
 
   const PrimaryPartnerListText: FC<PrimaryPartnerListText> = ({
     id,
@@ -305,6 +302,7 @@ const InvitesPage: FC = () => {
         </Button>
         <Button
           className={classes.deleteButton}
+          aria-label="confirm-delete-button"
           variant="outlined"
           onClick={() =>
             showConfirmInviteDelete.id &&
@@ -327,10 +325,9 @@ const InvitesPage: FC = () => {
               <ListItem>
                 <ListItemText primary={PARTNER_QUEUE} />
                 <ListItemSecondaryAction>
-                  <RefreshButton
-                    handleClick={fetchQueue}
-                    isRefreshing={isFetchingQueue}
-                  />
+                  {isFetchingQueue && (
+                    <CircularProgress size="1rem" thickness={2.4} />
+                  )}
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
@@ -378,10 +375,9 @@ const InvitesPage: FC = () => {
             <ListItem>
               <ListItemText primary="Invites" />
               <ListItemSecondaryAction>
-                <RefreshButton
-                  handleClick={fetchInvites}
-                  isRefreshing={isFetchingInvites}
-                />
+                {isFetchingInvites && (
+                  <CircularProgress size="1rem" thickness={2.4} />
+                )}
               </ListItemSecondaryAction>
             </ListItem>
             <Divider />
@@ -394,7 +390,7 @@ const InvitesPage: FC = () => {
               justify="space-evenly"
             >
               {state.invites?.content.length === 0 ? (
-                <p>No invites</p>
+                <p>{NO_INVITES}</p>
               ) : (
                 state.invites?.content.map((invite: Invite) => (
                   <Grid key={uuid()} item xs={12} md={12} lg={6}>
@@ -544,10 +540,9 @@ const InvitesPage: FC = () => {
               <ListItem>
                 <ListItemText primary={NUMBERS} />
                 <ListItemSecondaryAction>
-                  <RefreshButton
-                    handleClick={fetchInviteStats}
-                    isRefreshing={isFetchingStats}
-                  />
+                  {isFetchingStats && (
+                    <CircularProgress size="1rem" thickness={2.4} />
+                  )}
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />

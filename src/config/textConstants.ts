@@ -20,6 +20,7 @@ export const NUMBERS = 'Numbers';
 export const INVITE_SETTINGS = 'Invite settings';
 export const INVITE_INTERVAL = 'Invite expiry interval';
 export const INVITE_STATISTICS = 'Invite statistics';
+export const NO_INVITES = 'No invites';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';
