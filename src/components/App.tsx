@@ -1,7 +1,7 @@
-import React, { useState, FC } from 'react';
+import React, { FC } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
+
 import AppRouter from '../routers/AppRouter';
-import { AppNavContext } from '../contexts/appNavContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -16,25 +16,12 @@ const useStyles = makeStyles(() =>
 );
 
 const App: FC = () => {
-  const [showMenuDrawer, setShowMenuDrawer] = useState(true);
-  const [showUserDrawer, setShowUserDrawer] = useState<number | null>(null);
-
-  // ---------------------------------------- Setting up Material UI ----------------------------------------------- //
   const classes = useStyles();
 
-  // ---------------------------------------- Rendering component ------------------------------------------------- //
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <div className={classes.appContainer}>
-      <AppNavContext.Provider
-        value={{
-          showMenuDrawer,
-          showUserDrawer,
-          setShowMenuDrawer,
-          setShowUserDrawer,
-        }}
-      >
-        <AppRouter />
-      </AppNavContext.Provider>
+      <AppRouter />
     </div>
   );
 };

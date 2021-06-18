@@ -2,25 +2,29 @@ import React, { FC } from 'react';
 import { Router } from 'react-router-dom';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import chatloopTheme from '../assets/chatloopTheme';
-import history from '../helpers/getBrowserHistory';
+
 import { AppPropertiesProvider } from '../contexts/appPropertiesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
+import { AppNavContextProvider } from '../contexts/appNavContext';
+import chatloopTheme from '../assets/chatloopTheme';
+import history from '../helpers/getBrowserHistory';
 
 export const theme = createMuiTheme(chatloopTheme);
 
-interface IRootProps {
+interface RootProps {
   children: Array<JSX.Element> | JSX.Element;
 }
 
-const Root: FC<IRootProps> = ({ children }: IRootProps): JSX.Element => {
+const Root: FC<RootProps> = ({ children }): JSX.Element => {
   return (
     <>
       <CssBaseline />
       <Router history={history}>
         <ThemeProvider theme={theme}>
           <AppPropertiesProvider>
-            <UsersContextProvider>{children}</UsersContextProvider>
+            <AppNavContextProvider>
+              <UsersContextProvider>{children}</UsersContextProvider>
+            </AppNavContextProvider>
           </AppPropertiesProvider>
         </ThemeProvider>
       </Router>
