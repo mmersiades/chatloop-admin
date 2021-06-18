@@ -16,6 +16,9 @@ import {
   CANCEL,
   RESET,
 } from '../../config/textConstants';
+import { ExtendedUser } from '../../@types/interfaces';
+import { AxiosResponse } from 'axios';
+import { resetPassword } from '../../services/usersService';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -27,25 +30,45 @@ const useStyles = makeStyles(({ palette }: Theme) =>
 
 interface ResetPasswordDialogProps {
   open: boolean;
-  email: string;
+  user: ExtendedUser;
   handleClose: () => void;
-  handleReset: () => void;
 }
 
 const ResetPasswordDialog: FC<ResetPasswordDialogProps> = ({
   open,
-  email,
+  user,
   handleClose,
-  handleReset,
 }) => {
   const classes = useStyles();
+
+  // ----------------------------- Component functions ------------------------- //
+  const handlePasswordReset = async () => {
+    try {
+      const response: AxiosResponse | undefined = await resetPassword(
+        user.email
+      );
+
+      if (response && response.status === 200) {
+        alert(`${response.data.status}. ${response.data.message}`);
+      } else {
+        alert('Password NOT reset. Something went wrong');
+        console.warn('response', response);
+      }
+      handleClose();
+    } catch (error) {
+      console.error(error);
+      handleClose();
+    }
+  };
+
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>{RESET_PASSWORD_DIALOG_TITLE}</DialogTitle>
       <DialogContent>
         <Typography>
           Are you sure you want to reset{' '}
-          <span className={classes.highlightSpan}>{email}</span>
+          <span className={classes.highlightSpan}>{user.email}</span>
           's password?
         </Typography>
       </DialogContent>
@@ -57,7 +80,7 @@ const ResetPasswordDialog: FC<ResetPasswordDialogProps> = ({
           aria-label="Reset button"
           color="secondary"
           variant="contained"
-          onClick={handleReset}
+          onClick={handlePasswordReset}
         >
           {RESET}
         </Button>

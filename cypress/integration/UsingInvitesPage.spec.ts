@@ -8,7 +8,7 @@ import {
 import admin from '../fixtures/users/admin.json';
 import inviteResponse1 from '../fixtures/invitesResponses/inviteResponse1.json';
 
-describe('Using the Dashboard', () => {
+describe('Using the InvitesPage', () => {
   beforeEach(() => {
     cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/invites');

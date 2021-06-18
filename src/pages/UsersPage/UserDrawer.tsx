@@ -37,6 +37,7 @@ import {
   RESET_PASSWORD,
   DELETE,
 } from '../../config/textConstants';
+import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
@@ -78,10 +79,11 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
 
   // ----------------------------- Component state ------------------------------ //
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
-  const { tutors, setEmailForPasswordReset } = useUsers();
+  const { tutors } = useUsers();
 
   // ----------------------------- Component functions ------------------------- //
   const getTutor = (id: number) => {
@@ -120,6 +122,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           open={showDeleteUserDialog}
           user={extendedUser}
           handleClose={() => setShowDeleteUserDialog(false)}
+        />
+      )}
+      {showResetPasswordDialog && extendedUser && (
+        <ResetPasswordDialog
+          open={showResetPasswordDialog}
+          user={extendedUser}
+          handleClose={() => setShowResetPasswordDialog(false)}
         />
       )}
       <AppBar classes={{ root: classes.appbar }} position="relative">
@@ -277,9 +286,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               fullWidth
               color="secondary"
               variant="outlined"
-              onClick={() =>
-                !!extendedUser && setEmailForPasswordReset(extendedUser.email)
-              }
+              onClick={() => !!extendedUser && setShowResetPasswordDialog(true)}
               aria-label="Reset password button"
             >
               {RESET_PASSWORD}

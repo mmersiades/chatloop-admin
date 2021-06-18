@@ -1,6 +1,13 @@
 import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
-import { FormikValues, Formik, Form, Field, FieldProps, FormikProps } from 'formik';
+import {
+  FormikValues,
+  Formik,
+  Form,
+  Field,
+  FieldProps,
+  FormikProps,
+} from 'formik';
 import { UserRoles, TutorShifts } from '../../@types/enums';
 import { useUsers } from '../../contexts/usersContext';
 import {
@@ -26,7 +33,7 @@ import { handleError } from '../../helpers/handleError';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 import clsx from 'clsx';
 import { useAppNav } from '../../contexts/appNavContext';
-import { getLearners, getPartners, getTutors, createUser } from '../../services/usersService';
+import { createUser } from '../../services/usersService';
 
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
@@ -101,7 +108,9 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   // From UsersContext
-  const { learners, partners, tutors, usersDispatch, setNewLearnerEmail } = useUsers();
+  const { learners, partners, tutors, fetchUsersByUserRole } = useUsers();
+
+  const setNewLearnerEmail = (arg: string) => {};
 
   const handleChangePage = (event: any, newPage: any) => {
     setPage(newPage);
@@ -125,35 +134,49 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
       case UserRoles.learner:
         roleParams = {
           role: 'learner',
-          getUser: () => getLearners(usersDispatch),
+          getUser: () =>
+            !!fetchUsersByUserRole && fetchUsersByUserRole(UserRoles.learner),
           action: 'SET_LEARNERS',
           count: learners?.length || 0,
           rows:
             rowsPerPage > 0
-              ? learners?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || []
+              ? learners?.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                ) || []
               : learners || [],
         };
         break;
       case UserRoles.partner:
         roleParams = {
           role: 'partner',
-          getUser: () => getPartners(usersDispatch),
+          getUser: () =>
+            !!fetchUsersByUserRole && fetchUsersByUserRole(UserRoles.partner),
           action: 'SET_PARTNERS',
           count: partners?.length || 0,
           rows:
             rowsPerPage > 0
-              ? partners?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || []
+              ? partners?.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                ) || []
               : partners || [],
         };
         break;
       case UserRoles.tutor:
         roleParams = {
           role: 'tutor',
-          getUser: () => getTutors(usersDispatch),
+          getUser: () =>
+            !!fetchUsersByUserRole && fetchUsersByUserRole(UserRoles.tutor),
           action: 'SET_TUTORS',
           count: tutors?.length || 0,
           rows:
-            rowsPerPage > 0 ? tutors?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || [] : tutors || [],
+            rowsPerPage > 0
+              ? tutors?.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                ) || []
+              : tutors || [],
         };
         break;
       default:
@@ -173,7 +196,9 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
     email: Yup.string().email('Invalid email').required('Email is required'),
     shift:
       tableFor === UserRoles.tutor
-        ? Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift').required('Shift must be selected')
+        ? Yup.string()
+            .oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
+            .required('Shift must be selected')
         : Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift'),
   });
 
@@ -206,27 +231,46 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
       >
         {(props: FormikProps<FormikValues>) => {
           const disableButton =
-            props.isSubmitting || !!props.errors.displayName || !!props.errors.email || !!props.errors.shift;
+            props.isSubmitting ||
+            !!props.errors.displayName ||
+            !!props.errors.email ||
+            !!props.errors.shift;
           return (
             <Form>
               <TableContainer
-                classes={{ root: clsx(classes.tableContainer, { [classes.tableContainerShift]: showUserDrawer }) }}
+                classes={{
+                  root: clsx(classes.tableContainer, {
+                    [classes.tableContainerShift]: showUserDrawer,
+                  }),
+                }}
                 component={Paper}
               >
                 <Table size="small">
                   <TableHead classes={{ root: classes.tableHead }}>
                     <TableRow classes={{ root: classes.tableRow }}>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         id
                       </TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         displayName
                       </TableCell>
-                      <TableCell classes={{ root: classes.tableCell }} align="center">
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        align="center"
+                      >
                         email
                       </TableCell>
                       {tableFor === UserRoles.tutor && (
-                        <TableCell classes={{ root: classes.tableCell }} align="center">
+                        <TableCell
+                          classes={{ root: classes.tableCell }}
+                          align="center"
+                        >
                           shift
                         </TableCell>
                       )}
@@ -236,7 +280,12 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                     <TableRow classes={{ root: classes.tableRow }}>
                       <TableCell align="center">
                         <div className={classes.helperTextSpacer} />
-                        <Button type="submit" variant="contained" color="secondary" disabled={disableButton}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="secondary"
+                          disabled={disableButton}
+                        >
                           {`Add ${roleParams.role}`}
                         </Button>
                         <div className={classes.helperTextSpacer} />
@@ -255,7 +304,9 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                                 error={!!props.errors.displayName}
                               />
                               {props.errors.displayName ? (
-                                <FormHelperText error>{props.errors.displayName}</FormHelperText>
+                                <FormHelperText error>
+                                  {props.errors.displayName}
+                                </FormHelperText>
                               ) : (
                                 <div className={classes.helperTextSpacer} />
                               )}
@@ -277,7 +328,9 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                                 error={!!props.errors.email}
                               />
                               {props.errors.email ? (
-                                <FormHelperText error>{props.errors.email}</FormHelperText>
+                                <FormHelperText error>
+                                  {props.errors.email}
+                                </FormHelperText>
                               ) : (
                                 <div className={classes.helperTextSpacer} />
                               )}
@@ -289,14 +342,23 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                         {({ field }: FieldProps<FormikValues>) => {
                           return (
                             tableFor === UserRoles.tutor && (
-                              <TableCell classes={{ root: classes.tableCell }} align="center">
+                              <TableCell
+                                classes={{ root: classes.tableCell }}
+                                align="center"
+                              >
                                 <div className={classes.helperTextSpacer} />
                                 <Select {...field} fullWidth variant="outlined">
-                                  <MenuItem value={TutorShifts.one}>Shift One</MenuItem>
-                                  <MenuItem value={TutorShifts.two}>Shift Two</MenuItem>
+                                  <MenuItem value={TutorShifts.one}>
+                                    Shift One
+                                  </MenuItem>
+                                  <MenuItem value={TutorShifts.two}>
+                                    Shift Two
+                                  </MenuItem>
                                 </Select>
                                 {props.errors.shift ? (
-                                  <FormHelperText error>{props.errors.shift}</FormHelperText>
+                                  <FormHelperText error>
+                                    {props.errors.shift}
+                                  </FormHelperText>
                                 ) : (
                                   <div className={classes.helperTextSpacer} />
                                 )}
@@ -316,7 +378,9 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                         <TableCell align="center">{user.id}</TableCell>
                         <TableCell align="center">{user.displayName}</TableCell>
                         <TableCell align="center">{user.email}</TableCell>
-                        {tableFor === UserRoles.tutor && <TableCell align="center">{user.shift}</TableCell>}
+                        {tableFor === UserRoles.tutor && (
+                          <TableCell align="center">{user.shift}</TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>

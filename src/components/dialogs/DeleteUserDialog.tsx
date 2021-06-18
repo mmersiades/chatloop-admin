@@ -14,7 +14,6 @@ import {
 import { useUsers } from '../../contexts/usersContext';
 import { useAppNav } from '../../contexts/appNavContext';
 import { deleteUser } from '../../services/usersService';
-import { UserRoles } from '../../@types/enums';
 import { ExtendedUser } from '../../@types/interfaces';
 import {
   CANCEL,
@@ -45,32 +44,23 @@ const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { setShowUserDrawer } = useAppNav();
-  const { fetchTutors, fetchPartners, fetchLearners } = useUsers();
+  const { fetchUsersByUserRole } = useUsers();
 
   // ----------------------------- Component functions ------------------------- //
   const handleDelete = async () => {
-    try {
-      const response = await deleteUser(user.id);
-      if (response && response.status === 200) {
-        alert(response.data);
-        setShowUserDrawer(null);
-        switch (user.userRole) {
-          case UserRoles.learner:
-            fetchLearners();
-            break;
-          case UserRoles.partner:
-            fetchPartners();
-            break;
-          case UserRoles.tutor:
-            fetchTutors();
-            break;
-          default:
+    if (!!fetchUsersByUserRole) {
+      try {
+        const response = await deleteUser(user.id);
+        if (response && response.status === 200) {
+          alert(response.data);
+          fetchUsersByUserRole(user.userRole);
+          setShowUserDrawer(null);
+          handleClose();
         }
+      } catch (error) {
+        console.error(error);
         handleClose();
       }
-    } catch (error) {
-      console.error(error);
-      handleClose();
     }
   };
 
