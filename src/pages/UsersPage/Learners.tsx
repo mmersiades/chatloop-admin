@@ -5,6 +5,7 @@ import { UserRoles } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
 import ReplaceTutorDialog from '../../components/dialogs/ReplaceTutorDialog';
 import { ExtendedLearner } from '../../@types/interfaces';
+import NewUserForm from './NewUserForm';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -30,10 +31,13 @@ const Learners: FC<LearnersPageProps> = ({
   extendedUser,
   refreshExtendedUser,
 }) => {
-  const [showReplaceTutorDialog, setShowReplaceTutorDialog] =
-    useState<ShowReplaceTutorDialog>({ showDialog: false });
   const classes = useStyles();
 
+  // ----------------------------- Component state ------------------------------ //
+  const [showReplaceTutorDialog, setShowReplaceTutorDialog] =
+    useState<ShowReplaceTutorDialog>({ showDialog: false });
+
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <div className={classes.learnersContainer}>
       {showReplaceTutorDialog.showDialog && (
@@ -49,6 +53,7 @@ const Learners: FC<LearnersPageProps> = ({
         setShowDialog={setShowReplaceTutorDialog}
         extendedUser={extendedUser}
       />
+      <NewUserForm formFor={UserRoles.learner} />
     </div>
   );
 };

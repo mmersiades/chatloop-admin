@@ -4,6 +4,7 @@ import UsersTable from './UsersTable';
 import { UserRoles } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
 import { ExtendedPartner } from '../../@types/interfaces';
+import NewUserForm from './NewUserForm';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -24,6 +25,7 @@ const Partners: FC<PartnersPageProps> = ({ extendedUser }) => {
     <div className={classes.partnersContainer}>
       <UsersTable tableFor={UserRoles.partner} />
       <UserDrawer drawerFor={UserRoles.partner} extendedUser={extendedUser} />
+      <NewUserForm formFor={UserRoles.partner} />
     </div>
   );
 };

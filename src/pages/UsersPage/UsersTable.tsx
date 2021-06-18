@@ -34,6 +34,7 @@ import TablePaginationActions from '@material-ui/core/TablePagination/TablePagin
 import clsx from 'clsx';
 import { useAppNav } from '../../contexts/appNavContext';
 import { createUser } from '../../services/usersService';
+import AddUserFab from './AddUserFab';
 
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
@@ -88,7 +89,8 @@ interface UsersTableProps {
   tableFor: UserRoles;
 }
 
-/** An object of params passed to `tableGenerator` based on the role of Users the table is for */
+// An object of params passed to `tableGenerator`
+// based on the role of Users the table is for
 interface RoleParams {
   role: string;
   getUser: any;
@@ -99,7 +101,14 @@ interface RoleParams {
 
 const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   const classes = useStyles();
-  const { showUserDrawer, setShowUserDrawer } = useAppNav();
+
+  // ----------------------------- Hooks ---------------------------------------- //
+  const {
+    showUserDrawer,
+    setShowUserDrawer,
+    showNewUserForm,
+    setShowNewUserForm,
+  } = useAppNav();
 
   // The current table page (for table pagination)
   const [page, setPage] = React.useState(0);
@@ -240,7 +249,8 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
               <TableContainer
                 classes={{
                   root: clsx(classes.tableContainer, {
-                    [classes.tableContainerShift]: showUserDrawer,
+                    [classes.tableContainerShift]:
+                      showUserDrawer || showNewUserForm,
                   }),
                 }}
                 component={Paper}
@@ -402,6 +412,10 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
           );
         }}
       </Formik>
+      <AddUserFab
+        fabFor={tableFor}
+        handleClick={() => setShowNewUserForm(!showNewUserForm)}
+      />
     </>
   );
 };

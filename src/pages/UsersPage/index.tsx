@@ -96,19 +96,6 @@ const UsersPage: FC = () => {
 
   // ----------------------------- Render ---------------------------------------- //
   return (
-    // <UsersContext.Provider
-    //   value={{
-    //     ...state,
-    //     newLearnerEmail,
-    //     emailForPasswordReset,
-    //     usersDispatch: dispatch,
-    //     fetchLearners,
-    //     fetchPartners,
-    //     fetchTutors,
-    //     setNewLearnerEmail,
-    //     setEmailForPasswordReset,
-    //   }}
-    // >
     <div className={classes.usersContainer}>
       <div className={classes.tabs}>
         <Tabs
@@ -142,7 +129,6 @@ const UsersPage: FC = () => {
       {tab === 1 && <Partners extendedUser={extendedUser as ExtendedPartner} />}
       {tab === 2 && <Tutors extendedUser={extendedUser as ExtendedTutor} />}
     </div>
-    // </UsersContext.Provider>
   );
 };
 

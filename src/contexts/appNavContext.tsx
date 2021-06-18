@@ -3,8 +3,10 @@ import React, { FC, useContext, useState } from 'react';
 interface AppNavContext {
   showMenuDrawer: boolean;
   showUserDrawer: number | null;
+  showNewUserForm: boolean;
   setShowMenuDrawer: (showMenuDrawer: boolean) => void;
   setShowUserDrawer: (user: number | null) => void;
+  setShowNewUserForm: (showNewUserForm: boolean) => void;
 }
 
 interface AppNavContextProviderProps {
@@ -25,6 +27,7 @@ export const AppNavContextProvider: FC<AppNavContextProviderProps> = ({
 }) => {
   const [showMenuDrawer, setShowMenuDrawer] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState<number | null>(null);
+  const [showNewUserForm, setShowNewUserForm] = useState(false);
 
   return (
     <AppNavContext.Provider
@@ -33,6 +36,8 @@ export const AppNavContextProvider: FC<AppNavContextProviderProps> = ({
         setShowMenuDrawer,
         showUserDrawer,
         setShowUserDrawer,
+        showNewUserForm,
+        setShowNewUserForm,
       }}
     >
       {children}
