@@ -6,20 +6,32 @@ import { CssBaseline } from '@material-ui/core';
 
 import { theme } from './components/Root';
 import history from './helpers/getBrowserHistory';
+import { AppPropertiesProvider } from './contexts/appPropertiesContext';
 
-const AllTheProviders: FC = ({ children }) => {
+interface AllTheProvidersProps {
+  children: JSX.Element;
+}
+
+const AllTheProviders: FC<AllTheProvidersProps> = ({ children }) => {
   return (
     <>
       <CssBaseline />
       <Router history={history}>
-        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <AppPropertiesProvider>{children}</AppPropertiesProvider>
+        </ThemeProvider>
       </Router>
     </>
   );
 };
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries'>) =>
-  render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'queries'>
+) =>
+  render(ui, {
+    wrapper: (props: any) => <AllTheProviders {...props} {...options} />,
+  });
 
 export * from '@testing-library/react';
 
