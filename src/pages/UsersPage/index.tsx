@@ -36,8 +36,11 @@ import {
   getUser,
 } from '../../services/usersService';
 import {
+  CANCEL,
   LEARNERS_TAB,
   PARTNERS_TAB,
+  RESET,
+  RESET_PASSWORD_DIALOG_TITLE,
   TUTORS_TAB,
 } from '../../config/textConstants';
 
@@ -230,7 +233,7 @@ const UsersPage: FC = () => {
             open={!!emailForPasswordReset}
             onClose={() => setEmailForPasswordReset('')}
           >
-            <DialogTitle>Reset Password?</DialogTitle>
+            <DialogTitle>{RESET_PASSWORD_DIALOG_TITLE}</DialogTitle>
             <DialogContent>
               <Typography>
                 Are you sure you want to reset{' '}
@@ -242,14 +245,15 @@ const UsersPage: FC = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setEmailForPasswordReset('')}>
-                CANCEL
+                {CANCEL}
               </Button>
               <Button
+                aria-label="Reset button"
                 color="secondary"
                 variant="contained"
                 onClick={() => handlePasswordReset(emailForPasswordReset)}
               >
-                RESET
+                {RESET}
               </Button>
             </DialogActions>
           </Dialog>

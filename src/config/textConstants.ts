@@ -10,6 +10,9 @@ export const INVITES = 'Invites';
 export const USERS = 'Users';
 export const DASHBOARD = 'Dashboard';
 
+// Common
+export const CANCEL = 'CANCEL';
+
 // UsersPage
 export const USERS_TITLE = 'Manage Users';
 export const LEARNERS_TAB = 'LEARNERS';
@@ -42,3 +45,7 @@ export const PASSWORD_LABEL = 'Password';
 
 // Dashboard
 export const DASHBOARD_TITLE = 'Chatloop Admin';
+
+// ResetPasswordDialog
+export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';
+export const RESET = 'RESET';
