@@ -3,7 +3,7 @@ import { makeStyles, createStyles } from '@material-ui/core';
 import UsersTable from './UsersTable';
 import { UserRoles } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
-import ReplaceTutorDialog from './ReplaceTutorDialog';
+import ReplaceTutorDialog from '../../components/dialogs/ReplaceTutorDialog';
 import { ExtendedLearner } from '../../@types/interfaces';
 
 const useStyles = makeStyles(() =>
@@ -26,8 +26,12 @@ interface LearnersPageProps {
   refreshExtendedUser: (id: number) => void;
 }
 
-const Learners: FC<LearnersPageProps> = ({ extendedUser, refreshExtendedUser }) => {
-  const [showReplaceTutorDialog, setShowReplaceTutorDialog] = useState<ShowReplaceTutorDialog>({ showDialog: false });
+const Learners: FC<LearnersPageProps> = ({
+  extendedUser,
+  refreshExtendedUser,
+}) => {
+  const [showReplaceTutorDialog, setShowReplaceTutorDialog] =
+    useState<ShowReplaceTutorDialog>({ showDialog: false });
   const classes = useStyles();
 
   return (
@@ -40,7 +44,11 @@ const Learners: FC<LearnersPageProps> = ({ extendedUser, refreshExtendedUser }) 
         />
       )}
       <UsersTable tableFor={UserRoles.learner} />
-      <UserDrawer drawerFor={UserRoles.learner} setShowDialog={setShowReplaceTutorDialog} extendedUser={extendedUser} />
+      <UserDrawer
+        drawerFor={UserRoles.learner}
+        setShowDialog={setShowReplaceTutorDialog}
+        extendedUser={extendedUser}
+      />
     </div>
   );
 };

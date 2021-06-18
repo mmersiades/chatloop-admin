@@ -22,7 +22,7 @@ import { Tutor, ExtendedTutor } from '../../@types/interfaces';
 import { useUsers } from '../../contexts/usersContext';
 import { TutorShifts } from '../../@types/enums';
 
-import { ShowReplaceTutorDialog } from './Learners';
+import { ShowReplaceTutorDialog } from '../../pages/UsersPage/Learners';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
 import { getUser, replaceTutor } from '../../services/usersService';
 

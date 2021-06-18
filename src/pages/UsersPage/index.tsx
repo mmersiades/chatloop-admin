@@ -6,11 +6,6 @@ import {
   makeStyles,
   createStyles,
   Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  DialogActions,
-  Button,
 } from '@material-ui/core';
 import { UsersContext } from '../../contexts/usersContext';
 import { useAppNav } from '../../contexts/appNavContext';
@@ -27,7 +22,7 @@ import {
   ExtendedTutor,
 } from '../../@types/interfaces';
 import { AxiosResponse } from 'axios';
-import AssignTutorsDialog from './AssignTutorsDialog';
+import AssignTutorsDialog from '../../components/dialogs/AssignTutorsDialog';
 import {
   getTutors,
   getPartners,
@@ -36,13 +31,11 @@ import {
   getUser,
 } from '../../services/usersService';
 import {
-  CANCEL,
   LEARNERS_TAB,
   PARTNERS_TAB,
-  RESET,
-  RESET_PASSWORD_DIALOG_TITLE,
   TUTORS_TAB,
 } from '../../config/textConstants';
+import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -53,9 +46,6 @@ const useStyles = makeStyles(({ palette }: Theme) =>
     tabs: {
       width: '100%',
       backgroundColor: palette.common.white,
-    },
-    highlightSpan: {
-      color: palette.secondary.main,
     },
   })
 );
@@ -229,34 +219,12 @@ const UsersPage: FC = () => {
           </Dialog>
         )}
         {!!emailForPasswordReset && (
-          <Dialog
+          <ResetPasswordDialog
             open={!!emailForPasswordReset}
-            onClose={() => setEmailForPasswordReset('')}
-          >
-            <DialogTitle>{RESET_PASSWORD_DIALOG_TITLE}</DialogTitle>
-            <DialogContent>
-              <Typography>
-                Are you sure you want to reset{' '}
-                <span className={classes.highlightSpan}>
-                  {emailForPasswordReset}
-                </span>
-                's password?
-              </Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setEmailForPasswordReset('')}>
-                {CANCEL}
-              </Button>
-              <Button
-                aria-label="Reset button"
-                color="secondary"
-                variant="contained"
-                onClick={() => handlePasswordReset(emailForPasswordReset)}
-              >
-                {RESET}
-              </Button>
-            </DialogActions>
-          </Dialog>
+            email={emailForPasswordReset}
+            handleClose={() => setEmailForPasswordReset('')}
+            handleReset={() => handlePasswordReset(emailForPasswordReset)}
+          />
         )}
         {tab === 0 && (
           <Learners
