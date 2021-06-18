@@ -49,3 +49,6 @@ export const DASHBOARD_TITLE = 'Chatloop Admin';
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';
 export const RESET = 'RESET';
+
+// DeleteUserDialog
+export const DELETE_USER_DIALOG_TITLE = 'Delete user?';

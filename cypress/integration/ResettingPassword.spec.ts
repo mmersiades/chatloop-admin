@@ -13,7 +13,7 @@ describe('Using the UsersPage', () => {
     cy.visit('/users');
   });
 
-  it("should replace a Learner's Tutor", () => {
+  it("should reset a Learner's password", () => {
     cy.intercept({
       method: 'POST',
       url: '/rest/user/password/reset',

@@ -49,6 +49,8 @@ export interface ExtendedTutor extends Tutor {
   assignedLearners: number[]; // array of Learner ids
 }
 
+export type ExtendedUser = ExtendedLearner | ExtendedPartner | ExtendedTutor;
+
 export interface UserLanguageObject {
   code: string;
   language: string;

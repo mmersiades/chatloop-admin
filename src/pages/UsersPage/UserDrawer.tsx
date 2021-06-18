@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { UserRoles } from '../../@types/enums';
+import React, { FC, useState } from 'react';
+import clsx from 'clsx';
 import {
   Drawer,
   makeStyles,
@@ -15,19 +15,15 @@ import {
   Button,
   Grid,
 } from '@material-ui/core';
-import { useAppNav } from '../../contexts/appNavContext';
 import { CloseRounded } from '@material-ui/icons';
-import clsx from 'clsx';
-import { useUsers } from '../../contexts/usersContext';
-import {
-  Tutor,
-  ExtendedLearner,
-  ExtendedPartner,
-  ExtendedTutor,
-} from '../../@types/interfaces';
+
+import DeleteUserDialog from '../../components/dialogs/DeleteUserDialog';
 import { ShowReplaceTutorDialog } from './Learners';
+import { useAppNav } from '../../contexts/appNavContext';
+import { useUsers } from '../../contexts/usersContext';
+import { UserRoles } from '../../@types/enums';
+import { Tutor, ExtendedUser } from '../../@types/interfaces';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
-import { deleteUser } from '../../services/usersService';
 import {
   DISPLAY_NAME,
   EMAIL,
@@ -73,45 +69,21 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
 
 interface UserDrawerProps {
   drawerFor: UserRoles;
-  extendedUser?: ExtendedLearner | ExtendedPartner | ExtendedTutor;
+  extendedUser?: ExtendedUser;
   setShowDialog?: (params: ShowReplaceTutorDialog) => void;
 }
 
-const UserDrawer: FC<UserDrawerProps> = ({
-  drawerFor,
-  extendedUser,
-  setShowDialog,
-}) => {
+const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   const classes = useStyles();
+
+  // ----------------------------- Component state ------------------------------ //
+  const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
+
+  // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
-  const {
-    tutors,
-    setEmailForPasswordReset,
-    fetchTutors,
-    fetchPartners,
-    fetchLearners,
-  } = useUsers();
+  const { tutors, setEmailForPasswordReset } = useUsers();
 
-  const handleDelete = async (userId: number, userRole: UserRoles) => {
-    const response = await deleteUser(userId);
-    if (response && response.status === 200) {
-      alert(response.data);
-      setShowUserDrawer(null);
-      switch (userRole) {
-        case UserRoles.learner:
-          fetchLearners();
-          break;
-        case UserRoles.partner:
-          fetchPartners();
-          break;
-        case UserRoles.tutor:
-          fetchTutors();
-          break;
-        default:
-      }
-    }
-  };
-
+  // ----------------------------- Component functions ------------------------- //
   const getTutor = (id: number) => {
     let tutor = {
       id: '...',
@@ -131,6 +103,7 @@ const UserDrawer: FC<UserDrawerProps> = ({
     return tutor;
   };
 
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <Drawer
       classes={{
@@ -142,11 +115,18 @@ const UserDrawer: FC<UserDrawerProps> = ({
       anchor="right"
       variant="persistent"
     >
+      {showDeleteUserDialog && extendedUser && (
+        <DeleteUserDialog
+          open={showDeleteUserDialog}
+          user={extendedUser}
+          handleClose={() => setShowDeleteUserDialog(false)}
+        />
+      )}
       <AppBar classes={{ root: classes.appbar }} position="relative">
         <Toolbar classes={{ dense: classes.toolbar }} variant="dense">
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label="Close drawer button"
             onClick={() => setShowUserDrawer(null)}
             edge="start"
             className={classes.closeButton}
@@ -279,7 +259,7 @@ const UserDrawer: FC<UserDrawerProps> = ({
                             learner: extendedUser.id,
                           })
                         }
-                        data-test="replace-tutor-button"
+                        aria-label="Replace tutor button"
                       >
                         {REPLACE_TUTOR}
                       </Button>
@@ -300,7 +280,7 @@ const UserDrawer: FC<UserDrawerProps> = ({
               onClick={() =>
                 !!extendedUser && setEmailForPasswordReset(extendedUser.email)
               }
-              data-test="reset-password-button"
+              aria-label="Reset password button"
             >
               {RESET_PASSWORD}
             </Button>
@@ -313,10 +293,8 @@ const UserDrawer: FC<UserDrawerProps> = ({
               fullWidth
               variant="outlined"
               classes={{ root: classes.deleteButton }}
-              onClick={() =>
-                !!extendedUser && handleDelete(extendedUser.id, drawerFor)
-              }
-              data-test="add-user-button"
+              onClick={() => setShowDeleteUserDialog(true)}
+              aria-label="Delete user button"
             >
               {DELETE}
             </Button>
