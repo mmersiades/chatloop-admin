@@ -27,6 +27,7 @@ import { createUser } from '../../services/usersService';
 import { TutorShifts, UserRoles } from '../../@types/enums';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
+import { useLanguages } from '../../contexts/languagesContext';
 
 interface NewUserFormProps {
   formFor: UserRoles;
@@ -103,6 +104,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
   // ----------------------------- Hooks ---------------------------------------- //
   const { showNewUserForm, setShowNewUserForm } = useAppNav();
   const { fetchUsersByUserRole } = useUsers();
+  const { languages } = useLanguages();
 
   // ----------------------------- Component functions ------------------------- //
   const newUserSchema = Yup.object().shape({

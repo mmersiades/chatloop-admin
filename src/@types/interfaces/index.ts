@@ -145,3 +145,41 @@ export type Pageable<T> = {
   size: number;
   empty: boolean;
 };
+
+// An object representing a language as per [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3)
+export interface Language {
+  // A unique 6-digit number identifying each language
+  id: number;
+
+  /**
+   * A 2- or 3-character code representing a language
+   */
+  code?: string;
+
+  // The name of the language, in English
+  language: string;
+
+  // Individual (I) or macroLanguage (M). See more at [[LanguageScopes]]
+  scope?: LanguageScopes;
+
+  /**
+   * The language code for the selected language's macroLanguage,
+   * if the selected language belongs to a macroLanguage
+   */
+  macroLanguage?: string | null;
+}
+
+//These language scopes come from ISO-639-3. [Read more here](https://iso639-3.sil.org/about/scope)
+export enum LanguageScopes {
+  /** An individual scope means that the language codes represents just one, individual language. */
+  individual = 'I',
+  /** A macrolanguage scope that the language code represents an umbrella code for a collection of related individual languages.
+   * For example **"ara"** is a macrolanguage code that covers the various Arabic language codes, for example:
+   * * arb - Standard Arabic
+   * * arq - Algerian Arabic
+   * * ars - Nadji Arabic
+   * * arz - Egyptian Arabic
+   * * etc...
+   */
+  macrolanguage = 'M',
+}

@@ -7,6 +7,9 @@ import { CssBaseline } from '@material-ui/core';
 import { theme } from './components/Root';
 import history from './helpers/getBrowserHistory';
 import { AppPropertiesProvider } from './contexts/appPropertiesContext';
+import { AppNavContextProvider } from './contexts/appNavContext';
+import { LanguagesContextProvider } from './contexts/languagesContext';
+import { UsersContextProvider } from './contexts/usersContext';
 
 interface AllTheProvidersProps {
   children: JSX.Element;
@@ -18,7 +21,13 @@ const AllTheProviders: FC<AllTheProvidersProps> = ({ children }) => {
       <CssBaseline />
       <Router history={history}>
         <ThemeProvider theme={theme}>
-          <AppPropertiesProvider>{children}</AppPropertiesProvider>
+          <AppPropertiesProvider>
+            <AppNavContextProvider>
+              <UsersContextProvider>
+                <LanguagesContextProvider>{children}</LanguagesContextProvider>
+              </UsersContextProvider>
+            </AppNavContextProvider>
+          </AppPropertiesProvider>
         </ThemeProvider>
       </Router>
     </>

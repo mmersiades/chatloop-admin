@@ -8,6 +8,7 @@ import { UsersContextProvider } from '../contexts/usersContext';
 import { AppNavContextProvider } from '../contexts/appNavContext';
 import chatloopTheme from '../assets/chatloopTheme';
 import history from '../helpers/getBrowserHistory';
+import { LanguagesContextProvider } from '../contexts/languagesContext';
 
 export const theme = createMuiTheme(chatloopTheme);
 
@@ -23,7 +24,9 @@ const Root: FC<RootProps> = ({ children }): JSX.Element => {
         <ThemeProvider theme={theme}>
           <AppPropertiesProvider>
             <AppNavContextProvider>
-              <UsersContextProvider>{children}</UsersContextProvider>
+              <UsersContextProvider>
+                <LanguagesContextProvider>{children}</LanguagesContextProvider>
+              </UsersContextProvider>
             </AppNavContextProvider>
           </AppPropertiesProvider>
         </ThemeProvider>
