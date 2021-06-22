@@ -28,6 +28,7 @@ import { TutorShifts, UserRoles } from '../../@types/enums';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
 import { useLanguages } from '../../contexts/languagesContext';
+import CustomMultiSelect from '../../components/CustomMultiSelect';
 
 interface NewUserFormProps {
   formFor: UserRoles;
@@ -192,7 +193,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         variant="outlined"
                         type="text"
                         fullWidth
-                        error={!!errors.displayName}
+                        error={touched.displayName && !!errors.displayName}
                       />
                       {touched.displayName && errors.displayName ? (
                         <FormHelperText error>
@@ -216,7 +217,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         variant="outlined"
                         type="text"
                         fullWidth
-                        error={!!errors.email}
+                        error={touched.email && !!errors.email}
                       />
                       {touched.email && errors.email ? (
                         <FormHelperText error>{errors.email}</FormHelperText>
@@ -238,6 +239,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         {...field}
                         labelId="ui-language-label-id"
                         variant="outlined"
+                        error={touched.uiLanguage && !!errors.uiLanguage}
                       >
                         {uiLanguageOptions.map((option) => (
                           <MenuItem key={option.code} value={option.code}>
@@ -253,6 +255,32 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         <div className={classes.helperTextSpacer} />
                       )}
                     </FormControl>
+                  );
+                }}
+              </Field>
+              <Field name="firstLanguage" value="values.firstLanguage">
+                {({ field }: FieldProps<FormikValues>) => {
+                  return (
+                    <>
+                      <Field
+                        {...field}
+                        name="firstLanguage"
+                        options={languages.map((option) => ({
+                          label: option.language,
+                          value: option.code,
+                        }))}
+                        component={CustomMultiSelect}
+                        isMulti={false}
+                        error={touched.firstLanguage && !!errors.firstLanguage}
+                      />
+                      {touched.firstLanguage && errors.firstLanguage ? (
+                        <FormHelperText error>
+                          {errors.firstLanguage}
+                        </FormHelperText>
+                      ) : (
+                        <div className={classes.helperTextSpacer} />
+                      )}
+                    </>
                   );
                 }}
               </Field>
