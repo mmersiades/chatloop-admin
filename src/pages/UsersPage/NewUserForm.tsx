@@ -32,6 +32,21 @@ interface NewUserFormProps {
   formFor: UserRoles;
 }
 
+interface NewUserFormValues {
+  email: string;
+  displayName: string;
+  firstLanguage: string;
+  uiLanguage: string;
+  shift?: TutorShifts;
+  shiftOneTutorId?: number;
+  shiftTwoTutorId?: number;
+}
+
+interface UiLanguageOption {
+  code: string;
+  language: string;
+}
+
 const useStyles = makeStyles(() =>
   createStyles({
     formContainer: {
@@ -43,10 +58,43 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const newUserFormInitialValues: FormikValues = {
+const uiLanguageOptions: UiLanguageOption[] = [
+  { code: 'ar', language: 'Arabic' },
+  { code: 'en', language: 'English' },
+  { code: 'es', language: 'Spanish' },
+  { code: 'fa', language: 'Persian' },
+  { code: 'id', language: 'Indonesian' },
+  { code: 'prs', language: 'Hazaragi' },
+  { code: 'sw', language: 'Swahili' },
+];
+
+const commonInitialValues = {
   email: '',
   displayName: '',
-  shift: '',
+  firstLanguage: '',
+  uiLanguage: '',
+};
+
+const getInitialFormValues = (userRole: UserRoles): NewUserFormValues => {
+  switch (userRole) {
+    case UserRoles.learner:
+      return {
+        ...commonInitialValues,
+
+        shiftOneTutorId: 0,
+        shiftTwoTutorId: 0,
+      };
+    case UserRoles.partner:
+      return commonInitialValues;
+    case UserRoles.tutor:
+      return {
+        ...commonInitialValues,
+
+        shift: TutorShifts.one,
+      };
+    default:
+      return commonInitialValues;
+  }
 };
 
 const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
@@ -69,6 +117,18 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
             .oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
             .required('Shift must be selected')
         : Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift'),
+    firstLanguage: Yup.string()
+      .max(3, 'Use IS0639-3 code (usually 3 letters)')
+      .min(2)
+      .required(),
+    uiLanguage: Yup.string()
+      .max(3, 'Use IS0639-1 code (usually 2 letters)')
+      .min(2, 'Use IS0639-1 code (usually 2 letters)')
+      .required(),
+    shiftOneTutorId:
+      formFor === UserRoles.learner ? Yup.number().required() : Yup.number(),
+    shiftTwoTutorId:
+      formFor === UserRoles.learner ? Yup.number().required() : Yup.number(),
   });
 
   // ----------------------------- Render ---------------------------------------- //
@@ -79,7 +139,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
       handleCloseDrawer={() => setShowNewUserForm(false)}
     >
       <Formik
-        initialValues={newUserFormInitialValues}
+        initialValues={getInitialFormValues(formFor)}
         validationSchema={newUserSchema}
         onSubmit={async (values, actions) => {
           if (values.email && values.displayName) {
@@ -103,7 +163,12 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
           }
         }}
       >
-        {({ errors, values, isSubmitting }: FormikProps<FormikValues>) => {
+        {({
+          errors,
+          values,
+          touched,
+          isSubmitting,
+        }: FormikProps<FormikValues>) => {
           const disableButton =
             isSubmitting ||
             !!errors.displayName ||
@@ -127,7 +192,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         fullWidth
                         error={!!errors.displayName}
                       />
-                      {errors.displayName ? (
+                      {touched.displayName && errors.displayName ? (
                         <FormHelperText error>
                           {errors.displayName}
                         </FormHelperText>
@@ -151,12 +216,41 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         fullWidth
                         error={!!errors.email}
                       />
-                      {errors.email ? (
+                      {touched.email && errors.email ? (
                         <FormHelperText error>{errors.email}</FormHelperText>
                       ) : (
                         <div className={classes.helperTextSpacer} />
                       )}
                     </>
+                  );
+                }}
+              </Field>
+              <Field name="uiLanguage" value="values.uiLanguage">
+                {({ field }: FieldProps<FormikValues>) => {
+                  return (
+                    <FormControl fullWidth style={{ marginTop: '8px' }}>
+                      <InputLabel id="ui-language-label-id" variant="outlined">
+                        UI Language
+                      </InputLabel>
+                      <Select
+                        {...field}
+                        labelId="ui-language-label-id"
+                        variant="outlined"
+                      >
+                        {uiLanguageOptions.map((option) => (
+                          <MenuItem key={option.code} value={option.code}>
+                            {option.language}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {touched.uiLanguage && errors.uiLanguage ? (
+                        <FormHelperText error>
+                          {errors.uiLanguage}
+                        </FormHelperText>
+                      ) : (
+                        <div className={classes.helperTextSpacer} />
+                      )}
+                    </FormControl>
                   );
                 }}
               </Field>
@@ -179,7 +273,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                           <MenuItem value={TutorShifts.one}>Shift One</MenuItem>
                           <MenuItem value={TutorShifts.two}>Shift Two</MenuItem>
                         </Select>
-                        {errors.shift ? (
+                        {touched.shift && errors.shift ? (
                           <FormHelperText error>{errors.shift}</FormHelperText>
                         ) : (
                           <div className={classes.helperTextSpacer} />
