@@ -15,6 +15,7 @@ import { Learner } from '../../@types/interfaces';
 import { TutorShifts } from '../../@types/enums';
 import { useUsers } from '../../contexts/usersContext';
 import { assignTutors } from '../../services/usersService';
+import { getTutorsByShift } from '../../helpers/getTutorsByShift';
 
 interface AssignTutorValues {
   shiftOneTutor: number;
@@ -33,12 +34,10 @@ export const AssignTutorsDialog: FC<AssignTutorsDialogProps> = ({ open }) => {
   const setNewLearnerEmail = (arg: string) => {};
 
   // Gets arrays of shift one and shift two Tutors
-  const shiftOneTutors =
-    tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.one);
-  const shiftTwoTutors =
-    tutors && tutors.filter((tutor) => tutor.shift === TutorShifts.two);
+  const shiftOneTutors = getTutorsByShift(tutors, TutorShifts.one);
+  const shiftTwoTutors = getTutorsByShift(tutors, TutorShifts.two);
 
-  // Get the Learner to assignthe Tutors to
+  // Get the Learner to assign the Tutors to
   let learner: Learner;
   if (newLearnerEmail && learners) {
     learner = learners.filter(
@@ -84,7 +83,7 @@ export const AssignTutorsDialog: FC<AssignTutorsDialogProps> = ({ open }) => {
                         return (
                           <Select {...field} label="Shift One Tutor" fullWidth>
                             <MenuItem value="">Select</MenuItem>;
-                            {shiftOneTutors &&
+                            {shiftOneTutors.length > 0 &&
                               shiftOneTutors.map((tutor) => {
                                 return (
                                   <MenuItem key={tutor.id} value={tutor.id}>
@@ -101,7 +100,7 @@ export const AssignTutorsDialog: FC<AssignTutorsDialogProps> = ({ open }) => {
                         return (
                           <Select {...field} label="Shift Two Tutor" fullWidth>
                             <MenuItem value="">Select</MenuItem>;
-                            {shiftTwoTutors &&
+                            {shiftTwoTutors.length > 0 &&
                               shiftTwoTutors.map((tutor) => {
                                 return (
                                   <MenuItem key={tutor.id} value={tutor.id}>

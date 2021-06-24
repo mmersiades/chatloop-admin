@@ -29,6 +29,7 @@ import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
 import { useLanguages } from '../../contexts/languagesContext';
 import CustomMultiSelect from '../../components/CustomMultiSelect';
+import { getTutorsByShift } from '../../helpers/getTutorsByShift';
 
 interface NewUserFormProps {
   formFor: UserRoles;
@@ -57,6 +58,7 @@ const useStyles = makeStyles(() =>
   createStyles({
     formContainer: {
       padding: '12px',
+      overflowY: 'auto',
     },
     helperTextSpacer: {
       height: 22,
@@ -160,7 +162,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showNewUserForm, setShowNewUserForm } = useAppNav();
-  const { fetchUsersByUserRole } = useUsers();
+  const { fetchUsersByUserRole, tutors } = useUsers();
   const { languages } = useLanguages();
 
   // ----------------------------- Component functions ------------------------- //
@@ -189,6 +191,10 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
     shiftTwoTutorId:
       formFor === UserRoles.learner ? Yup.number().required() : Yup.number(),
   });
+
+  // Gets arrays of shift one and shift two Tutors
+  const shiftOneTutors = getTutorsByShift(tutors, TutorShifts.one);
+  const shiftTwoTutors = getTutorsByShift(tutors, TutorShifts.two);
 
   // ----------------------------- Render ---------------------------------------- //
   return (
@@ -229,7 +235,10 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
             !!errors.shift ||
             !values.displayName ||
             !values.email ||
-            (formFor === UserRoles.tutor && !values.shift);
+            (formFor === UserRoles.tutor && !values.shift) ||
+            (formFor === UserRoles.learner && !values.shiftOneTutorId) ||
+            (formFor === UserRoles.learner && !values.shiftTwoTutorId);
+
           return (
             <Form className={classes.formContainer}>
               <Field name="displayName" value="values.displayName">
@@ -289,6 +298,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                         {...field}
                         labelId="ui-language-label-id"
                         variant="outlined"
+                        label="UI Language"
                         error={touched.uiLanguage && !!errors.uiLanguage}
                       >
                         {uiLanguageOptions.map((option) => (
@@ -349,6 +359,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                           {...field}
                           labelId="tutor-shift-label-id"
                           variant="outlined"
+                          label="Tutor shift"
                         >
                           <MenuItem value={TutorShifts.one}>Shift One</MenuItem>
                           <MenuItem value={TutorShifts.two}>Shift Two</MenuItem>
@@ -362,6 +373,84 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                     );
                   }}
                 </Field>
+              )}
+              {formFor === UserRoles.learner && tutors.length > 0 && (
+                <>
+                  <Field name="shiftOneTutorId" value="values.shiftOneTutorId">
+                    {({ field }: FieldProps<FormikValues>) => {
+                      return (
+                        <FormControl fullWidth style={{ marginTop: '8px' }}>
+                          <InputLabel
+                            id="shift-one-tutor-label-id"
+                            variant="outlined"
+                          >
+                            Shift one tutors
+                          </InputLabel>
+                          <Select
+                            {...field}
+                            labelId="shift-one-tutor-label-id"
+                            variant="outlined"
+                            label="Shift one tutors"
+                          >
+                            <MenuItem value={0}>Select</MenuItem>
+                            {shiftOneTutors.length > 0 &&
+                              shiftOneTutors.map((tutor) => {
+                                return (
+                                  <MenuItem key={tutor.id} value={tutor.id}>
+                                    {`${tutor.displayName} ${tutor.email}`}
+                                  </MenuItem>
+                                );
+                              })}
+                          </Select>
+                          {touched.shiftOneTutorId && errors.shiftOneTutorId ? (
+                            <FormHelperText error>
+                              {errors.shiftOneTutorId}
+                            </FormHelperText>
+                          ) : (
+                            <div className={classes.helperTextSpacer} />
+                          )}
+                        </FormControl>
+                      );
+                    }}
+                  </Field>
+                  <Field name="shiftTwoTutorId" value="values.shiftTwoTutorId">
+                    {({ field }: FieldProps<FormikValues>) => {
+                      return (
+                        <FormControl fullWidth style={{ marginTop: '8px' }}>
+                          <InputLabel
+                            id="shift-one-tutor-label-id"
+                            variant="outlined"
+                          >
+                            Shift two tutors
+                          </InputLabel>
+                          <Select
+                            {...field}
+                            labelId="shift-one-tutor-label-id"
+                            variant="outlined"
+                            label="Shift two tutors"
+                          >
+                            <MenuItem value={0}>Select</MenuItem>
+                            {shiftTwoTutors.length > 0 &&
+                              shiftTwoTutors.map((tutor) => {
+                                return (
+                                  <MenuItem key={tutor.id} value={tutor.id}>
+                                    {`${tutor.displayName} ${tutor.email}`}
+                                  </MenuItem>
+                                );
+                              })}
+                          </Select>
+                          {touched.shiftTwoTutorId && errors.shiftTwoTutorId ? (
+                            <FormHelperText error>
+                              {errors.shiftTwoTutorId}
+                            </FormHelperText>
+                          ) : (
+                            <div className={classes.helperTextSpacer} />
+                          )}
+                        </FormControl>
+                      );
+                    }}
+                  </Field>
+                </>
               )}
               <Button
                 type="submit"

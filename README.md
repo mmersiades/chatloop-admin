@@ -23,7 +23,7 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 End-to-end tests are written with Cypress.
 
-They require the Chatloop monolithic api server to be runnin glocally with the `mockdata` profile active.
+They require the Chatloop monolithic api server to be running locally with the `mockdata` profile active.
 
 `npm run cypress:open`: Opens the Cypress test runner app.
 

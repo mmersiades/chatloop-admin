@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import UsersTable from './UsersTable';
 import { UserRoles } from '../../@types/enums';
@@ -6,7 +6,6 @@ import UserDrawer from './UserDrawer';
 import ReplaceTutorDialog from '../../components/dialogs/ReplaceTutorDialog';
 import { ExtendedLearner } from '../../@types/interfaces';
 import NewUserForm from './NewUserForm';
-import { useUsers } from '../../contexts/usersContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -37,14 +36,6 @@ const Learners: FC<LearnersPageProps> = ({
   // ----------------------------- Component state ------------------------------ //
   const [showReplaceTutorDialog, setShowReplaceTutorDialog] =
     useState<ShowReplaceTutorDialog>({ showDialog: false });
-
-  // ----------------------------- Hooks ---------------------------------------- //
-  const { learners } = useUsers();
-
-  // ----------------------------- Effects ---------------------------------------- //
-  useEffect(() => {
-    learners?.map((learner) => console.log(`learner`, learner));
-  }, [learners]);
 
   // ----------------------------- Render ---------------------------------------- //
   return (
