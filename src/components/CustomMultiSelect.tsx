@@ -119,8 +119,6 @@ export const CustomMultiSelect = ({
 
   const getValue = () => {
     if (options) {
-      console.log(`options`, options);
-      console.log(`field`, field);
       return isMulti
         ? options.filter((option) => field.value.indexOf(option.value) >= 0)
         : options.find((option) => option.value === field.value);

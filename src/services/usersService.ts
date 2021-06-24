@@ -6,6 +6,7 @@ import { handleError } from '../helpers/handleError';
 
 import { AxiosResponse } from 'axios';
 import { usersAction } from '../contexts/usersContext';
+import { NewUserPayload } from '../pages/UsersPage/NewUserForm';
 
 export const getUser = async (userId: number): Promise<AxiosResponse> => {
   const requestOptions = {
@@ -113,21 +114,9 @@ export const getUsersByUserRole = (
   }
 };
 
-export const createUser = async (newUser: {
-  email: string;
-  displayName: string;
-  userRole: UserRoles;
-  shift: TutorShifts;
-}) => {
+export const createUser = async (body: NewUserPayload) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
-  };
-
-  const body = {
-    email: newUser.email,
-    displayName: newUser.displayName,
-    userRole: newUser.userRole,
-    shift: newUser.shift,
   };
 
   try {

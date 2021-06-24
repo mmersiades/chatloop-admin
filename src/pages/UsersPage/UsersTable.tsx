@@ -186,7 +186,10 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                 classes={{ root: classes.tableRow }}
                 key={user.id}
                 hover
-                onClick={() => setShowUserDrawer(user.id)}
+                onClick={() => {
+                  setShowNewUserForm(false);
+                  setShowUserDrawer(user.id);
+                }}
               >
                 <TableCell align="center">{user.id}</TableCell>
                 <TableCell align="center">{user.displayName}</TableCell>

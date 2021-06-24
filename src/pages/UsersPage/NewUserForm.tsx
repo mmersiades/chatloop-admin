@@ -44,6 +44,10 @@ interface NewUserFormValues {
   shiftTwoTutorId?: number;
 }
 
+export interface NewUserPayload extends NewUserFormValues {
+  userRole: UserRoles;
+}
+
 interface UiLanguageOption {
   code: string;
   language: string;
@@ -99,6 +103,58 @@ const getInitialFormValues = (userRole: UserRoles): NewUserFormValues => {
   }
 };
 
+const getPayload = (
+  userRole: UserRoles,
+  {
+    email,
+    displayName,
+    firstLanguage,
+    uiLanguage,
+    shiftOneTutorId,
+    shiftTwoTutorId,
+    shift,
+  }: NewUserFormValues
+): NewUserPayload | undefined => {
+  if (email && displayName && firstLanguage && uiLanguage) {
+    // Payload values common to all UserRoles
+    const commonPayload = {
+      email,
+      displayName,
+      firstLanguage,
+      uiLanguage,
+      userRole,
+    };
+
+    switch (userRole) {
+      case UserRoles.learner:
+        if (shiftOneTutorId && shiftTwoTutorId) {
+          return {
+            ...commonPayload,
+            shiftOneTutorId,
+            shiftTwoTutorId,
+          };
+        } else {
+          return undefined;
+        }
+      case UserRoles.partner:
+        return commonPayload;
+      case UserRoles.tutor:
+        if (shift) {
+          return {
+            ...commonPayload,
+            shift,
+          };
+        } else {
+          return undefined;
+        }
+      default:
+        return undefined;
+    }
+  } else {
+    return undefined;
+  }
+};
+
 const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
   const classes = useStyles();
 
@@ -145,22 +201,16 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
         initialValues={getInitialFormValues(formFor)}
         validationSchema={newUserSchema}
         onSubmit={async (values, actions) => {
-          if (values.email && values.displayName) {
-            const newUser = {
-              email: values.email,
-              displayName: values.displayName,
-              userRole: formFor,
-              shift: values.shift as TutorShifts,
-            };
-
+          const body = getPayload(formFor, values);
+          if (!!body) {
             try {
-              const response = await createUser(newUser);
+              const response = await createUser(body);
               if (!!fetchUsersByUserRole) fetchUsersByUserRole(formFor);
               console.log(`response`, response);
+              actions.resetForm();
             } catch (error) {
               handleError(error);
             }
-            actions.resetForm();
           } else {
             throw new Error('Submit called without values');
           }
