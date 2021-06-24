@@ -7,6 +7,8 @@ declare global {
     interface Chainable {
       getAuthTokens(username: string, password: string): Promise<AxiosResponse>;
       resetDb(): Promise<void>;
+      clickTab(tabLabel: string): void;
+      deleteUser(email: string): void;
     }
   }
 }
@@ -47,4 +49,24 @@ Cypress.Commands.add('resetDb', () => {
       expect(body.code).to.equal('DB_RESET');
     });
   });
+});
+
+Cypress.Commands.add('clickTab', (tabLabel: string) => {
+  cy.contains('button[role="tab"]', tabLabel).should('not.be.disabled');
+  cy.contains('button[role="tab"]', tabLabel).click();
+  cy.contains('button[role="tab"]', tabLabel)
+    .should('have.attr', 'aria-selected')
+    .and('equal', 'true');
+});
+
+Cypress.Commands.add('deleteUser', (email: string) => {
+  cy.contains('tr', email).click();
+  cy.get('button[aria-label="Delete user button"]').scrollIntoView();
+  cy.get('button[aria-label="Delete user button"]').click();
+  cy.get('button[aria-label="Confirm delete user button"]').should(
+    'not.be.disabled'
+  );
+  cy.get('button[aria-label="Confirm delete user button"]').click();
+  cy.get('button[aria-label="Close drawer button"]').should('not.be.visible');
+  cy.contains(email).should('not.be.visible');
 });

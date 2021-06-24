@@ -278,7 +278,7 @@ export const CustomMultiSelect = ({
   };
 
   return (
-    <div className={classes.root}>
+    <div aria-label="First language select" className={classes.root}>
       <NoSsr>
         <Select
           className={classes.textField}

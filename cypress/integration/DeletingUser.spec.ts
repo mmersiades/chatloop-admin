@@ -1,4 +1,3 @@
-import { should } from 'chai';
 import { DELETE_USER_DIALOG_TITLE } from '../../src/config/textConstants';
 import admin from '../fixtures/users/admin.json';
 

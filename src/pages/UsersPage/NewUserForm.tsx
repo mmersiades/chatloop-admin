@@ -227,14 +227,20 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
           values,
           touched,
           isSubmitting,
-        }: FormikProps<FormikValues>) => {
+        }: FormikProps<NewUserFormValues>) => {
           const disableButton =
             isSubmitting ||
             !!errors.displayName ||
             !!errors.email ||
             !!errors.shift ||
+            !!errors.uiLanguage ||
+            !!errors.firstLanguage ||
+            !!errors.shiftOneTutorId ||
+            !!errors.shiftTwoTutorId ||
             !values.displayName ||
             !values.email ||
+            !values.uiLanguage ||
+            !values.firstLanguage ||
             (formFor === UserRoles.tutor && !values.shift) ||
             (formFor === UserRoles.learner && !values.shiftOneTutorId) ||
             (formFor === UserRoles.learner && !values.shiftTwoTutorId);
@@ -325,6 +331,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                       <Field
                         {...field}
                         name="firstLanguage"
+                        label="First language"
                         options={languages.map((option) => ({
                           label: option.language,
                           value: option.code,
@@ -392,7 +399,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                             variant="outlined"
                             label="Shift one tutors"
                           >
-                            <MenuItem value={0}>Select</MenuItem>
+                            <MenuItem value={0}>Select for shift one</MenuItem>
                             {shiftOneTutors.length > 0 &&
                               shiftOneTutors.map((tutor) => {
                                 return (
@@ -429,7 +436,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                             variant="outlined"
                             label="Shift two tutors"
                           >
-                            <MenuItem value={0}>Select</MenuItem>
+                            <MenuItem value={0}>Select for shift two</MenuItem>
                             {shiftTwoTutors.length > 0 &&
                               shiftTwoTutors.map((tutor) => {
                                 return (

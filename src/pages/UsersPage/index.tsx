@@ -14,7 +14,6 @@ import {
   ExtendedPartner,
   ExtendedTutor,
 } from '../../@types/interfaces';
-import AssignTutorsDialog from '../../components/dialogs/AssignTutorsDialog';
 import { getUser } from '../../services/usersService';
 import {
   LEARNERS_TAB,
@@ -41,14 +40,9 @@ const UsersPage: FC = () => {
   // ----------------------------- Component state ------------------------------ //
   const [tab, setTab] = useState(0);
 
-  // The email address of a newly added Learner.
-  // Used for adding Tutors to the new Learner.
-  const [newLearnerEmail /*setNewLearnerEmail*/] = useState<string>('');
-
-  // const [emailForPasswordReset, setEmailForPasswordReset] =
-  //   useState<string>('');
-  const [extendedUser, setExtendedUser] =
-    useState<ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined>();
+  const [extendedUser, setExtendedUser] = useState<
+    ExtendedLearner | ExtendedPartner | ExtendedTutor | undefined
+  >();
 
   const { showUserDrawer, setShowUserDrawer } = useAppNav();
 
@@ -116,9 +110,6 @@ const UsersPage: FC = () => {
           <Tab label={TUTORS_TAB} />
         </Tabs>
       </div>
-      {newLearnerEmail && (
-        <AssignTutorsDialog open={!!tutors && !!newLearnerEmail} />
-      )}
 
       {tab === 0 && (
         <Learners

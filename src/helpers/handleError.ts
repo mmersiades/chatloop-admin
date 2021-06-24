@@ -10,6 +10,9 @@ export const handleError = (error?: any) => {
     if (error.config) {
       console.log('error.config', error.config);
     }
-    !error.message && !error.response && !error.request && console.log('error', error);
+    !error.message &&
+      !error.response &&
+      !error.request &&
+      console.log('error', error);
   }
 };

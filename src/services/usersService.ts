@@ -39,6 +39,7 @@ export const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
     );
     dispatch({ type: 'SET_LEARNERS', payload: learners });
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };
@@ -58,6 +59,7 @@ export const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
     );
     dispatch({ type: 'SET_PARTNERS', payload: partners });
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };
@@ -92,6 +94,7 @@ export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
       payload: shiftOneTutors.concat(shiftTwoTutors),
     });
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };
@@ -127,29 +130,30 @@ export const createUser = async (body: NewUserPayload) => {
     );
     return response;
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };
 
-export const assignTutors = async (body: {
-  shiftOneTutor: number;
-  shiftTwoTutor: number;
-  learner: number;
-}) => {
-  const requestOptions = {
-    headers: { authorization: authHeader() },
-  };
-  try {
-    const response = await apiChatloopOrg.post(
-      '/rest/admin/assign-learner-to-tutor',
-      body,
-      requestOptions
-    );
-    return response;
-  } catch (error) {
-    handleError(error);
-  }
-};
+// export const assignTutors = async (body: {
+//   shiftOneTutor: number;
+//   shiftTwoTutor: number;
+//   learner: number;
+// }) => {
+//   const requestOptions = {
+//     headers: { authorization: authHeader() },
+//   };
+//   try {
+//     const response = await apiChatloopOrg.post(
+//       '/rest/admin/assign-learner-to-tutor',
+//       body,
+//       requestOptions
+//     );
+//     return response;
+//   } catch (error) {
+//     handleError(error);
+//   }
+// };
 
 export const replaceTutor = async (
   oldTutor: number,
@@ -169,6 +173,7 @@ export const replaceTutor = async (
       requestOptions
     );
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };
@@ -185,6 +190,7 @@ export const deleteUser = async (userId: number) => {
     );
     return response;
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };
@@ -204,6 +210,7 @@ export const resetPassword = async (email: string) => {
     );
     return response;
   } catch (error) {
+    /* istanbul ignore next */
     handleError(error);
   }
 };

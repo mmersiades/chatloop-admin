@@ -19,6 +19,7 @@ import {
 import { ExtendedUser } from '../../@types/interfaces';
 import { AxiosResponse } from 'axios';
 import { resetPassword } from '../../services/usersService';
+import { handleError } from '../../helpers/handleError';
 
 const useStyles = makeStyles(({ palette }: Theme) =>
   createStyles({
@@ -50,15 +51,12 @@ const ResetPasswordDialog: FC<ResetPasswordDialogProps> = ({
 
       if (response && response.status === 200) {
         alert(`${response.data.status}. ${response.data.message}`);
-      } else {
-        alert('Password NOT reset. Something went wrong');
-        console.warn('response', response);
       }
-      handleClose();
     } catch (error) {
-      console.error(error);
-      handleClose();
+      alert('Password NOT reset. Something went wrong');
+      handleError(error);
     }
+    handleClose();
   };
 
   // ----------------------------- Render ---------------------------------------- //
