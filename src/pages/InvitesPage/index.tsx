@@ -130,17 +130,18 @@ const InvitesPage: FC = () => {
   const handleDeleteInvite = async (id: number) => {
     const response: AxiosResponse | undefined =
       await invitesService.deleteInvite(id);
-    if (response && !!refreshInvitesContext) {
-      if (response.status === 200 && response.data === 'Invite-Deleted') {
-        refreshInvitesContext();
-        setSelectedInviteId(undefined);
-        alert(response.data);
-      } else {
-        setSelectedInviteId(undefined);
-        alert(`failed to delete invite ${id}`);
-      }
+    if (
+      !!response &&
+      !!refreshInvitesContext &&
+      response.status === 200 &&
+      response.data === 'Invite-Deleted'
+    ) {
+      refreshInvitesContext();
+      setSelectedInviteId(undefined);
+      alert(response.data);
     } else {
       setSelectedInviteId(undefined);
+      alert(`failed to delete invite ${id}`);
     }
   };
 
@@ -256,7 +257,7 @@ const InvitesPage: FC = () => {
             root: clsx(classes.subListContainer, classes.invitesHeader),
           }}
         >
-          <ListItem>
+          <ListItem ContainerProps={{ id: 'partner-queue-header' }}>
             <ListItemText primary="Invites" />
             <ListItemSecondaryAction>
               {isFetchingInvites ? (
