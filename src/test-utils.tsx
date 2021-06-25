@@ -10,6 +10,7 @@ import { AppPropertiesProvider } from './contexts/appPropertiesContext';
 import { AppNavContextProvider } from './contexts/appNavContext';
 import { LanguagesContextProvider } from './contexts/languagesContext';
 import { UsersContextProvider } from './contexts/usersContext';
+import { InvitesContextProvider } from './contexts/invitesContext';
 
 interface AllTheProvidersProps {
   children: JSX.Element;
@@ -24,7 +25,11 @@ const AllTheProviders: FC<AllTheProvidersProps> = ({ children }) => {
           <AppPropertiesProvider>
             <AppNavContextProvider>
               <UsersContextProvider>
-                <LanguagesContextProvider>{children}</LanguagesContextProvider>
+                <InvitesContextProvider>
+                  <LanguagesContextProvider>
+                    {children}
+                  </LanguagesContextProvider>
+                </InvitesContextProvider>
               </UsersContextProvider>
             </AppNavContextProvider>
           </AppPropertiesProvider>

@@ -27,12 +27,9 @@ const initialContext: UsersContext = {
   tutors: [],
 };
 
-// eslint-disable-next-line
-export const UsersContext = React.createContext<UsersContext>(initialContext);
+export const usersContext = React.createContext<UsersContext>(initialContext);
 
-export const useUsers = () => {
-  return useContext(UsersContext);
-};
+export const useUsers = () => useContext(usersContext);
 
 export type usersAction =
   | {
@@ -47,12 +44,6 @@ export type usersAction =
       type: 'SET_TUTORS';
       payload?: Array<Tutor>;
     };
-
-const usersReducerInitialState: usersState = {
-  learners: [],
-  partners: [],
-  tutors: [],
-};
 
 const usersReducer = (state: usersState, action: usersAction) => {
   switch (action.type) {
@@ -70,7 +61,7 @@ const usersReducer = (state: usersState, action: usersAction) => {
 export const UsersContextProvider: FC<UsersContextProviderProps> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(usersReducer, usersReducerInitialState);
+  const [state, dispatch] = useReducer(usersReducer, initialContext);
 
   const fetchUsersByUserRole = (userRole: UserRoles) => {
     getUsersByUserRole(userRole, dispatch);
@@ -83,8 +74,8 @@ export const UsersContextProvider: FC<UsersContextProviderProps> = ({
   }, []);
 
   return (
-    <UsersContext.Provider value={{ ...state, fetchUsersByUserRole }}>
+    <usersContext.Provider value={{ ...state, fetchUsersByUserRole }}>
       {children}
-    </UsersContext.Provider>
+    </usersContext.Provider>
   );
 };

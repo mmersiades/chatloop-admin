@@ -12,6 +12,7 @@ export const DASHBOARD = 'Dashboard';
 
 // Common
 export const CANCEL = 'CANCEL';
+export const DELETE = 'DELETE';
 
 // UsersPage
 export const USERS_TITLE = 'Manage Users';
@@ -28,7 +29,6 @@ export const SHIFT_ONE_TUTOR = 'Shift one tutor';
 export const SHIFT_TWO_TUTOR = 'Shift two tutor';
 export const REPLACE_TUTOR = 'REPLACE TUTOR';
 export const RESET_PASSWORD = 'RESET PASSWORD';
-export const DELETE = 'DELETE';
 
 // InvitesPage
 export const INVITES_TITLE = 'Manage Invites';
