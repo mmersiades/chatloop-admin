@@ -6,46 +6,55 @@ import React, {
   useState,
 } from 'react';
 import { ExpiryInterval } from '../@types/interfaces';
+import {
+  DEV_EXPIRY_INTERVAL,
+  DEV_PARTNER_QUEUE_SIZE,
+  PROD_EXPIRY_INTERVAL,
+  PROD_PARTNER_QUEUE_SIZE,
+} from '../config/constants';
 import baseURL from '../serverUrls';
 
 interface AppPropertiesContext {
   inviteExpiryInterval?: ExpiryInterval;
+  partnerQueueDefaultSize?: number;
 }
 
 interface AppPropertiesProviderProps {
   children: JSX.Element | JSX.Element[];
 }
 
-// eslint-disable-next-line
-const AppPropertiesContext = createContext<AppPropertiesContext>({});
+const initialState: AppPropertiesContext = {
+  inviteExpiryInterval: undefined,
+  partnerQueueDefaultSize: undefined,
+};
 
-export const useAppProperties = () => useContext(AppPropertiesContext);
+const appPropertiesContext = createContext<AppPropertiesContext>(initialState);
 
-export const AppPropertiesConsumer = AppPropertiesContext.Consumer;
+export const useAppProperties = () => useContext(appPropertiesContext);
+
+export const AppPropertiesConsumer = appPropertiesContext.Consumer;
 
 export const AppPropertiesProvider: FC<AppPropertiesProviderProps> = ({
   children,
 }) => {
-  const [inviteExpiryInterval, setInviteExpiryInterval] =
-    useState<ExpiryInterval | undefined>();
+  const [inviteExpiryInterval, setInviteExpiryInterval] = useState<
+    ExpiryInterval | undefined
+  >(initialState.inviteExpiryInterval);
+  const [partnerQueueDefaultSize, setPartnerQueueDefaultSize] = useState<
+    number | undefined
+  >(initialState.partnerQueueDefaultSize);
 
   // These expiry intervals will be hardcoded for now,
   // until we have endpoints for fetching them from the back-end
   const setApplicationProperties = () => {
     if (baseURL === 'https://api.chatloop.org') {
       // For production environment
-      setInviteExpiryInterval({
-        value: 3,
-        unit: 'hours',
-        ms: 10800000,
-      });
+      setInviteExpiryInterval(PROD_EXPIRY_INTERVAL);
+      setPartnerQueueDefaultSize(PROD_PARTNER_QUEUE_SIZE);
     } else {
       // For local and staging environments
-      setInviteExpiryInterval({
-        value: 20,
-        unit: 'seconds',
-        ms: 20000,
-      });
+      setInviteExpiryInterval(DEV_EXPIRY_INTERVAL);
+      setPartnerQueueDefaultSize(DEV_PARTNER_QUEUE_SIZE);
     }
   };
 
@@ -54,8 +63,10 @@ export const AppPropertiesProvider: FC<AppPropertiesProviderProps> = ({
   }, []);
 
   return (
-    <AppPropertiesContext.Provider value={{ inviteExpiryInterval }}>
+    <appPropertiesContext.Provider
+      value={{ inviteExpiryInterval, partnerQueueDefaultSize }}
+    >
       {children}
-    </AppPropertiesContext.Provider>
+    </appPropertiesContext.Provider>
   );
 };

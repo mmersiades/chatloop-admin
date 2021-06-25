@@ -1,6 +1,7 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { v4 as uuid } from 'uuid';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import clsx from 'clsx';
 import moment from 'moment';
 import momentTZ from 'moment-timezone';
@@ -24,7 +25,11 @@ import {
   Collapse,
   IconButton,
 } from '@material-ui/core';
-import { ExpandMoreRounded, ExpandLessRounded } from '@material-ui/icons';
+import {
+  ExpandMoreRounded,
+  ExpandLessRounded,
+  RefreshRounded,
+} from '@material-ui/icons';
 
 import withNavbar from '../../components/WithNavbar';
 import { useInvites } from '../../contexts/invitesContext';
@@ -96,15 +101,21 @@ const InvitesPage: FC = () => {
     number | undefined
   >();
   const [expandedInvite, setexpandedInvite] = useState<number | null>();
+  const [currentPage, setCurrentPage] = useState(0);
+  const queueDiv = useRef<HTMLDivElement>(null);
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { inviteExpiryInterval } = useAppProperties();
   const {
     isFetchingPartnerQueue,
+    isFetchingMoreQueue,
     isFetchingInvites,
     queuePageable,
     invitesPageable,
     refreshInvitesContext,
+    fetchQueue,
+    fetchMoreQueue,
+    fetchInvites,
   } = useInvites();
 
   // ----------------------------- Component functions ------------------------- //
@@ -133,17 +144,15 @@ const InvitesPage: FC = () => {
     }
   };
 
-  // ----------------------------- Effects ---------------------------------------- //
-
-  useEffect(() => {
-    let interval: number | undefined;
-    if (!!inviteExpiryInterval && !!refreshInvitesContext) {
-      interval = window.setInterval(() => {
-        refreshInvitesContext();
-      }, inviteExpiryInterval.ms / 2);
+  const refreshQueue = () => {
+    if (!!fetchQueue) {
+      fetchQueue();
+      setCurrentPage(0);
+      if (!!queueDiv.current) {
+        queueDiv.current.scrollTop = 0;
+      }
     }
-    return () => window.clearInterval(interval);
-  }, [inviteExpiryInterval, refreshInvitesContext]);
+  };
 
   // ----------------------------- Render ---------------------------------------- //
 
@@ -170,41 +179,73 @@ const InvitesPage: FC = () => {
             <ListItem>
               <ListItemText primary={PARTNER_QUEUE} />
               <ListItemSecondaryAction>
-                {isFetchingPartnerQueue && (
-                  <CircularProgress size="1rem" thickness={2.4} />
+                {isFetchingPartnerQueue || isFetchingMoreQueue ? (
+                  <IconButton edge="end">
+                    <CircularProgress
+                      color="primary"
+                      size="18px"
+                      thickness={4.5}
+                    />
+                  </IconButton>
+                ) : (
+                  <IconButton onClick={refreshQueue} edge="end">
+                    <RefreshRounded color="primary" />
+                  </IconButton>
                 )}
               </ListItemSecondaryAction>
             </ListItem>
             <Divider />
-            <div className={classes.queue}>
-              {queuePageable?.content.map((partner: PartnerInQueue) => {
-                const duration = moment.duration(
-                  moment().diff(moment(partner.lastChatFinished))
-                );
-                return (
-                  <ListItem
-                    key={partner.id}
-                    data-testid="partner-queue-list-item"
-                  >
-                    <ListItemText
-                      disableTypography
-                      primary={
-                        <PrimaryPartnerListText
-                          id={partner.id}
-                          displayName={partner.displayName}
+            <div ref={queueDiv} className={classes.queue} id="scrollableDiv">
+              {!!queuePageable ? (
+                <InfiniteScroll
+                  dataLength={queuePageable.content.length}
+                  next={() => {
+                    !!fetchMoreQueue && fetchMoreQueue(currentPage + 1);
+                    setCurrentPage(currentPage + 1);
+                  }}
+                  hasMore={!queuePageable.last}
+                  loader={<div />}
+                  endMessage={
+                    <Typography align="center" paragraph variant="caption">
+                      End of queue
+                    </Typography>
+                  }
+                  scrollableTarget="scrollableDiv"
+                >
+                  {queuePageable.content.map((partner: PartnerInQueue) => {
+                    const duration = moment.duration(
+                      moment().diff(moment(partner.lastChatFinished))
+                    );
+                    return (
+                      <ListItem
+                        key={partner.id}
+                        data-testid="partner-queue-list-item"
+                      >
+                        <ListItemText
+                          disableTypography
+                          primary={
+                            <PrimaryPartnerListText
+                              id={partner.id}
+                              displayName={partner.displayName}
+                            />
+                          }
+                          secondary={
+                            <SecondaryPartnerListText
+                              duration={duration}
+                              currentActivities={
+                                partner.currentNumberOfActivities
+                              }
+                              maxActivities={partner.maxNumberOfActivities}
+                            />
+                          }
                         />
-                      }
-                      secondary={
-                        <SecondaryPartnerListText
-                          duration={duration}
-                          currentActivities={partner.currentNumberOfActivities}
-                          maxActivities={partner.maxNumberOfActivities}
-                        />
-                      }
-                    />
-                  </ListItem>
-                );
-              })}
+                      </ListItem>
+                    );
+                  })}
+                </InfiniteScroll>
+              ) : (
+                <div />
+              )}
             </div>
           </List>
         </div>
@@ -218,8 +259,18 @@ const InvitesPage: FC = () => {
           <ListItem>
             <ListItemText primary="Invites" />
             <ListItemSecondaryAction>
-              {isFetchingInvites && (
-                <CircularProgress size="1rem" thickness={2.4} />
+              {isFetchingInvites ? (
+                <IconButton edge="end">
+                  <CircularProgress
+                    color="primary"
+                    size="18px"
+                    thickness={4.5}
+                  />
+                </IconButton>
+              ) : (
+                <IconButton onClick={fetchInvites} edge="end">
+                  <RefreshRounded color="primary" />
+                </IconButton>
               )}
             </ListItemSecondaryAction>
           </ListItem>

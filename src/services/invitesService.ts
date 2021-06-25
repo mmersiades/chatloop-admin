@@ -3,13 +3,16 @@ import { authHeader } from '../helpers/getAuthHeader';
 import { handleError } from '../helpers/handleError';
 import { AxiosResponse } from 'axios';
 
-const getPartnerQueue = async () => {
+const getPartnerQueue = async (page: number, size: number) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
 
   try {
-    const response: AxiosResponse = await apiChatloopOrg.get('/rest/admin/partner-ranking/', requestOptions);
+    const response: AxiosResponse = await apiChatloopOrg.get(
+      `/rest/admin/partner-ranking?page=${page}&size=${size}`,
+      requestOptions
+    );
     return response.data;
   } catch (error) {
     handleError(error);
@@ -22,7 +25,10 @@ const getInvites = async () => {
   };
 
   try {
-    const response: AxiosResponse = await apiChatloopOrg.get('/rest/admin/invites/', requestOptions);
+    const response: AxiosResponse = await apiChatloopOrg.get(
+      '/rest/admin/invites/',
+      requestOptions
+    );
     return response.data;
   } catch (error) {
     handleError(error);

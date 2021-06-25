@@ -1,19 +1,29 @@
 import React, {
   createContext,
   FC,
+  useCallback,
   useContext,
   useEffect,
   useReducer,
 } from 'react';
 import { Pageable, PartnerInQueue, Invite } from '../@types/interfaces';
 import invitesService from '../services/invitesService';
+import baseURL from '../serverUrls';
+import {
+  DEV_PARTNER_QUEUE_SIZE,
+  PROD_PARTNER_QUEUE_SIZE,
+} from '../config/constants';
 
 interface InvitesContext {
   isFetchingPartnerQueue: boolean;
+  isFetchingMoreQueue: boolean;
   isFetchingInvites: boolean;
   queuePageable?: Pageable<PartnerInQueue[]>;
   invitesPageable?: Pageable<Invite[]>;
   refreshInvitesContext?: () => void;
+  fetchQueue?: (page?: number, size?: number) => void;
+  fetchMoreQueue?: (page: number, size?: number) => void;
+  fetchInvites?: () => void;
 }
 
 interface InvitesContextProviderProps {
@@ -21,13 +31,16 @@ interface InvitesContextProviderProps {
 }
 
 export type InvitesActions =
-  | { type: 'GET_PARTNER_QUEUE'; payload?: any }
-  | { type: 'SET_PARTNER_QUEUE'; payload?: any }
-  | { type: 'GET_INVITES'; payload?: any }
-  | { type: 'SET_INVITES'; payload?: any };
+  | { type: 'PARTNER_QUEUE_REQUEST'; payload?: any }
+  | { type: 'PARTNER_QUEUE_SUCCESS'; payload?: any }
+  | { type: 'MORE_QUEUE_REQUEST'; payload?: any }
+  | { type: 'MORE_QUEUE_SUCCESS'; payload?: any }
+  | { type: 'INVITES_REQUEST'; payload?: any }
+  | { type: 'INVITES_SUCCESS'; payload?: any };
 
 const initialState: InvitesContext = {
   isFetchingPartnerQueue: false,
+  isFetchingMoreQueue: false,
   isFetchingInvites: false,
 };
 
@@ -40,23 +53,39 @@ const invitesReducer = (
   action: InvitesActions
 ): InvitesContext => {
   switch (action.type) {
-    case 'GET_PARTNER_QUEUE':
+    case 'PARTNER_QUEUE_REQUEST':
       return {
         ...state,
         isFetchingPartnerQueue: true,
       };
-    case 'SET_PARTNER_QUEUE':
+    case 'PARTNER_QUEUE_SUCCESS':
       return {
         ...state,
         queuePageable: action.payload,
         isFetchingPartnerQueue: false,
       };
-    case 'GET_INVITES':
+    case 'MORE_QUEUE_REQUEST':
+      return {
+        ...state,
+        isFetchingMoreQueue: true,
+      };
+    case 'MORE_QUEUE_SUCCESS':
+      return {
+        ...state,
+        queuePageable: {
+          ...action.payload,
+          content: !!state.queuePageable
+            ? [...state.queuePageable.content, ...action.payload.content]
+            : action.payload,
+        },
+        isFetchingMoreQueue: false,
+      };
+    case 'INVITES_REQUEST':
       return {
         ...state,
         isFetchingInvites: true,
       };
-    case 'SET_INVITES':
+    case 'INVITES_SUCCESS':
       return {
         ...state,
         isFetchingInvites: false,
@@ -70,32 +99,58 @@ const invitesReducer = (
 export const InvitesContextProvider: FC<InvitesContextProviderProps> = ({
   children,
 }) => {
+  // ----------------------------- Component state ------------------------------ //
   const [state, dispatch] = useReducer(invitesReducer, initialState);
 
-  const fetchQueue = async () => {
-    dispatch({ type: 'GET_INVITES' });
-    const partnerQueue = await invitesService.getPartnerQueue();
-    dispatch({ type: 'SET_PARTNER_QUEUE', payload: partnerQueue });
-  };
+  // ----------------------------- Component functions ------------------------- //
+  const defaultSize =
+    baseURL === 'https://api.chatloop.org'
+      ? PROD_PARTNER_QUEUE_SIZE
+      : DEV_PARTNER_QUEUE_SIZE;
 
-  const fetchInvites = async () => {
-    dispatch({ type: 'GET_INVITES' });
+  const fetchQueue = useCallback(
+    async (page: number = 0, size: number = defaultSize) => {
+      dispatch({ type: 'PARTNER_QUEUE_REQUEST' });
+      const partnerQueue = await invitesService.getPartnerQueue(page, size);
+      dispatch({ type: 'PARTNER_QUEUE_SUCCESS', payload: partnerQueue });
+    },
+    [defaultSize]
+  );
+
+  const fetchInvites = useCallback(async () => {
+    dispatch({ type: 'INVITES_REQUEST' });
     const invites = await invitesService.getInvites();
-    dispatch({ type: 'SET_INVITES', payload: invites });
-  };
+    dispatch({ type: 'INVITES_SUCCESS', payload: invites });
+  }, []);
 
   const refreshInvitesContext = () => {
     fetchQueue();
     fetchInvites();
   };
 
+  const fetchMoreQueue = async (page: number, size: number = defaultSize) => {
+    dispatch({ type: 'MORE_QUEUE_REQUEST' });
+    const partnerQueue = await invitesService.getPartnerQueue(page, size);
+    dispatch({ type: 'MORE_QUEUE_SUCCESS', payload: partnerQueue });
+  };
+
+  // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
     fetchQueue();
     fetchInvites();
-  }, []);
+  }, [fetchQueue, fetchInvites]);
 
+  // ----------------------------- Render ---------------------------------------- //
   return (
-    <invitesContext.Provider value={{ ...state, refreshInvitesContext }}>
+    <invitesContext.Provider
+      value={{
+        ...state,
+        refreshInvitesContext,
+        fetchQueue,
+        fetchInvites,
+        fetchMoreQueue,
+      }}
+    >
       {children}
     </invitesContext.Provider>
   );
