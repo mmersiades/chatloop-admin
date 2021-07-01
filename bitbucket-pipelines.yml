@@ -10,8 +10,11 @@ pipelines:
             - node
           script:
             - npm install
+            - export CYPRESS_API_HOST=https://staging-api.chatloop.org
+            - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
+            - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
             - npm run test:staging
-            - npm run start:staging
+            - npm run start:staging &
             - npm run cypress:all
 
     # Build & deploy app to staging environment
