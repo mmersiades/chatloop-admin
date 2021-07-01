@@ -2,18 +2,27 @@ image: nikolaik/python-nodejs
 
 pipelines:
   custom:
+    install:
+      - step: &install
+          name: Install and unit tests
+          caches:
+            - npm
+          script:
+            - npm ci
+            - npm run test:staging
     # Run tests
     test:
       - step: &test
-          name: Test
+          name: E2E tests
           caches:
-            - node
+            - npm
+            - cypress
+          image: cypress/base:10
           script:
-            - npm install
+            - npm ci
             - export CYPRESS_API_HOST=https://staging-api.chatloop.org
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
             - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
-            - npm run test:staging
             - npm run start:staging &
             - npm run cypress:all
 
@@ -25,7 +34,7 @@ pipelines:
           caches:
             - node
           script: # Modify the commands below to build your repository.
-            - npm install
+            - npm ci
             - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
@@ -40,7 +49,7 @@ pipelines:
           caches:
             - node
           script:
-            - npm install
+            - npm ci
             - npm run build:prod
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
@@ -57,3 +66,7 @@ pipelines:
       - step: *deploy_staging # ...build and automatically deploy staging
       - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
+definitions:
+  caches:
+    npm: $HOME/.npm
+    cypress: $HOME/.cache/Cypress
