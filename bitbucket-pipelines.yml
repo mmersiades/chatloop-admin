@@ -44,12 +44,9 @@ pipelines:
     - step: *test
 
   branches:
-    # All commits to master can be manually deployed to production environment via pipeline web interface
+    # On all commits to master...
     master:
-      - step: *test
-      - step: *deploy_production
+      - step: *test # ...run the tests
+      - step: *deploy_staging # ...build and automatically deploy staging
+      - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
-    # All commits to dev branch get automatically deployed to staging environment
-    staging:
-      - step: *test
-      - step: *deploy_staging
