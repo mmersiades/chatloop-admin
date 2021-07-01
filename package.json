@@ -39,7 +39,7 @@
     "eject": "react-scripts eject",
     "cypress:open": "cypress open",
     "cypress:all": "cypress run",
-    "test-coverage": "yarn test --coverage --watchAll=false && yarn cypress:all && node ./scripts/mergeCoverage.js"
+    "test-coverage": "yarn test --coverage --watchAll=false && npm run cypress:all && node ./scripts/mergeCoverage.js"
   },
   "eslintConfig": {
     "extends": "react-app"

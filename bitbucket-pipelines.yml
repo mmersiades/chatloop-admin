@@ -24,7 +24,6 @@ pipelines:
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
             - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
             - npm run start:staging &
-            - sleep 30000 &&
             - npm run cypress:all
 
     # Build & deploy app to staging environment
