@@ -8,11 +8,12 @@ import React, {
 } from 'react';
 import { Pageable, PartnerInQueue, Invite } from '../@types/interfaces';
 import invitesService from '../services/invitesService';
-import baseURL from '../serverUrls';
 import {
   DEV_PARTNER_QUEUE_SIZE,
   PROD_PARTNER_QUEUE_SIZE,
 } from '../config/constants';
+
+const env = process.env.REACT_APP_ENV;
 
 interface InvitesContext {
   isFetchingPartnerQueue: boolean;
@@ -104,9 +105,7 @@ export const InvitesContextProvider: FC<InvitesContextProviderProps> = ({
 
   // ----------------------------- Component functions ------------------------- //
   const defaultSize =
-    baseURL === 'https://api.chatloop.org'
-      ? PROD_PARTNER_QUEUE_SIZE
-      : DEV_PARTNER_QUEUE_SIZE;
+    env === 'prod' ? PROD_PARTNER_QUEUE_SIZE : DEV_PARTNER_QUEUE_SIZE;
 
   const fetchQueue = useCallback(
     async (page: number = 0, size: number = defaultSize) => {

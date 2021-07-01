@@ -12,7 +12,8 @@ import {
   PROD_EXPIRY_INTERVAL,
   PROD_PARTNER_QUEUE_SIZE,
 } from '../config/constants';
-import baseURL from '../serverUrls';
+
+const env = process.env.REACT_APP_ENV;
 
 interface AppPropertiesContext {
   inviteExpiryInterval?: ExpiryInterval;
@@ -47,7 +48,7 @@ export const AppPropertiesProvider: FC<AppPropertiesProviderProps> = ({
   // These expiry intervals will be hardcoded for now,
   // until we have endpoints for fetching them from the back-end
   const setApplicationProperties = () => {
-    if (baseURL === 'https://api.chatloop.org') {
+    if (env === 'prod') {
       // For production environment
       setInviteExpiryInterval(PROD_EXPIRY_INTERVAL);
       setPartnerQueueDefaultSize(PROD_PARTNER_QUEUE_SIZE);
