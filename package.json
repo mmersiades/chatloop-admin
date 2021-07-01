@@ -30,10 +30,12 @@
   "scripts": {
     "start": "react-scripts -r @cypress/instrument-cra start",
     "start:dev": "env-cmd -f ./src/config/local.env yarn start",
+    "start:staging": "env-cmd -f ./src/config/staging.env yarn start",
     "build": "react-scripts build",
     "build:staging": "env-cmd -f ./src/config/staging.env yarn build",
     "build:prod": "env-cmd -f ./src/config/prod.env yarn build",
     "test": "env-cmd -f ./src/config/local.env react-scripts test",
+    "test:staging": "env-cmd -f ./src/config/staging.env react-scripts test",
     "eject": "react-scripts eject",
     "cypress:open": "cypress open",
     "cypress:all": "cypress run",

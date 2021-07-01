@@ -6,9 +6,13 @@ pipelines:
     test:
       - step: &test
           name: Test
+          caches:
+            - node
           script:
             - npm install
-            - npm test
+            - npm run test:staging
+            - npm run start:staging
+            - npm run cypress:all
 
     # Build & deploy app to staging environment
     deploy_staging:
