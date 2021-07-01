@@ -42,7 +42,7 @@ describe('Using the InvitesPage', () => {
     });
 
     cy.contains(inviteResponse1.content[0].topic).should('be.visible');
-    cy.contains('Expires: Sun, 1:50:40 pm');
+    cy.contains('Expires:');
 
     // Check can expand invite
     cy.get('button[aria-label="show more"]').should('not.be.disabled');
