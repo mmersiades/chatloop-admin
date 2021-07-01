@@ -19,7 +19,7 @@ pipelines:
             - node
           script: # Modify the commands below to build your repository.
             - npm install
-            - npm run build
+            - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
             - aws cloudfront create-invalidation --distribution-id EB299TW0BQQ5S --paths '/*'
@@ -34,7 +34,7 @@ pipelines:
             - node
           script:
             - npm install
-            - npm run build
+            - npm run build:prod
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
             - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'

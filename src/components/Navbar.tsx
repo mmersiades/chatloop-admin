@@ -12,7 +12,6 @@ import {
 import MenuIcon from '@material-ui/icons/Menu';
 import { useLocation } from 'react-router-dom';
 import clsx from 'clsx';
-import connectedUrl from '../serverUrls';
 import { useAppNav } from '../contexts/appNavContext';
 import {
   DASHBOARD_TITLE,
@@ -20,6 +19,8 @@ import {
   INVITES_TITLE,
   ACCOUNT_SETTINGS_TITLE,
 } from '../config/textConstants';
+
+const connectedUrl = process.env.REACT_APP_MONOLITH_BASE_URL;
 
 const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
   createStyles({
