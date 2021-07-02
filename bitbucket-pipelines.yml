@@ -25,7 +25,7 @@ pipelines:
             - npm run start:staging & npx wait-on http://localhost:3000
             - npm run test-coverage
           artifacts:
-            - coverage-combined/lcov-report/index.html
+            - coverage-combined/lcov-report/
 
     # Build & deploy app to staging environment
     deploy_staging:
