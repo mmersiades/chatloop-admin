@@ -12,6 +12,67 @@ import { LanguagesContextProvider } from './contexts/languagesContext';
 import { UsersContextProvider } from './contexts/usersContext';
 import { InvitesContextProvider } from './contexts/invitesContext';
 
+interface NoAuthProvidersProps {
+  children: JSX.Element;
+}
+
+const NoAuthProviders: FC<NoAuthProvidersProps> = ({ children }) => {
+  return (
+    <>
+      <CssBaseline />
+      <Router history={history}>
+        <ThemeProvider theme={theme}>
+          <AppPropertiesProvider>
+            <AppNavContextProvider>{children}</AppNavContextProvider>
+          </AppPropertiesProvider>
+        </ThemeProvider>
+      </Router>
+    </>
+  );
+};
+
+interface UserPageProvidersProps {
+  children: JSX.Element;
+}
+
+const UserPageProviders: FC<UserPageProvidersProps> = ({ children }) => {
+  return (
+    <NoAuthProviders>
+      <UsersContextProvider>
+        <LanguagesContextProvider>{children}</LanguagesContextProvider>
+      </UsersContextProvider>
+    </NoAuthProviders>
+  );
+};
+
+export const userPageRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'queries'>
+) =>
+  render(ui, {
+    wrapper: (props: any) => <UserPageProviders {...props} {...options} />,
+  });
+
+interface InvitesPageProvidersProps {
+  children: JSX.Element;
+}
+
+const InvitesPageProviders: FC<InvitesPageProvidersProps> = ({ children }) => {
+  return (
+    <NoAuthProviders>
+      <InvitesContextProvider>{children}</InvitesContextProvider>
+    </NoAuthProviders>
+  );
+};
+
+export const invitesPageRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'queries'>
+) =>
+  render(ui, {
+    wrapper: (props: any) => <InvitesPageProviders {...props} {...options} />,
+  });
+
 interface AllTheProvidersProps {
   children: JSX.Element;
 }
@@ -39,7 +100,7 @@ const AllTheProviders: FC<AllTheProvidersProps> = ({ children }) => {
   );
 };
 
-const customRender = (
+export const renderWithAllProviders = (
   ui: ReactElement,
   options?: Omit<RenderOptions, 'queries'>
 ) =>
@@ -47,6 +108,4 @@ const customRender = (
     wrapper: (props: any) => <AllTheProviders {...props} {...options} />,
   });
 
-export * from '@testing-library/react';
-
-export { customRender as render };
+// export * from '@testing-library/react';

@@ -4,12 +4,9 @@ import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { AppPropertiesProvider } from '../contexts/appPropertiesContext';
-import { UsersContextProvider } from '../contexts/usersContext';
 import { AppNavContextProvider } from '../contexts/appNavContext';
 import chatloopTheme from '../assets/chatloopTheme';
 import history from '../helpers/getBrowserHistory';
-import { LanguagesContextProvider } from '../contexts/languagesContext';
-import { InvitesContextProvider } from '../contexts/invitesContext';
 
 export const theme = createMuiTheme(chatloopTheme);
 
@@ -24,15 +21,7 @@ const Root: FC<RootProps> = ({ children }): JSX.Element => {
       <Router history={history}>
         <ThemeProvider theme={theme}>
           <AppPropertiesProvider>
-            <AppNavContextProvider>
-              <UsersContextProvider>
-                <InvitesContextProvider>
-                  <LanguagesContextProvider>
-                    {children}
-                  </LanguagesContextProvider>
-                </InvitesContextProvider>
-              </UsersContextProvider>
-            </AppNavContextProvider>
+            <AppNavContextProvider>{children}</AppNavContextProvider>
           </AppPropertiesProvider>
         </ThemeProvider>
       </Router>
