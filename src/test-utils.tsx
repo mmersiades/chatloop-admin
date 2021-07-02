@@ -107,5 +107,3 @@ export const renderWithAllProviders = (
   render(ui, {
     wrapper: (props: any) => <AllTheProviders {...props} {...options} />,
   });
-
-// export * from '@testing-library/react';
