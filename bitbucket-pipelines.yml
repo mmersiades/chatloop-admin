@@ -4,12 +4,11 @@ pipelines:
   custom:
     install:
       - step: &install
-          name: Install and unit tests
+          name: Install
           caches:
             - npm
           script:
             - npm ci
-            - npm run test:staging
     # Run tests
     test:
       - step: &test
@@ -24,7 +23,9 @@ pipelines:
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
             - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
             - npm run start:staging & npx wait-on http://localhost:3000
-            - npm run cypress:all
+            - npm run test-coverage
+          artifacts:
+            - coverage-combined/lcov-report/index.html
 
     # Build & deploy app to staging environment
     deploy_staging:
@@ -55,7 +56,7 @@ pipelines:
             - aws s3 sync ./build s3://chatloop-admin
             - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'
 
-  # Runs tests on commits to all branches ( excpet master and dev)
+  # Runs tests on commits to all branches (except master)
   default:
     - step: *install
     - step: *test
@@ -64,7 +65,7 @@ pipelines:
     # On all commits to master...
     master:
       - step: *install
-      - step: *test # ...run the tests
+      - step: *test # ...run all the tests
       - step: *deploy_staging # ...build and automatically deploy staging
       - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
