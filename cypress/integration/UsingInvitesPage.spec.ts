@@ -57,8 +57,10 @@ describe('Using the InvitesPage', () => {
     cy.contains(
       `Are you sure you want to delete invite ${inviteResponse1.content[0].id}?`
     ).should('be.visible');
+    cy.contains('button', 'CANCEL').should('not.be.disabled');
     cy.contains('button', 'CANCEL').click();
     cy.contains(inviteResponse1.content[0].topic).should('be.visible');
+    cy.contains('button', 'DELETE').should('not.be.disabled');
     cy.contains('button', 'DELETE').click();
     cy.intercept(
       'DELETE',
@@ -68,6 +70,9 @@ describe('Using the InvitesPage', () => {
     cy.intercept(`/rest/admin/invites`, {
       fixture: '/invitesResponses/inviteResponse2.json',
     });
+    cy.get('button[aria-label="confirm-delete-button"]').should(
+      'not.be.disabled'
+    );
     cy.get('button[aria-label="confirm-delete-button"]').click();
     cy.on('window:alert', (str) => {
       expect(str).to.equal('Invite-Deleted');
@@ -81,10 +86,14 @@ describe('Using the InvitesPage', () => {
     });
 
     cy.contains(inviteResponse1.content[0].topic).should('be.visible');
+    cy.contains('button', 'DELETE').should('not.be.disabled');
     cy.contains('button', 'DELETE').click();
     cy.contains(
       `Are you sure you want to delete invite ${inviteResponse1.content[0].id}?`
     ).should('be.visible');
+    cy.contains('button[aria-label="confirm-delete-button"]', 'DELETE').should(
+      'not.be.disabled'
+    );
     cy.contains('button[aria-label="confirm-delete-button"]', 'DELETE').click();
     cy.on('window:alert', (str) => {
       expect(str).to.equal(

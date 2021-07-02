@@ -174,7 +174,7 @@ const InvitesPage: FC = () => {
           !!selectedInviteId && handleDeleteInvite(selectedInviteId)
         }
       />
-      <Grid item xs={3} lg={2}>
+      <Grid item xs={3}>
         <div className={classes.listContainer}>
           <List classes={{ root: classes.subListContainer }}>
             <ListItem>
@@ -251,7 +251,7 @@ const InvitesPage: FC = () => {
           </List>
         </div>
       </Grid>
-      <Grid item xs={6} lg={8}>
+      <Grid item xs={6}>
         <List
           classes={{
             root: clsx(classes.subListContainer, classes.invitesHeader),
@@ -422,7 +422,7 @@ const InvitesPage: FC = () => {
           </Grid>
         </div>
       </Grid>
-      <Grid item xs={3} lg={2}>
+      <Grid item xs={3}>
         <div className={classes.listContainer}>
           <List classes={{ root: classes.subListContainer }}>
             <ListItem>
