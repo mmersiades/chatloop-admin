@@ -2,13 +2,30 @@ image: nikolaik/python-nodejs
 
 pipelines:
   custom:
+    install:
+      - step: &install
+          name: Install
+          caches:
+            - npm
+          script:
+            - npm ci
     # Run tests
     test:
       - step: &test
-          name: Test
+          name: E2E tests
+          caches:
+            - npm
+            - cypress
+          image: cypress/base:10
           script:
-            - npm install
-            - npm test
+            - npm ci
+            - export CYPRESS_API_HOST=https://staging-api.chatloop.org
+            - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
+            - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
+            - npm run start:staging & npx wait-on http://localhost:3000
+            - npm run test-coverage
+          artifacts:
+            - coverage-combined/lcov-report/**
 
     # Build & deploy app to staging environment
     deploy_staging:
@@ -18,7 +35,7 @@ pipelines:
           caches:
             - node
           script: # Modify the commands below to build your repository.
-            - npm install
+            - npm ci
             - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
@@ -33,23 +50,26 @@ pipelines:
           caches:
             - node
           script:
-            - npm install
+            - npm ci
             - npm run build:prod
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
             - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'
 
-  # Runs tests on commits to all branches ( excpet master and dev)
+  # Runs tests on commits to all branches (except master)
   default:
+    - step: *install
     - step: *test
 
   branches:
-    # All commits to master can be manually deployed to production environment via pipeline web interface
+    # On all commits to master...
     master:
-      - step: *test
-      - step: *deploy_production
+      - step: *install
+      - step: *test # ...run all the tests
+      - step: *deploy_staging # ...build and automatically deploy staging
+      - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
-    # All commits to dev branch get automatically deployed to staging environment
-    staging:
-      - step: *test
-      - step: *deploy_staging
+definitions:
+  caches:
+    npm: $HOME/.npm
+    cypress: $HOME/.cache/Cypress
