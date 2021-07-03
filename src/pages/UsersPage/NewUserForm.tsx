@@ -59,6 +59,7 @@ const useStyles = makeStyles(() =>
     formContainer: {
       padding: '12px',
       overflowY: 'auto',
+      height: '100%',
     },
     helperTextSpacer: {
       height: 22,
@@ -210,9 +211,8 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
           const body = getPayload(formFor, values);
           if (!!body) {
             try {
-              const response = await createUser(body);
+              await createUser(body);
               if (!!fetchUsersByUserRole) fetchUsersByUserRole(formFor);
-              console.log(`response`, response);
               actions.resetForm();
             } catch (error) {
               handleError(error);
