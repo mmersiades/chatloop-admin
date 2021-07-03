@@ -59,6 +59,7 @@ const useStyles = makeStyles(() =>
     formContainer: {
       padding: '12px',
       overflowY: 'auto',
+      minHeight: '100%',
     },
     helperTextSpacer: {
       height: 22,
