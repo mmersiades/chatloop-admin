@@ -211,7 +211,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
           const body = getPayload(formFor, values);
           if (!!body) {
             try {
-              const response = await createUser(body);
+              await createUser(body);
               if (!!fetchUsersByUserRole) fetchUsersByUserRole(formFor);
               actions.resetForm();
             } catch (error) {
