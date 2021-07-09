@@ -1,6 +1,7 @@
 import { Fab, makeStyles, Theme, createStyles } from '@material-ui/core';
 import React, { FC } from 'react';
 import { UserRoles } from '../../@types/enums';
+import { useAppNav } from '../../contexts/appNavContext';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 
 interface AddUserFabProps {
@@ -20,13 +21,17 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
 
 const AddUserFab: FC<AddUserFabProps> = ({ fabFor, handleClick }) => {
   const classes = useStyles();
+  // ----------------------------- Hooks ---------------------------------------- //
+  const { showNewUserForm } = useAppNav();
 
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <Fab
       color="secondary"
       variant="extended"
       classes={{ root: classes.fab }}
       onClick={handleClick}
+      disabled={showNewUserForm}
     >
       {`ADD ${getReadableRoles(fabFor).toUpperCase()}`}
     </Fab>

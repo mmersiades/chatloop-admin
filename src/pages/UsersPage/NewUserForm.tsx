@@ -75,6 +75,8 @@ const uiLanguageOptions: UiLanguageOption[] = [
   { code: 'id', language: 'Indonesian' },
   { code: 'prs', language: 'Hazaragi' },
   { code: 'sw', language: 'Swahili' },
+  { code: 'kar', language: 'Karen' },
+  { code: 'my', language: 'Burmese' },
 ];
 
 const commonInitialValues = {
