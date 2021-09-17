@@ -1,13 +1,8 @@
 import React, { FC } from 'react';
 import * as Yup from 'yup';
-import {
-  Field,
-  FieldProps,
-  Form,
-  Formik,
-  FormikProps,
-  FormikValues,
-} from 'formik';
+import { yupResolver } from '@hookform/resolvers/yup';
+import ReactSelect, { OptionTypeBase } from 'react-select';
+import { useForm, Controller } from 'react-hook-form';
 import {
   FormHelperText,
   makeStyles,
@@ -28,7 +23,6 @@ import { OperatingSystem, TutorShift, UserRole } from '../../@types/enums';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
 import { useLanguages } from '../../contexts/languagesContext';
-import CustomMultiSelect from '../../components/CustomMultiSelect';
 import { getTutorsByShift } from '../../helpers/getTutorsByShift';
 
 interface NewUserFormProps {
@@ -38,7 +32,7 @@ interface NewUserFormProps {
 interface NewUserFormValues {
   email: string;
   displayName: string;
-  firstLanguage: string;
+  firstLanguage: OptionTypeBase;
   uiLanguage: string;
   os: OperatingSystem;
   shift?: TutorShift;
@@ -80,33 +74,36 @@ const uiLanguageOptions: UiLanguageOption[] = [
   { code: 'my', language: 'Burmese' },
 ];
 
-const commonInitialValues = {
+const commonDefaultValues = {
   email: '',
   displayName: '',
-  firstLanguage: '',
-  uiLanguage: '',
+  firstLanguage: {
+    label: 'English',
+    value: 'eng',
+  },
+  uiLanguage: 'en',
   os: OperatingSystem.android,
 };
 
-const getInitialFormValues = (userRole: UserRole): NewUserFormValues => {
+const getDefaultValues = (userRole: UserRole): NewUserFormValues => {
   switch (userRole) {
     case UserRole.learner:
       return {
-        ...commonInitialValues,
+        ...commonDefaultValues,
 
         shiftOneTutorId: 0,
         shiftTwoTutorId: 0,
       };
     case UserRole.partner:
-      return commonInitialValues;
+      return commonDefaultValues;
     case UserRole.tutor:
       return {
-        ...commonInitialValues,
+        ...commonDefaultValues,
 
         shift: TutorShift.one,
       };
     default:
-      return commonInitialValues;
+      return commonDefaultValues;
   }
 };
 
@@ -128,7 +125,7 @@ const getPayload = (
     const commonPayload = {
       email,
       displayName,
-      firstLanguage,
+      firstLanguage: firstLanguage.value,
       uiLanguage,
       userRole,
       os,
@@ -167,12 +164,6 @@ const getPayload = (
 const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
   const classes = useStyles();
 
-  // ----------------------------- Hooks ---------------------------------------- //
-  const { showNewUserForm, setShowNewUserForm } = useAppNav();
-  const { fetchUsersByUserRole, tutors } = useUsers();
-  const { languages } = useLanguages();
-
-  // ----------------------------- Component functions ------------------------- //
   const newUserSchema = Yup.object().shape({
     displayName: Yup.string()
       .min(2, 'displayName too short')
@@ -185,10 +176,13 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
             .oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
             .required('Shift must be selected')
         : Yup.string().oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift'),
-    firstLanguage: Yup.string()
-      .max(3, 'Use IS0639-3 code (usually 3 letters)')
-      .min(2)
-      .required(),
+    firstLanguage: Yup.object().shape({
+      label: Yup.string().required(),
+      value: Yup.string()
+        .max(3, 'Use IS0639-3 code (usually 3 letters)')
+        .min(2)
+        .required(),
+    }),
     uiLanguage: Yup.string()
       .max(3, 'Use IS0639-1 code (usually 2 letters)')
       .min(2, 'Use IS0639-1 code (usually 2 letters)')
@@ -199,9 +193,60 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
       formFor === UserRole.learner ? Yup.number().required() : Yup.number(),
   });
 
+  // ----------------------------- 3rd party hooks ------------------------------- //
+  const {
+    handleSubmit,
+    formState: { errors, touchedFields, isSubmitting },
+    reset,
+    control,
+  } = useForm<NewUserFormValues>({
+    resolver: yupResolver(newUserSchema),
+    defaultValues: getDefaultValues(formFor),
+  });
+
+  // ----------------------------- Hooks ---------------------------------------- //
+  const { showNewUserForm, setShowNewUserForm } = useAppNav();
+  const { fetchUsersByUserRole, tutors } = useUsers();
+  const { languages } = useLanguages();
+
+  // ----------------------------- Component functions ------------------------- //
+
   // Gets arrays of shift one and shift two Tutors
   const shiftOneTutors = getTutorsByShift(tutors, TutorShift.one);
   const shiftTwoTutors = getTutorsByShift(tutors, TutorShift.two);
+
+  const disableButton =
+    isSubmitting ||
+    !!errors.displayName ||
+    !!errors.email ||
+    !!errors.shift ||
+    !!errors.uiLanguage ||
+    !!errors.firstLanguage ||
+    !!errors.shiftOneTutorId ||
+    !!errors.shiftTwoTutorId ||
+    !touchedFields.displayName ||
+    !touchedFields.email ||
+    (formFor === UserRole.learner && !touchedFields.shiftOneTutorId) ||
+    (formFor === UserRole.learner && !touchedFields.shiftTwoTutorId) ||
+    (formFor === UserRole.tutor && !touchedFields.shift);
+
+  const onSubmit = handleSubmit(async (data) => {
+    console.log(`data`, data);
+    const body = getPayload(formFor, data);
+    console.log(`body`, body);
+
+    if (!!body) {
+      try {
+        await createUser(body);
+        if (!!fetchUsersByUserRole) fetchUsersByUserRole(formFor);
+        reset();
+      } catch (error) {
+        handleError(error);
+      }
+    } else {
+      throw new Error('Submit called without values');
+    }
+  });
 
   // ----------------------------- Render ---------------------------------------- //
   return (
@@ -210,311 +255,261 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
       title={`Add ${getReadableRoles(formFor)}`}
       handleCloseDrawer={() => setShowNewUserForm(false)}
     >
-      <Formik
-        initialValues={getInitialFormValues(formFor)}
-        validationSchema={newUserSchema}
-        onSubmit={async (values, actions) => {
-          const body = getPayload(formFor, values);
-          if (!!body) {
-            try {
-              await createUser(body);
-              if (!!fetchUsersByUserRole) fetchUsersByUserRole(formFor);
-              actions.resetForm();
-            } catch (error) {
-              handleError(error);
-            }
-          } else {
-            throw new Error('Submit called without values');
-          }
-        }}
-      >
-        {({
-          errors,
-          values,
-          touched,
-          isSubmitting,
-        }: FormikProps<NewUserFormValues>) => {
-          const disableButton =
-            isSubmitting ||
-            !!errors.displayName ||
-            !!errors.email ||
-            !!errors.shift ||
-            !!errors.uiLanguage ||
-            !!errors.firstLanguage ||
-            !!errors.shiftOneTutorId ||
-            !!errors.shiftTwoTutorId ||
-            !values.displayName ||
-            !values.email ||
-            !values.uiLanguage ||
-            !values.firstLanguage ||
-            (formFor === UserRole.tutor && !values.shift) ||
-            (formFor === UserRole.learner && !values.shiftOneTutorId) ||
-            (formFor === UserRole.learner && !values.shiftTwoTutorId);
+      <form className={classes.formContainer} onSubmit={onSubmit}>
+        <Controller
+          name="displayName"
+          control={control}
+          render={({ field }) => (
+            <>
+              <TextField
+                {...field}
+                label="Display name"
+                margin="dense"
+                variant="outlined"
+                type="text"
+                fullWidth
+                error={touchedFields.displayName && !!errors.displayName}
+              />
+              {touchedFields.displayName && errors.displayName ? (
+                <FormHelperText error>
+                  {errors.displayName.message}
+                </FormHelperText>
+              ) : (
+                <div className={classes.helperTextSpacer} />
+              )}
+            </>
+          )}
+        />
 
-          return (
-            <Form className={classes.formContainer}>
-              <Field name="displayName" value="values.displayName">
-                {({ field }: FieldProps<FormikValues>) => {
-                  return (
-                    <>
-                      <TextField
-                        {...field}
-                        label="Display name"
-                        margin="dense"
-                        variant="outlined"
-                        type="text"
-                        fullWidth
-                        error={touched.displayName && !!errors.displayName}
-                      />
-                      {touched.displayName && errors.displayName ? (
-                        <FormHelperText error>
-                          {errors.displayName}
-                        </FormHelperText>
-                      ) : (
-                        <div className={classes.helperTextSpacer} />
-                      )}
-                    </>
-                  );
-                }}
-              </Field>
-              <Field name="email" value="values.email">
-                {({ field }: FieldProps<FormikValues>) => {
-                  return (
-                    <>
-                      <TextField
-                        {...field}
-                        label="Email"
-                        margin="dense"
-                        variant="outlined"
-                        type="text"
-                        fullWidth
-                        error={touched.email && !!errors.email}
-                      />
-                      {touched.email && errors.email ? (
-                        <FormHelperText error>{errors.email}</FormHelperText>
-                      ) : (
-                        <div className={classes.helperTextSpacer} />
-                      )}
-                    </>
-                  );
-                }}
-              </Field>
-              <Field name="uiLanguage" value="values.uiLanguage">
-                {({ field }: FieldProps<FormikValues>) => {
-                  return (
-                    <FormControl fullWidth style={{ marginTop: '8px' }}>
-                      <InputLabel id="ui-language-label-id" variant="outlined">
-                        UI Language
-                      </InputLabel>
-                      <Select
-                        {...field}
-                        labelId="ui-language-label-id"
-                        variant="outlined"
-                        label="UI Language"
-                        error={touched.uiLanguage && !!errors.uiLanguage}
-                      >
-                        {uiLanguageOptions.map((option) => (
-                          <MenuItem key={option.code} value={option.code}>
-                            {option.language}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {touched.uiLanguage && errors.uiLanguage ? (
-                        <FormHelperText error>
-                          {errors.uiLanguage}
-                        </FormHelperText>
-                      ) : (
-                        <div className={classes.helperTextSpacer} />
-                      )}
-                    </FormControl>
-                  );
-                }}
-              </Field>
-              <Field name="os" value="values.os">
-                {({ field }: FieldProps<FormikValues>) => {
-                  return (
-                    <FormControl fullWidth style={{ marginTop: '8px' }}>
-                      <InputLabel id="os-label-id" variant="outlined">
-                        Operating system
-                      </InputLabel>
-                      <Select
-                        {...field}
-                        labelId="os-label-id"
-                        variant="outlined"
-                        label="Operating system"
-                        error={touched.os && !!errors.os}
-                      >
-                        <MenuItem
-                          key={OperatingSystem.android}
-                          value={OperatingSystem.android}
-                        >
-                          {OperatingSystem.android.toLowerCase()}
-                        </MenuItem>
-                        <MenuItem
-                          key={OperatingSystem.ios}
-                          value={OperatingSystem.ios}
-                        >
-                          {OperatingSystem.ios.toLowerCase()}
-                        </MenuItem>
-                      </Select>
-                      {touched.uiLanguage && errors.uiLanguage ? (
-                        <FormHelperText error>
-                          {errors.uiLanguage}
-                        </FormHelperText>
-                      ) : (
-                        <div className={classes.helperTextSpacer} />
-                      )}
-                    </FormControl>
-                  );
-                }}
-              </Field>
-              <Field name="firstLanguage" value="values.firstLanguage">
-                {({ field }: FieldProps<FormikValues>) => {
-                  return (
-                    <>
-                      <Field
-                        {...field}
-                        name="firstLanguage"
-                        label="First language"
-                        options={languages.map((option) => ({
-                          label: option.language,
-                          value: option.code,
-                        }))}
-                        component={CustomMultiSelect}
-                        isMulti={false}
-                        error={touched.firstLanguage && !!errors.firstLanguage}
-                      />
-                      {touched.firstLanguage && errors.firstLanguage ? (
-                        <FormHelperText error>
-                          {errors.firstLanguage}
-                        </FormHelperText>
-                      ) : (
-                        <div className={classes.helperTextSpacer} />
-                      )}
-                    </>
-                  );
-                }}
-              </Field>
-              {formFor === UserRole.tutor && (
-                <Field name="shift" value="values.shift">
-                  {({ field }: FieldProps<FormikValues>) => {
-                    return (
-                      <FormControl fullWidth style={{ marginTop: '8px' }}>
-                        <InputLabel
-                          id="tutor-shift-label-id"
-                          variant="outlined"
-                        >
-                          Tutor shift
-                        </InputLabel>
-                        <Select
-                          {...field}
-                          labelId="tutor-shift-label-id"
-                          variant="outlined"
-                          label="Tutor shift"
-                        >
-                          <MenuItem value={TutorShift.one}>Shift One</MenuItem>
-                          <MenuItem value={TutorShift.two}>Shift Two</MenuItem>
-                        </Select>
-                        {touched.shift && errors.shift ? (
-                          <FormHelperText error>{errors.shift}</FormHelperText>
-                        ) : (
-                          <div className={classes.helperTextSpacer} />
-                        )}
-                      </FormControl>
-                    );
-                  }}
-                </Field>
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <>
+              <TextField
+                {...field}
+                label="Email"
+                margin="dense"
+                variant="outlined"
+                type="text"
+                fullWidth
+                error={touchedFields.email && !!errors.email}
+              />
+              {touchedFields.email && errors.email ? (
+                <FormHelperText error>{errors.email.message}</FormHelperText>
+              ) : (
+                <div className={classes.helperTextSpacer} />
               )}
-              {formFor === UserRole.learner && tutors.length > 0 && (
-                <>
-                  <Field name="shiftOneTutorId" value="values.shiftOneTutorId">
-                    {({ field }: FieldProps<FormikValues>) => {
-                      return (
-                        <FormControl fullWidth style={{ marginTop: '8px' }}>
-                          <InputLabel
-                            id="shift-one-tutor-label-id"
-                            variant="outlined"
-                          >
-                            Shift one tutors
-                          </InputLabel>
-                          <Select
-                            {...field}
-                            labelId="shift-one-tutor-label-id"
-                            variant="outlined"
-                            label="Shift one tutors"
-                          >
-                            <MenuItem value={0}>Select for shift one</MenuItem>
-                            {shiftOneTutors.length > 0 &&
-                              shiftOneTutors.map((tutor) => {
-                                return (
-                                  <MenuItem key={tutor.id} value={tutor.id}>
-                                    {`${tutor.displayName} ${tutor.email}`}
-                                  </MenuItem>
-                                );
-                              })}
-                          </Select>
-                          {touched.shiftOneTutorId && errors.shiftOneTutorId ? (
-                            <FormHelperText error>
-                              {errors.shiftOneTutorId}
-                            </FormHelperText>
-                          ) : (
-                            <div className={classes.helperTextSpacer} />
-                          )}
-                        </FormControl>
-                      );
-                    }}
-                  </Field>
-                  <Field name="shiftTwoTutorId" value="values.shiftTwoTutorId">
-                    {({ field }: FieldProps<FormikValues>) => {
-                      return (
-                        <FormControl fullWidth style={{ marginTop: '8px' }}>
-                          <InputLabel
-                            id="shift-one-tutor-label-id"
-                            variant="outlined"
-                          >
-                            Shift two tutors
-                          </InputLabel>
-                          <Select
-                            {...field}
-                            labelId="shift-one-tutor-label-id"
-                            variant="outlined"
-                            label="Shift two tutors"
-                          >
-                            <MenuItem value={0}>Select for shift two</MenuItem>
-                            {shiftTwoTutors.length > 0 &&
-                              shiftTwoTutors.map((tutor) => {
-                                return (
-                                  <MenuItem key={tutor.id} value={tutor.id}>
-                                    {`${tutor.displayName} ${tutor.email}`}
-                                  </MenuItem>
-                                );
-                              })}
-                          </Select>
-                          {touched.shiftTwoTutorId && errors.shiftTwoTutorId ? (
-                            <FormHelperText error>
-                              {errors.shiftTwoTutorId}
-                            </FormHelperText>
-                          ) : (
-                            <div className={classes.helperTextSpacer} />
-                          )}
-                        </FormControl>
-                      );
-                    }}
-                  </Field>
-                </>
-              )}
-              <Button
-                type="submit"
-                color="secondary"
-                variant="contained"
-                disabled={disableButton}
+            </>
+          )}
+        />
+
+        <Controller
+          name="uiLanguage"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
+              <InputLabel id="ui-language-label-id" variant="outlined">
+                UI Language
+              </InputLabel>
+              <Select
+                {...field}
+                labelId="ui-language-label-id"
+                variant="outlined"
+                label="UI Language"
+                error={touchedFields.uiLanguage && !!errors.uiLanguage}
               >
-                SUBMIT
-              </Button>
-            </Form>
-          );
-        }}
-      </Formik>
+                {uiLanguageOptions.map((option) => (
+                  <MenuItem key={option.code} value={option.code}>
+                    {option.language}
+                  </MenuItem>
+                ))}
+              </Select>
+              {touchedFields.uiLanguage && errors.uiLanguage ? (
+                <FormHelperText error>
+                  {errors.uiLanguage.message}
+                </FormHelperText>
+              ) : (
+                <div className={classes.helperTextSpacer} />
+              )}
+            </FormControl>
+          )}
+        />
+
+        <Controller
+          name="os"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
+              <InputLabel id="os-label-id" variant="outlined">
+                Operating System
+              </InputLabel>
+              <Select
+                {...field}
+                labelId="os-label-id"
+                variant="outlined"
+                label="Operating System"
+                error={touchedFields.os && !!errors.os}
+              >
+                <MenuItem
+                  key={OperatingSystem.android}
+                  value={OperatingSystem.android}
+                >
+                  {OperatingSystem.android.toLowerCase()}
+                </MenuItem>
+                <MenuItem key={OperatingSystem.ios} value={OperatingSystem.ios}>
+                  {OperatingSystem.ios.toLowerCase()}
+                </MenuItem>
+              </Select>
+              {touchedFields.os && errors.os ? (
+                <FormHelperText error>{errors.os.message}</FormHelperText>
+              ) : (
+                <div className={classes.helperTextSpacer} />
+              )}
+            </FormControl>
+          )}
+        />
+
+        <Controller
+          name="firstLanguage"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
+              <ReactSelect
+                {...field}
+                id="first-language-select"
+                styles={{
+                  // Fixes the overlapping problem of the component
+                  menu: (provided) => ({ ...provided, zIndex: 10 }),
+                }}
+                options={languages.map((option) => ({
+                  label: option.language,
+                  value: option.code,
+                }))}
+              />
+
+              {touchedFields.firstLanguage && errors.firstLanguage ? (
+                <FormHelperText error>
+                  {errors.firstLanguage.message}
+                </FormHelperText>
+              ) : (
+                <div className={classes.helperTextSpacer} />
+              )}
+            </FormControl>
+          )}
+        />
+
+        {formFor === UserRole.tutor && (
+          <Controller
+            name="shift"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth style={{ marginTop: '8px' }}>
+                <InputLabel id="tutor-shift-label-id" variant="outlined">
+                  Tutor shift
+                </InputLabel>
+                <Select
+                  {...field}
+                  labelId="tutor-shift-label-id"
+                  variant="outlined"
+                  label="Tutor shift"
+                >
+                  <MenuItem value={TutorShift.one}>Shift One</MenuItem>
+                  <MenuItem value={TutorShift.two}>Shift Two</MenuItem>
+                </Select>
+                {touchedFields.shift && errors.shift ? (
+                  <FormHelperText error>{errors.shift.message}</FormHelperText>
+                ) : (
+                  <div className={classes.helperTextSpacer} />
+                )}
+              </FormControl>
+            )}
+          />
+        )}
+
+        {formFor === UserRole.learner && tutors.length > 0 && (
+          <>
+            <Controller
+              name="shiftOneTutorId"
+              control={control}
+              render={({ field }) => (
+                <FormControl fullWidth style={{ marginTop: '8px' }}>
+                  <InputLabel id="shift-one-tutor-label-id" variant="outlined">
+                    Shift one tutors
+                  </InputLabel>
+                  <Select
+                    {...field}
+                    labelId="shift-one-tutor-label-id"
+                    variant="outlined"
+                    label="Shift one tutors"
+                  >
+                    <MenuItem value={0}>Select for shift one</MenuItem>
+                    {shiftOneTutors.length > 0 &&
+                      shiftOneTutors.map((tutor) => {
+                        return (
+                          <MenuItem key={tutor.id} value={tutor.id}>
+                            {`${tutor.displayName} ${tutor.email}`}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+                  {touchedFields.shiftOneTutorId && errors.shiftOneTutorId ? (
+                    <FormHelperText error>
+                      {errors.shiftOneTutorId.message}
+                    </FormHelperText>
+                  ) : (
+                    <div className={classes.helperTextSpacer} />
+                  )}
+                </FormControl>
+              )}
+            />
+
+            <Controller
+              name="shiftTwoTutorId"
+              control={control}
+              render={({ field }) => (
+                <FormControl fullWidth style={{ marginTop: '8px' }}>
+                  <InputLabel id="shift-two-tutor-label-id" variant="outlined">
+                    Shift two tutors
+                  </InputLabel>
+                  <Select
+                    {...field}
+                    labelId="shift-two-tutor-label-id"
+                    variant="outlined"
+                    label="Shift two tutors"
+                  >
+                    <MenuItem value={0}>Select for shift two</MenuItem>
+                    {shiftTwoTutors.length > 0 &&
+                      shiftTwoTutors.map((tutor) => {
+                        return (
+                          <MenuItem key={tutor.id} value={tutor.id}>
+                            {`${tutor.displayName} ${tutor.email}`}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+                  {touchedFields.shiftTwoTutorId && errors.shiftTwoTutorId ? (
+                    <FormHelperText error>
+                      {errors.shiftTwoTutorId.message}
+                    </FormHelperText>
+                  ) : (
+                    <div className={classes.helperTextSpacer} />
+                  )}
+                </FormControl>
+              )}
+            />
+          </>
+        )}
+
+        <Button
+          type="submit"
+          color="secondary"
+          variant="contained"
+          disabled={disableButton}
+        >
+          SUBMIT
+        </Button>
+      </form>
     </UserPageDrawer>
   );
 };
