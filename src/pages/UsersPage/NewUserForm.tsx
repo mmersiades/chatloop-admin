@@ -291,7 +291,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                 label="Email"
                 margin="dense"
                 variant="outlined"
-                type="text"
+                type="email"
                 fullWidth
                 error={touchedFields.email && !!errors.email}
               />
