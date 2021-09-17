@@ -1,9 +1,9 @@
-import { TutorShifts } from '../@types/enums';
+import { TutorShift } from '../@types/enums';
 import { Tutor } from '../@types/interfaces';
 
 export const getTutorsByShift = (
   tutors: Tutor[],
-  shift: TutorShifts
+  shift: TutorShift
 ): Tutor[] => {
   return tutors.filter((tutor) => tutor.shift === shift);
 };

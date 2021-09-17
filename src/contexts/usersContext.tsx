@@ -1,14 +1,14 @@
 import React, { FC, useContext, useEffect, useReducer } from 'react';
 
 import { getUsersByUserRole } from '../services/usersService';
-import { UserRoles } from '../@types/enums';
+import { UserRole } from '../@types/enums';
 import { Learner, Partner, Tutor } from '../@types/interfaces';
 
 interface UsersContext {
   learners: Array<Learner>;
   partners: Array<Partner>;
   tutors: Array<Tutor>;
-  fetchUsersByUserRole?: (userRole: UserRoles) => void;
+  fetchUsersByUserRole?: (userRole: UserRole) => void;
 }
 
 interface UsersContextProviderProps {
@@ -63,14 +63,14 @@ export const UsersContextProvider: FC<UsersContextProviderProps> = ({
 }) => {
   const [state, dispatch] = useReducer(usersReducer, initialContext);
 
-  const fetchUsersByUserRole = (userRole: UserRoles) => {
+  const fetchUsersByUserRole = (userRole: UserRole) => {
     getUsersByUserRole(userRole, dispatch);
   };
 
   useEffect(() => {
-    fetchUsersByUserRole(UserRoles.learner);
-    fetchUsersByUserRole(UserRoles.partner);
-    fetchUsersByUserRole(UserRoles.tutor);
+    fetchUsersByUserRole(UserRole.learner);
+    fetchUsersByUserRole(UserRole.partner);
+    fetchUsersByUserRole(UserRole.tutor);
   }, []);
 
   return (

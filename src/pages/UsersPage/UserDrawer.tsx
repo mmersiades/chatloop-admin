@@ -21,7 +21,7 @@ import DeleteUserDialog from '../../components/dialogs/DeleteUserDialog';
 import { ShowReplaceTutorDialog } from './Learners';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useUsers } from '../../contexts/usersContext';
-import { UserRoles } from '../../@types/enums';
+import { UserRole } from '../../@types/enums';
 import { Tutor, ExtendedUser } from '../../@types/interfaces';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
 import {
@@ -69,7 +69,7 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
 );
 
 interface UserDrawerProps {
-  drawerFor: UserRoles;
+  drawerFor: UserRole;
   extendedUser?: ExtendedUser;
   setShowDialog?: (params: ShowReplaceTutorDialog) => void;
 }
@@ -174,7 +174,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             secondary={extendedUser ? extendedUser.uiLanguage : '...'}
           />
         </ListItem>
-        {!!extendedUser && extendedUser.userRole !== UserRoles.tutor && (
+        {!!extendedUser && extendedUser.userRole !== UserRole.tutor && (
           <ListItem>
             <ListItemText
               primary={CURRENT_ACTIVITIES}
@@ -182,7 +182,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             />
           </ListItem>
         )}
-        {!!extendedUser && extendedUser.userRole === UserRoles.tutor && (
+        {!!extendedUser && extendedUser.userRole === UserRole.tutor && (
           <ListItem>
             <ListItemText
               primary={CURRENT_LEARNERS}
@@ -191,7 +191,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           </ListItem>
         )}
         {!!extendedUser &&
-          extendedUser.userRole === UserRoles.learner &&
+          extendedUser.userRole === UserRole.learner &&
           tutors && (
             <ListItem data-testid="shift-one-tutor-box">
               <ListItemText
@@ -236,7 +236,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             </ListItem>
           )}
         {!!extendedUser &&
-          extendedUser.userRole === UserRoles.learner &&
+          extendedUser.userRole === UserRole.learner &&
           tutors && (
             <ListItem data-testid="shift-two-tutor-box" divider>
               <ListItemText

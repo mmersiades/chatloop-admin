@@ -1,7 +1,7 @@
 import apiChatloopOrg from '../config/axiosConfig';
 import { authHeader } from '../helpers/getAuthHeader';
 import { Learner, Partner, Tutor } from '../@types/interfaces';
-import { TutorShifts, UserRoles } from '../@types/enums';
+import { TutorShift, UserRole } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
 
 import { AxiosResponse } from 'axios';
@@ -77,7 +77,7 @@ export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
       requestOptions
     );
     shiftOneTutors = responseShiftOne.data.users.map((tutor: any) => {
-      tutor.shift = TutorShifts.one;
+      tutor.shift = TutorShift.one;
       return tutor;
     });
 
@@ -86,7 +86,7 @@ export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
       requestOptions
     );
     shiftTwoTutors = responseShiftTwo.data.users.map((tutor: any) => {
-      tutor.shift = TutorShifts.two;
+      tutor.shift = TutorShift.two;
       return tutor;
     });
     dispatch({
@@ -100,17 +100,17 @@ export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
 };
 
 export const getUsersByUserRole = (
-  userRole: UserRoles,
+  userRole: UserRole,
   dispatch: React.Dispatch<usersAction>
 ) => {
   switch (userRole) {
-    case UserRoles.learner:
+    case UserRole.learner:
       getLearners(dispatch);
       break;
-    case UserRoles.partner:
+    case UserRole.partner:
       getPartners(dispatch);
       break;
-    case UserRoles.tutor:
+    case UserRole.tutor:
       getTutors(dispatch);
       break;
     default:

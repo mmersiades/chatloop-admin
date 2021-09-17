@@ -24,7 +24,7 @@ import UserPageDrawer from './UserPageDrawer';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useUsers } from '../../contexts/usersContext';
 import { createUser } from '../../services/usersService';
-import { TutorShifts, UserRoles } from '../../@types/enums';
+import { TutorShift, UserRole } from '../../@types/enums';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
 import { useLanguages } from '../../contexts/languagesContext';
@@ -32,7 +32,7 @@ import CustomMultiSelect from '../../components/CustomMultiSelect';
 import { getTutorsByShift } from '../../helpers/getTutorsByShift';
 
 interface NewUserFormProps {
-  formFor: UserRoles;
+  formFor: UserRole;
 }
 
 interface NewUserFormValues {
@@ -40,13 +40,13 @@ interface NewUserFormValues {
   displayName: string;
   firstLanguage: string;
   uiLanguage: string;
-  shift?: TutorShifts;
+  shift?: TutorShift;
   shiftOneTutorId?: number;
   shiftTwoTutorId?: number;
 }
 
 export interface NewUserPayload extends NewUserFormValues {
-  userRole: UserRoles;
+  userRole: UserRole;
 }
 
 interface UiLanguageOption {
@@ -86,22 +86,22 @@ const commonInitialValues = {
   uiLanguage: '',
 };
 
-const getInitialFormValues = (userRole: UserRoles): NewUserFormValues => {
+const getInitialFormValues = (userRole: UserRole): NewUserFormValues => {
   switch (userRole) {
-    case UserRoles.learner:
+    case UserRole.learner:
       return {
         ...commonInitialValues,
 
         shiftOneTutorId: 0,
         shiftTwoTutorId: 0,
       };
-    case UserRoles.partner:
+    case UserRole.partner:
       return commonInitialValues;
-    case UserRoles.tutor:
+    case UserRole.tutor:
       return {
         ...commonInitialValues,
 
-        shift: TutorShifts.one,
+        shift: TutorShift.one,
       };
     default:
       return commonInitialValues;
@@ -109,7 +109,7 @@ const getInitialFormValues = (userRole: UserRoles): NewUserFormValues => {
 };
 
 const getPayload = (
-  userRole: UserRoles,
+  userRole: UserRole,
   {
     email,
     displayName,
@@ -131,7 +131,7 @@ const getPayload = (
     };
 
     switch (userRole) {
-      case UserRoles.learner:
+      case UserRole.learner:
         if (shiftOneTutorId && shiftTwoTutorId) {
           return {
             ...commonPayload,
@@ -141,9 +141,9 @@ const getPayload = (
         } else {
           return undefined;
         }
-      case UserRoles.partner:
+      case UserRole.partner:
         return commonPayload;
-      case UserRoles.tutor:
+      case UserRole.tutor:
         if (shift) {
           return {
             ...commonPayload,
@@ -176,7 +176,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
       .required('DisplayName is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
     shift:
-      formFor === UserRoles.tutor
+      formFor === UserRole.tutor
         ? Yup.string()
             .oneOf(['SHIFT_ONE', 'SHIFT_TWO'], 'invalid shift')
             .required('Shift must be selected')
@@ -190,14 +190,14 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
       .min(2, 'Use IS0639-1 code (usually 2 letters)')
       .required(),
     shiftOneTutorId:
-      formFor === UserRoles.learner ? Yup.number().required() : Yup.number(),
+      formFor === UserRole.learner ? Yup.number().required() : Yup.number(),
     shiftTwoTutorId:
-      formFor === UserRoles.learner ? Yup.number().required() : Yup.number(),
+      formFor === UserRole.learner ? Yup.number().required() : Yup.number(),
   });
 
   // Gets arrays of shift one and shift two Tutors
-  const shiftOneTutors = getTutorsByShift(tutors, TutorShifts.one);
-  const shiftTwoTutors = getTutorsByShift(tutors, TutorShifts.two);
+  const shiftOneTutors = getTutorsByShift(tutors, TutorShift.one);
+  const shiftTwoTutors = getTutorsByShift(tutors, TutorShift.two);
 
   // ----------------------------- Render ---------------------------------------- //
   return (
@@ -243,9 +243,9 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
             !values.email ||
             !values.uiLanguage ||
             !values.firstLanguage ||
-            (formFor === UserRoles.tutor && !values.shift) ||
-            (formFor === UserRoles.learner && !values.shiftOneTutorId) ||
-            (formFor === UserRoles.learner && !values.shiftTwoTutorId);
+            (formFor === UserRole.tutor && !values.shift) ||
+            (formFor === UserRole.learner && !values.shiftOneTutorId) ||
+            (formFor === UserRole.learner && !values.shiftTwoTutorId);
 
           return (
             <Form className={classes.formContainer}>
@@ -353,7 +353,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                   );
                 }}
               </Field>
-              {formFor === UserRoles.tutor && (
+              {formFor === UserRole.tutor && (
                 <Field name="shift" value="values.shift">
                   {({ field }: FieldProps<FormikValues>) => {
                     return (
@@ -370,8 +370,8 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                           variant="outlined"
                           label="Tutor shift"
                         >
-                          <MenuItem value={TutorShifts.one}>Shift One</MenuItem>
-                          <MenuItem value={TutorShifts.two}>Shift Two</MenuItem>
+                          <MenuItem value={TutorShift.one}>Shift One</MenuItem>
+                          <MenuItem value={TutorShift.two}>Shift Two</MenuItem>
                         </Select>
                         {touched.shift && errors.shift ? (
                           <FormHelperText error>{errors.shift}</FormHelperText>
@@ -383,7 +383,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                   }}
                 </Field>
               )}
-              {formFor === UserRoles.learner && tutors.length > 0 && (
+              {formFor === UserRole.learner && tutors.length > 0 && (
                 <>
                   <Field name="shiftOneTutorId" value="values.shiftOneTutorId">
                     {({ field }: FieldProps<FormikValues>) => {
