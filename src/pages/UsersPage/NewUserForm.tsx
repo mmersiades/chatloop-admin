@@ -24,7 +24,7 @@ import UserPageDrawer from './UserPageDrawer';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useUsers } from '../../contexts/usersContext';
 import { createUser } from '../../services/usersService';
-import { TutorShift, UserRole } from '../../@types/enums';
+import { OperatingSystem, TutorShift, UserRole } from '../../@types/enums';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
 import { useLanguages } from '../../contexts/languagesContext';
@@ -40,6 +40,7 @@ interface NewUserFormValues {
   displayName: string;
   firstLanguage: string;
   uiLanguage: string;
+  os: OperatingSystem;
   shift?: TutorShift;
   shiftOneTutorId?: number;
   shiftTwoTutorId?: number;
@@ -84,6 +85,7 @@ const commonInitialValues = {
   displayName: '',
   firstLanguage: '',
   uiLanguage: '',
+  os: OperatingSystem.android,
 };
 
 const getInitialFormValues = (userRole: UserRole): NewUserFormValues => {
@@ -115,6 +117,7 @@ const getPayload = (
     displayName,
     firstLanguage,
     uiLanguage,
+    os,
     shiftOneTutorId,
     shiftTwoTutorId,
     shift,
@@ -128,6 +131,7 @@ const getPayload = (
       firstLanguage,
       uiLanguage,
       userRole,
+      os,
     };
 
     switch (userRole) {
@@ -314,6 +318,44 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                             {option.language}
                           </MenuItem>
                         ))}
+                      </Select>
+                      {touched.uiLanguage && errors.uiLanguage ? (
+                        <FormHelperText error>
+                          {errors.uiLanguage}
+                        </FormHelperText>
+                      ) : (
+                        <div className={classes.helperTextSpacer} />
+                      )}
+                    </FormControl>
+                  );
+                }}
+              </Field>
+              <Field name="os" value="values.os">
+                {({ field }: FieldProps<FormikValues>) => {
+                  return (
+                    <FormControl fullWidth style={{ marginTop: '8px' }}>
+                      <InputLabel id="os-label-id" variant="outlined">
+                        Operating system
+                      </InputLabel>
+                      <Select
+                        {...field}
+                        labelId="os-label-id"
+                        variant="outlined"
+                        label="Operating system"
+                        error={touched.os && !!errors.os}
+                      >
+                        <MenuItem
+                          key={OperatingSystem.android}
+                          value={OperatingSystem.android}
+                        >
+                          {OperatingSystem.android.toLowerCase()}
+                        </MenuItem>
+                        <MenuItem
+                          key={OperatingSystem.ios}
+                          value={OperatingSystem.ios}
+                        >
+                          {OperatingSystem.ios.toLowerCase()}
+                        </MenuItem>
                       </Select>
                       {touched.uiLanguage && errors.uiLanguage ? (
                         <FormHelperText error>
