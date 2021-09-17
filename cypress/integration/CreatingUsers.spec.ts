@@ -1,5 +1,5 @@
 import admin from '../fixtures/users/admin.json';
-import { TutorShifts } from '../../src/@types/enums';
+import { TutorShift } from '../../src/@types/enums';
 import { grey } from '@material-ui/core/colors';
 
 describe('Creating new users', () => {
@@ -64,7 +64,7 @@ describe('Creating new users', () => {
       'div[aria-labelledby="tutor-shift-label-id mui-component-select-shift"]',
       'Shift One'
     ).should('be.visible');
-    cy.get('input[name="shift"]').should('have.value', TutorShifts.one);
+    cy.get('input[name="shift"]').should('have.value', TutorShift.one);
     cy.contains('button[type="submit"]', 'SUBMIT').should('be.disabled');
 
     // Fill in form
@@ -82,7 +82,7 @@ describe('Creating new users', () => {
     ).click();
     cy.get('li[data-value="SHIFT_TWO"]').should('be.visible');
     cy.get('li[data-value="SHIFT_TWO"]').click();
-    cy.get('input[name="shift"]').should('have.value', TutorShifts.two);
+    cy.get('input[name="shift"]').should('have.value', TutorShift.two);
 
     cy.contains('button[type="submit"]', 'SUBMIT').should('not.be.disabled');
     cy.contains('button[type="submit"]', 'SUBMIT').click();
