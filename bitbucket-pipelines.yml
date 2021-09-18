@@ -23,9 +23,7 @@ pipelines:
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
             - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
             - npm run start:staging & npx wait-on http://localhost:3000
-            - npm run test-coverage
-          artifacts:
-            - coverage-combined/lcov-report/**
+            - npm run test:ci
 
     # Build & deploy app to staging environment
     deploy_staging:

@@ -22,8 +22,8 @@ describe('Creating new users', () => {
     );
     cy.get('input[name="displayName"]').should('have.value', '');
     cy.get('input[name="email"]').should('have.value', '');
-    cy.get('input[name="uiLanguage"]').should('have.value', '');
-    cy.get('input[name="firstLanguage"]').should('have.value', '');
+    cy.get('input[name="uiLanguage"]').should('have.value', 'en');
+    cy.get('input[name="firstLanguage"]').should('have.value', 'eng');
     cy.get('input[name="os"]').should('have.value', OperatingSystem.android);
     cy.contains('button[type="submit"]', 'SUBMIT').should('be.disabled');
 
@@ -44,8 +44,8 @@ describe('Creating new users', () => {
     // Check form reset
     cy.get('input[name="displayName"]').should('have.value', '');
     cy.get('input[name="email"]').should('have.value', '');
-    cy.get('input[name="uiLanguage"]').should('have.value', '');
-    // cy.get('input[name="firstLanguage"]').should('have.value', ''); // Value remaining as English
+    cy.get('input[name="uiLanguage"]').should('have.value', 'en');
+    cy.get('input[name="firstLanguage"]').should('have.value', 'eng');
     cy.contains('button[type="submit"]', 'SUBMIT').should('be.disabled');
 
     // Check new user is in list
@@ -85,6 +85,7 @@ describe('Creating new users', () => {
     ).click();
     cy.get('li[data-value="SHIFT_TWO"]').should('be.visible');
     cy.get('li[data-value="SHIFT_TWO"]').click();
+    cy.get('#mui-component-select-shift').blur();
     cy.get('input[name="shift"]').should('have.value', TutorShift.two);
 
     cy.contains('button[type="submit"]', 'SUBMIT').should('not.be.disabled');
@@ -131,6 +132,7 @@ describe('Creating new users', () => {
     ).click();
     cy.contains('li[role="option"]', 'tutor1@gmail.com').should('be.visible');
     cy.contains('li[role="option"]', 'tutor1@gmail.com').click();
+    cy.get('#mui-component-select-shiftTwoTutorId').blur();
 
     cy.contains('button[type="submit"]', 'SUBMIT').should('not.be.disabled');
     cy.contains('button[type="submit"]', 'SUBMIT').click();
@@ -168,12 +170,8 @@ const fillCommonFields = (
   });
   cy.get('input[name="os"]').should('have.value', osValue);
 
-  cy.get('div[aria-label="First language select"]', {
-    timeout: 20000,
-  }).click(); // TODO: Increase the performance of this Select
-  cy.contains('button[type="submit"]', 'SUBMIT').should('be.disabled');
-  cy.contains('div[role="menuitem"]', firstLanguage).scrollIntoView();
-  cy.contains('div[role="menuitem"]', firstLanguage).click();
+  cy.get('#first-language-select').type(`${firstLanguage}{enter}`);
+
   cy.get('input[name="firstLanguage"]').should(
     'have.value',
     firstLanguageValue

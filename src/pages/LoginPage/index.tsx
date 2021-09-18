@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import { Formik, FormikProps, Form, Field, FieldProps } from 'formik';
+import { useHistory } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
 import {
   makeStyles,
   Theme,
@@ -10,9 +11,9 @@ import {
   Button,
   FormHelperText,
 } from '@material-ui/core';
-import logo from '../../assets/splashLogo.svg';
+
 import authService from '../../services/authServices';
-import { useHistory } from 'react-router-dom';
+import logo from '../../assets/splashLogo.svg';
 import { LOGIN_ERROR } from '../../config/textConstants';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
@@ -34,20 +35,51 @@ const useStyles = makeStyles(({ spacing }: Theme) =>
   })
 );
 
-interface IFormikValues {
+interface FormData {
   email: string;
   password: string;
 }
 
+const defaultValues: FormData = {
+  email: '',
+  password: '',
+};
+
 const LoginPage = () => {
-  const [errors, setErrors] = useState<string[]>([]);
+  // ----------------------------- Component state ------------------------------ //
+  const [authErrors, setAuthErrors] = useState<string[]>([]);
+
+  // ----------------------------- 3rd party hooks ------------------------------- //
   const classes = useStyles();
   const history = useHistory();
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+    reset,
+    control,
+  } = useForm<FormData>({
+    defaultValues,
+  });
 
-  const formikInitialValues: IFormikValues = {
-    email: '',
-    password: '',
-  };
+  // ----------------------------- Component functions ------------------------- //
+  const onSubmit = handleSubmit(async (data: FormData) => {
+    const response = await authService.loginWithCredentials(
+      data.email,
+      data.password
+    );
+
+    if (!response.isAuthError) {
+      reset();
+      history.push({
+        pathname: '/dashboard',
+        state: 'Dashboard',
+      });
+    } else {
+      setAuthErrors((prevState) => [...prevState, LOGIN_ERROR]);
+    }
+  });
+
+  // ----------------------------- Render ---------------------------------------- //
 
   return (
     <Grid
@@ -61,94 +93,70 @@ const LoginPage = () => {
         src={logo}
         alt="The Chatloop logo"
       />
-      <Formik
-        initialValues={formikInitialValues}
-        onSubmit={async (values, actions) => {
-          const response = await authService.loginWithCredentials(
-            values.email,
-            values.password
-          );
-
-          if (!response.isAuthError) {
-            actions.resetForm();
-            history.push({
-              pathname: '/dashboard',
-              state: 'Dashboard',
-            });
-          } else {
-            setErrors((prevState) => [...prevState, LOGIN_ERROR]);
-          }
-        }}
-      >
-        {({ isSubmitting }: FormikProps<IFormikValues>) => {
-          return (
-            <Form>
-              <Grid
-                classes={{
-                  root: clsx(classes.formContainer, classes.contentHeight),
-                }}
-                container
-                direction="column"
-                justify="space-between"
-                alignItems="flex-end"
+      <form onSubmit={onSubmit}>
+        <Grid
+          classes={{
+            root: clsx(classes.formContainer, classes.contentHeight),
+          }}
+          container
+          direction="column"
+          justify="space-between"
+          alignItems="flex-end"
+        >
+          {authErrors.length > 0 ? (
+            authErrors.map((error, index) => (
+              <FormHelperText
+                key={index + error}
+                error
+                style={{ alignSelf: 'center' }}
               >
-                {errors.length > 0 ? (
-                  errors.map((error, index) => (
-                    <FormHelperText
-                      key={index + error}
-                      error
-                      style={{ alignSelf: 'center' }}
-                    >
-                      {error}
-                    </FormHelperText>
-                  ))
-                ) : (
-                  <FormHelperText> </FormHelperText>
-                )}
-                <Field name="email" value="values.email">
-                  {({ field }: FieldProps<IFormikValues>) => {
-                    return (
-                      <TextField
-                        {...field}
-                        inputProps={{ 'aria-label': 'email field' }}
-                        autoFocus
-                        variant="outlined"
-                        label="Email"
-                        type="email"
-                        fullWidth
-                        onFocus={() => setErrors([])}
-                      />
-                    );
-                  }}
-                </Field>
-                <Field name="password" value="values.password">
-                  {({ field }: FieldProps<IFormikValues>) => {
-                    return (
-                      <TextField
-                        {...field}
-                        inputProps={{ 'aria-label': 'password field' }}
-                        variant="outlined"
-                        label="Password"
-                        type="password"
-                        fullWidth
-                        onFocus={() => setErrors([])}
-                      />
-                    );
-                  }}
-                </Field>
-                <Button
-                  type="submit"
-                  color="secondary"
-                  disabled={isSubmitting}
-                  variant="contained"
-                >
-                  Log In
-                </Button>
-              </Grid>
-            </Form>
-          );
-        }}
-      </Formik>
+                {error}
+              </FormHelperText>
+            ))
+          ) : (
+            <FormHelperText> </FormHelperText>
+          )}
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                inputProps={{ 'aria-label': 'email field' }}
+                autoFocus
+                variant="outlined"
+                label="Email"
+                type="email"
+                fullWidth
+                onFocus={() => setAuthErrors([])}
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                inputProps={{ 'aria-label': 'password field' }}
+                variant="outlined"
+                label="Password"
+                type="password"
+                fullWidth
+                onFocus={() => setAuthErrors([])}
+              />
+            )}
+          />
+          <Button
+            type="submit"
+            color="secondary"
+            disabled={isSubmitting}
+            variant="contained"
+          >
+            Log In
+          </Button>
+        </Grid>
+      </form>
     </Grid>
   );
 };

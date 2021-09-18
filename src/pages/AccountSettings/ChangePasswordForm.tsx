@@ -1,24 +1,7 @@
-/**
- * @module pages
- */
-
-/**
- * This functional React component renders a Formik form
- * for changing a User's password.
- */
-
-/** */
 import React, { FC, useState } from 'react';
-import {
-  Formik,
-  Form,
-  Field,
-  ErrorMessage,
-  FormikProps,
-  FieldProps,
-} from 'formik';
 import * as Yup from 'yup';
-
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm, Controller } from 'react-hook-form';
 import {
   createStyles,
   useTheme,
@@ -39,10 +22,10 @@ import {
   VisibilityOff,
 } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import authService from '../../services/authServices';
 import { AxiosResponse } from 'axios';
 
-/** @ignore */
+import authService from '../../services/authServices';
+
 const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   createStyles({
     textField: {
@@ -62,7 +45,6 @@ const useStyles = makeStyles(({ palette, spacing }: Theme) =>
   })
 );
 
-/** Yup schema for validating the password fields */
 const validationSchema = Yup.object().shape({
   currentPassword: Yup.string()
     .min(8, 'Passwords must be 8 characters or more')
@@ -75,56 +57,52 @@ const validationSchema = Yup.object().shape({
     .required('Please re-enter your new password'),
 });
 
-interface IChangePasswordFormProps {
-  /**
-   * Closes the form <br>
-   * Passed in by parent component
-   *  */
+interface ChangePasswordFormProps {
   closeForm: () => void;
-
-  /**
-   * Should the change password form be shown?
-   * Used to trigger Fade transition <br>
-   * Passed in by parent component
-   *  */
   showForm: boolean;
 }
 
-interface IChangePasswordFormValues {
+interface FormData {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
 
-/**
- * This functional React component renders a Formik form
- * for changing a User's password, with three fields:
- * * current password
- * * new passoword
- * * confirm password
- */
-const ChangePasswordForm: FC<IChangePasswordFormProps> = ({
+const defaultValues: FormData = {
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+};
+
+const ChangePasswordForm: FC<ChangePasswordFormProps> = ({
   showForm,
   closeForm,
 }) => {
-  // -------------------------------- Setting up component state ------------------------------------------ //
-  /** Should the current password be shown as text or masking dots? */
+  // ----------------------------- Component state ------------------------------ //
   const [showCurrentPassword, setShowCurrentPassword] =
     useState<boolean>(false);
 
-  /** Should the new password be shown as text or masking dots? */
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
 
-  /** Should the confirmation password be shown as text or masking dots? */
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
 
-  // -------------------------------- Setting up Material-UI styling ---------------------------------------- //
+  const [noMatch, setNoMatch] = useState(false);
+
+  // ----------------------------- 3rd party hooks ------------------------------- //
   const theme = useTheme();
   const classes = useStyles(theme);
+  const {
+    handleSubmit,
+    formState: { isSubmitting, touchedFields, errors },
+    reset,
+    control,
+  } = useForm<FormData>({
+    defaultValues,
+    resolver: yupResolver(validationSchema),
+  });
 
-  // ------------------------------------------- Component Functions ----------------------------------------- //
-  /** Changes the component state values so passwords can be revealed as text rather than masking dots */
+  // ----------------------------- Component functions ------------------------- //
   const toggleShowPassword = (type: string) => {
     if (type === 'newPassword') {
       setShowNewPassword(!showNewPassword);
@@ -135,26 +113,43 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({
     }
   };
 
-  /** Renders JSX for error messages controlled by Formik */
-  const renderFormikErrorMessage = (name: any) => {
+  const onSubmit = handleSubmit(async (data) => {
+    if (data.newPassword !== data.confirmPassword) {
+      setNoMatch(true);
+      return;
+    }
+    const response: AxiosResponse = await authService.updatePassword(
+      data.currentPassword,
+      data.newPassword,
+      data.confirmPassword
+    );
+    if (response.status === 200) {
+      reset();
+      alert('Password changed');
+    } else {
+      alert('Password change failed');
+      console.log('response', response);
+    }
+    closeForm();
+  });
+
+  const disableSubmit: boolean =
+    noMatch ||
+    isSubmitting ||
+    !touchedFields.currentPassword ||
+    !touchedFields.newPassword;
+
+  // ----------------------------- Render ---------------------------------------- //
+  const renderFormErrorMessage = (
+    name: 'currentPassword' | 'newPassword' | 'confirmPassword'
+  ) => {
     return (
-      <ErrorMessage name={name}>
-        {(msg) => {
-          return (
-            <FormHelperText error variant="outlined">
-              {msg}
-            </FormHelperText>
-          );
-        }}
-      </ErrorMessage>
+      <FormHelperText error variant="outlined">
+        {errors[name]?.message}
+      </FormHelperText>
     );
   };
 
-  /**
-   * Renders JSX for error messages that are not controlled by Formik/Yup
-   * TODO: add error message if servers returns a failure (eg wrong current password)
-   * @param noMatch
-   */
   const renderErrorMessage = (noMatch: boolean) => {
     if (noMatch) {
       return (
@@ -165,7 +160,6 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({
     }
   };
 
-  // --------------------------------------- Render component ---------------------------------------------- //
   return (
     <Fade in={showForm}>
       <Grid className={classes.listItem} container>
@@ -175,187 +169,146 @@ const ChangePasswordForm: FC<IChangePasswordFormProps> = ({
             primary="Password"
           />
         </Grid>
-        <Formik
-          initialValues={{
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: '',
-          }}
-          onSubmit={async (values: IChangePasswordFormValues) => {
-            const response: AxiosResponse = await authService.updatePassword(
-              values.currentPassword,
-              values.newPassword,
-              values.confirmPassword
-            );
-            if (response.status === 200) {
-              alert('Password changed');
-            } else {
-              alert('Password change failed');
-              console.log('response', response);
-            }
-            closeForm();
-          }}
-          validationSchema={validationSchema}
-        >
-          {(props: FormikProps<IChangePasswordFormValues>) => {
-            let noMatch: boolean = false;
-            if (props.touched.newPassword && props.touched.confirmPassword) {
-              noMatch =
-                props.values.newPassword !== props.values.confirmPassword;
-            }
+        <form onSubmit={onSubmit}>
+          <Grid item xs={12}>
+            <Grid container alignItems="center">
+              {renderFormErrorMessage('currentPassword')}
 
-            const disableSubmit: boolean =
-              noMatch ||
-              props.values.currentPassword.length < 8 ||
-              props.values.newPassword.length < 8 ||
-              props.values.confirmPassword.length < 8;
-            return (
-              <React.Fragment>
-                <Form style={{ width: '100%' }}>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center">
-                      {renderFormikErrorMessage('currentPassword')}
-                      <Field name="currentPassword">
-                        {({ field }: FieldProps<IChangePasswordFormValues>) => {
-                          return (
-                            <TextField
-                              {...field}
-                              placeholder="Current password"
-                              type={showCurrentPassword ? 'text' : 'password'}
-                              variant="outlined"
-                              error={
-                                !!props.errors.currentPassword &&
-                                props.touched.currentPassword
-                              }
-                              classes={{ root: classes.textField }}
-                              InputProps={{
-                                style: { height: 32, width: '100%' },
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <IconButton
-                                      aria-label="Toggle password visibility"
-                                      onClick={() => {
-                                        toggleShowPassword(field.name);
-                                      }}
-                                    >
-                                      {showCurrentPassword ? (
-                                        <Visibility />
-                                      ) : (
-                                        <VisibilityOff />
-                                      )}
-                                    </IconButton>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          );
-                        }}
-                      </Field>
-                      {renderFormikErrorMessage('newPassword')}
-                      <Field name="newPassword">
-                        {({ field }: FieldProps<IChangePasswordFormValues>) => {
-                          return (
-                            <TextField
-                              {...field}
-                              placeholder="New password"
-                              type={showNewPassword ? 'text' : 'password'}
-                              variant="outlined"
-                              error={
-                                !!props.errors.newPassword &&
-                                props.touched.newPassword
-                              }
-                              classes={{ root: classes.textField }}
-                              InputProps={{
-                                style: { height: 32, width: '100%' },
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <IconButton
-                                      aria-label="Toggle password visibility"
-                                      onClick={() => {
-                                        toggleShowPassword(field.name);
-                                      }}
-                                    >
-                                      {showNewPassword ? (
-                                        <Visibility />
-                                      ) : (
-                                        <VisibilityOff />
-                                      )}
-                                    </IconButton>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          );
-                        }}
-                      </Field>
-                      {renderFormikErrorMessage('confirmPassword')}
-                      <Field name="confirmPassword">
-                        {({ field }: FieldProps<IChangePasswordFormValues>) => {
-                          return (
-                            <TextField
-                              {...field}
-                              placeholder="Confirm password"
-                              type={showConfirmPassword ? 'text' : 'password'}
-                              variant="outlined"
-                              error={
-                                !!props.errors.confirmPassword &&
-                                props.touched.confirmPassword
-                              }
-                              classes={{ root: classes.textField }}
-                              InputProps={{
-                                style: { height: 32, width: '100%' },
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <IconButton
-                                      aria-label="Toggle password visibility"
-                                      onClick={() => {
-                                        toggleShowPassword(field.name);
-                                      }}
-                                    >
-                                      {showConfirmPassword ? (
-                                        <Visibility />
-                                      ) : (
-                                        <VisibilityOff />
-                                      )}
-                                    </IconButton>
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs>
-                    <Grid
-                      container
-                      wrap="nowrap"
-                      justify="flex-end"
-                      alignItems="center"
-                    >
-                      {renderErrorMessage(noMatch)}
-                      <IconButton
-                        aria-label="close-form-button"
-                        onClick={closeForm}
-                      >
-                        <CloseRounded className={classes.closeForm} />
-                      </IconButton>
-                      <IconButton
-                        aria-label="submit-form-button"
-                        onClick={() => props.submitForm()}
-                        disabled={disableSubmit}
-                        color="secondary"
-                      >
-                        <CheckRounded />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </Form>
-              </React.Fragment>
-            );
-          }}
-        </Formik>
+              <Controller
+                name="currentPassword"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    placeholder="Current password"
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    variant="outlined"
+                    error={
+                      errors.currentPassword && touchedFields.currentPassword
+                    }
+                    classes={{ root: classes.textField }}
+                    InputProps={{
+                      style: { height: 32, width: '100%' },
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="Toggle password visibility"
+                            onClick={() => {
+                              toggleShowPassword(field.name);
+                            }}
+                          >
+                            {showCurrentPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+
+              {renderFormErrorMessage('newPassword')}
+
+              <Controller
+                name="newPassword"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    placeholder="New password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    variant="outlined"
+                    error={errors.newPassword && touchedFields.newPassword}
+                    classes={{ root: classes.textField }}
+                    onFocus={() => setNoMatch(false)}
+                    InputProps={{
+                      style: { height: 32, width: '100%' },
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="Toggle password visibility"
+                            onClick={() => {
+                              toggleShowPassword(field.name);
+                            }}
+                          >
+                            {showNewPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+
+              {renderFormErrorMessage('confirmPassword')}
+
+              <Controller
+                name="confirmPassword"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    placeholder="Confirm password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    variant="outlined"
+                    error={
+                      errors.confirmPassword && touchedFields.confirmPassword
+                    }
+                    onFocus={() => setNoMatch(false)}
+                    classes={{ root: classes.textField }}
+                    InputProps={{
+                      style: { height: 32, width: '100%' },
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="Toggle password visibility"
+                            onClick={() => {
+                              toggleShowPassword(field.name);
+                            }}
+                          >
+                            {showConfirmPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+          <Grid item xs>
+            <Grid
+              container
+              wrap="nowrap"
+              justify="flex-end"
+              alignItems="center"
+            >
+              {renderErrorMessage(noMatch)}
+              <IconButton aria-label="close-form-button" onClick={closeForm}>
+                <CloseRounded className={classes.closeForm} />
+              </IconButton>
+              <IconButton
+                type="submit"
+                aria-label="submit-form-button"
+                disabled={disableSubmit}
+                color="secondary"
+              >
+                <CheckRounded />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </form>
       </Grid>
     </Fade>
   );
