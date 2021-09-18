@@ -1,11 +1,11 @@
 import { Fab, makeStyles, Theme, createStyles } from '@material-ui/core';
 import React, { FC } from 'react';
-import { UserRoles } from '../../@types/enums';
+import { UserRole } from '../../@types/enums';
 import { useAppNav } from '../../contexts/appNavContext';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
 
 interface AddUserFabProps {
-  fabFor: UserRoles;
+  fabFor: UserRole;
   handleClick: () => void;
 }
 

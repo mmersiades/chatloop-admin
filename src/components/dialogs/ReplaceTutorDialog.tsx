@@ -20,7 +20,7 @@ import {
 } from '@material-ui/core';
 import { Tutor, ExtendedTutor } from '../../@types/interfaces';
 import { useUsers } from '../../contexts/usersContext';
-import { TutorShifts } from '../../@types/enums';
+import { TutorShift } from '../../@types/enums';
 
 import { ShowReplaceTutorDialog } from '../../pages/UsersPage/Learners';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
@@ -93,8 +93,9 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
 }) => {
   const classes = useStyles();
   const [shiftTutors, setShiftTutors] = useState<Array<Tutor> | undefined>();
-  const [selectedTutor, setSelectedTutor] =
-    useState<ExtendedTutor | undefined>();
+  const [selectedTutor, setSelectedTutor] = useState<
+    ExtendedTutor | undefined
+  >();
   const [oldTutor, setOldTutor] = useState<Tutor | undefined>();
   const [value, setValue] = useState<number | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -104,12 +105,12 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
   useEffect(() => {
     if (!!tutors && !!oldTutor) {
       const filteredTutors = tutors.filter((tutor) => tutor.id !== oldTutor.id);
-      oldTutor.shift === TutorShifts.one
+      oldTutor.shift === TutorShift.one
         ? setShiftTutors(
-            filteredTutors.filter((tutor) => tutor.shift === TutorShifts.one)
+            filteredTutors.filter((tutor) => tutor.shift === TutorShift.one)
           )
         : setShiftTutors(
-            filteredTutors.filter((tutor) => tutor.shift === TutorShifts.two)
+            filteredTutors.filter((tutor) => tutor.shift === TutorShift.two)
           );
     }
   }, [tutors, showDialog, oldTutor]);

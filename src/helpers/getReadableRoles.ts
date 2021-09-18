@@ -1,12 +1,12 @@
-import { UserRoles } from '../@types/enums';
+import { UserRole } from '../@types/enums';
 
-export const getReadableRoles = (userRole: UserRoles) => {
+export const getReadableRoles = (userRole: UserRole) => {
   switch (userRole) {
-    case UserRoles.learner:
+    case UserRole.learner:
       return 'learner';
-    case UserRoles.partner:
+    case UserRole.partner:
       return 'partner';
-    case UserRoles.tutor:
+    case UserRole.tutor:
       return 'tutor';
     default:
       return 'user';

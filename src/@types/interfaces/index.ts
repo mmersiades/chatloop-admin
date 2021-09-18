@@ -1,20 +1,20 @@
-import { UserRoles, TutorShifts } from '../enums';
+import { UserRole, TutorShift } from '../enums';
 
 export interface User {
   id: number;
   displayName: string;
   email: string;
-  roles: Array<UserRoles>;
+  roles: Array<UserRole>;
   uiLanguage: string;
 }
 
 export interface Learner extends User {
-  roles: [UserRoles.learner];
+  roles: [UserRole.learner];
   showNewActivityDrawer: false;
 }
 
 export interface ExtendedLearner extends Learner {
-  userRole: UserRoles.learner;
+  userRole: UserRole.learner;
   id: number; // Learner's id
   firstLanguages: UserLanguageObject[];
   numberOfActivities: number;
@@ -24,11 +24,11 @@ export interface ExtendedLearner extends Learner {
 }
 
 export interface Partner extends User {
-  roles: [UserRoles.partner];
+  roles: [UserRole.partner];
 }
 
 export interface ExtendedPartner extends Partner {
-  userRole: UserRoles.partner;
+  userRole: UserRole.partner;
   id: number; // Partner's id
   firstLanguages: UserLanguageObject[];
   numberOfActivities: number;
@@ -36,12 +36,12 @@ export interface ExtendedPartner extends Partner {
 }
 
 export interface Tutor extends User {
-  roles: [UserRoles.tutor];
-  shift: TutorShifts;
+  roles: [UserRole.tutor];
+  shift: TutorShift;
 }
 
 export interface ExtendedTutor extends Tutor {
-  userRole: UserRoles.tutor;
+  userRole: UserRole.tutor;
   id: number; // Tutor's id
   firstLanguages: UserLanguageObject[];
   numberOfLearners: number;

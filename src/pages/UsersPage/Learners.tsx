@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import UsersTable from './UsersTable';
-import { UserRoles } from '../../@types/enums';
+import { UserRole } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
 import ReplaceTutorDialog from '../../components/dialogs/ReplaceTutorDialog';
 import { ExtendedLearner } from '../../@types/interfaces';
@@ -47,13 +47,13 @@ const Learners: FC<LearnersPageProps> = ({
           refreshExtendedUser={refreshExtendedUser}
         />
       )}
-      <UsersTable tableFor={UserRoles.learner} />
+      <UsersTable tableFor={UserRole.learner} />
       <UserDrawer
-        drawerFor={UserRoles.learner}
+        drawerFor={UserRole.learner}
         setShowDialog={setShowReplaceTutorDialog}
         extendedUser={extendedUser}
       />
-      <NewUserForm formFor={UserRoles.learner} />
+      <NewUserForm formFor={UserRole.learner} />
     </div>
   );
 };

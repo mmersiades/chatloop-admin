@@ -19,7 +19,7 @@ import TablePaginationActions from '@material-ui/core/TablePagination/TablePagin
 import AddUserFab from './AddUserFab';
 import { useUsers } from '../../contexts/usersContext';
 import { useAppNav } from '../../contexts/appNavContext';
-import { UserRoles } from '../../@types/enums';
+import { UserRole } from '../../@types/enums';
 
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
@@ -59,7 +59,7 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
 );
 
 interface UsersTableProps {
-  tableFor: UserRoles;
+  tableFor: UserRole;
 }
 
 // An object of params passed to `tableGenerator`
@@ -105,7 +105,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
     };
 
     switch (tableFor) {
-      case UserRoles.learner:
+      case UserRole.learner:
         roleParams = {
           count: learners?.length || 0,
           rows:
@@ -117,7 +117,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
               : learners || [],
         };
         break;
-      case UserRoles.partner:
+      case UserRole.partner:
         roleParams = {
           count: partners?.length || 0,
           rows:
@@ -129,7 +129,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
               : partners || [],
         };
         break;
-      case UserRoles.tutor:
+      case UserRole.tutor:
         roleParams = {
           count: tutors?.length || 0,
           rows:
@@ -173,7 +173,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
               <TableCell classes={{ root: classes.tableCell }} align="center">
                 email
               </TableCell>
-              {tableFor === UserRoles.tutor && (
+              {tableFor === UserRole.tutor && (
                 <TableCell classes={{ root: classes.tableCell }} align="center">
                   shift
                 </TableCell>
@@ -194,7 +194,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                 <TableCell align="center">{user.id}</TableCell>
                 <TableCell align="center">{user.displayName}</TableCell>
                 <TableCell align="center">{user.email}</TableCell>
-                {tableFor === UserRoles.tutor && (
+                {tableFor === UserRole.tutor && (
                   <TableCell align="center">{user.shift}</TableCell>
                 )}
               </TableRow>

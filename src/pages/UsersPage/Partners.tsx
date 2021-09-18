@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core';
 import UsersTable from './UsersTable';
-import { UserRoles } from '../../@types/enums';
+import { UserRole } from '../../@types/enums';
 import UserDrawer from './UserDrawer';
 import { ExtendedPartner } from '../../@types/interfaces';
 import NewUserForm from './NewUserForm';
@@ -23,9 +23,9 @@ const Partners: FC<PartnersPageProps> = ({ extendedUser }) => {
   const classes = useStyles();
   return (
     <div className={classes.partnersContainer}>
-      <UsersTable tableFor={UserRoles.partner} />
-      <UserDrawer drawerFor={UserRoles.partner} extendedUser={extendedUser} />
-      <NewUserForm formFor={UserRoles.partner} />
+      <UsersTable tableFor={UserRole.partner} />
+      <UserDrawer drawerFor={UserRole.partner} extendedUser={extendedUser} />
+      <NewUserForm formFor={UserRole.partner} />
     </div>
   );
 };
