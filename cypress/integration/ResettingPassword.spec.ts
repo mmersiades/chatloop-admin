@@ -8,7 +8,7 @@ import {
 import admin from '../fixtures/users/admin.json';
 import sara from '../fixtures/users/sara.json';
 
-describe('Using the UsersPage', () => {
+describe('Resetting a password', () => {
   beforeEach(() => {
     cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/users');
