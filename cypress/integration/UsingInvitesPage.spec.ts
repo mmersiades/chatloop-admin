@@ -10,8 +10,13 @@ import inviteResponse1 from '../fixtures/invitesResponses/inviteResponse1.json';
 
 describe('Using the InvitesPage', () => {
   beforeEach(() => {
+    cy.intercept('GET', '/rest/admin/partner-ranking?*').as('getRankingPage');
+    cy.intercept(`/rest/admin/invites`, {
+      fixture: '/invitesResponses/inviteResponse1.json',
+    });
     cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/invites');
+    cy.wait('@getRankingPage');
   });
 
   it('should render InvitesPage in initial state', () => {
@@ -28,19 +33,20 @@ describe('Using the InvitesPage', () => {
   it('should fetch more queue on scroll', () => {
     cy.viewport(1000, 500);
     cy.get('li[data-testid="partner-queue-list-item"]').last().scrollIntoView();
+    cy.wait('@getRankingPage');
     cy.get('li[data-testid="partner-queue-list-item"]').should(
       'have.length',
       10
     );
     cy.get('li[data-testid="partner-queue-list-item"]').last().scrollIntoView();
+    cy.wait('@getRankingPage');
+    cy.get('li[data-testid="partner-queue-list-item"]').last().scrollIntoView();
+    cy.wait('@getRankingPage');
+    cy.get('li[data-testid="partner-queue-list-item"]').last().scrollIntoView();
     cy.contains('End of queue').should('be.visible');
   });
 
   it('should show invite and delete it', () => {
-    cy.intercept(`/rest/admin/invites`, {
-      fixture: '/invitesResponses/inviteResponse1.json',
-    });
-
     cy.contains(inviteResponse1.content[0].topic).should('be.visible');
     cy.contains('Expires:');
 
