@@ -1,4 +1,28 @@
-import { UserRole, TutorShift } from '../enums';
+import { UserRole, TutorShift, ReferralStatus } from '../enums';
+
+export interface Action<T> {
+  type: T;
+}
+
+export interface Referrer {
+  referrerId: number;
+  referrerName: string;
+  email: string;
+  orgId: number;
+  orgName: string;
+}
+
+export interface Referral {
+  id: number;
+  email: string;
+  createdAt: string;
+  expiresAt: string;
+  role: UserRole;
+  referreeName: string;
+  status: ReferralStatus;
+}
+
+export interface ExtendedReferral extends Referral, Referrer {}
 
 export interface User {
   id: number;
@@ -48,6 +72,9 @@ export interface ExtendedTutor extends Tutor {
   maxNumberOfLearners: number;
   assignedLearners: number[]; // array of Learner ids
 }
+
+export const isExtendedTutor = (item: any): item is ExtendedTutor =>
+  (item as ExtendedTutor).roles[0] === UserRole.tutor;
 
 export type ExtendedUser = ExtendedLearner | ExtendedPartner | ExtendedTutor;
 

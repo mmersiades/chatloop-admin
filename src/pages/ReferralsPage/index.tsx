@@ -1,4 +1,5 @@
 import React from 'react';
+
 import WithNavbar from '../../components/WithNavbar';
 
 const ReferralsPage = () => {

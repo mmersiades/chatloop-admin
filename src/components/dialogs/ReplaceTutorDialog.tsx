@@ -18,7 +18,7 @@ import {
   Radio,
   CircularProgress,
 } from '@material-ui/core';
-import { Tutor, ExtendedTutor } from '../../@types/interfaces';
+import { Tutor, ExtendedTutor, isExtendedTutor } from '../../@types/interfaces';
 import { useUsers } from '../../contexts/usersContext';
 import { TutorShift } from '../../@types/enums';
 
@@ -125,8 +125,10 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
 
   const handleSelect = async (tutor: Tutor) => {
     setValue(tutor.id);
-    const response = await getUser(tutor.id);
-    response.status === 200 && setSelectedTutor({ ...tutor, ...response.data });
+    const { status, data } = await getUser(tutor.id);
+    if (status === 200 && isExtendedTutor(data)) {
+      setSelectedTutor({ ...tutor, ...data });
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {

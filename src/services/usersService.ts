@@ -1,6 +1,6 @@
 import apiChatloopOrg from '../config/axiosConfig';
 import { authHeader } from '../helpers/getAuthHeader';
-import { Learner, Partner, Tutor } from '../@types/interfaces';
+import { ExtendedUser, Learner, Partner, Tutor } from '../@types/interfaces';
 import { TutorShift, UserRole } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
 
@@ -8,7 +8,9 @@ import { AxiosResponse } from 'axios';
 import { usersAction } from '../contexts/usersContext';
 import { NewUserPayload } from '../pages/UsersPage/NewUserForm';
 
-export const getUser = async (userId: number): Promise<AxiosResponse> => {
+export const getUser = async (
+  userId: number
+): Promise<AxiosResponse<ExtendedUser>> => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };

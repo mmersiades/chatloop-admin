@@ -12,6 +12,7 @@ import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
 import { LanguagesContextProvider } from '../contexts/languagesContext';
 import ReferralsPage from '../pages/ReferralsPage';
+import { ReferralsProvider } from '../contexts/referralsContext';
 
 export const AppRouter = () => {
   return (
@@ -37,7 +38,14 @@ export const AppRouter = () => {
           </InvitesContextProvider>
         )}
       />
-      <PrivateRoute path="/referrals" component={() => <ReferralsPage />} />
+      <PrivateRoute
+        path="/referrals"
+        component={() => (
+          <ReferralsProvider>
+            <ReferralsPage />
+          </ReferralsProvider>
+        )}
+      />
     </Switch>
   );
 };

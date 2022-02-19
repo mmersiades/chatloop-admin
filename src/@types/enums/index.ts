@@ -14,3 +14,9 @@ export enum OperatingSystem {
   ios = 'IOS',
   android = 'ANDROID',
 }
+
+export enum ReferralStatus {
+  sent = 'INVITATION_SENT',
+  accepted = 'INVITATION_ACCEPTED',
+  expired = 'INVITATION_EXPIRED',
+}
