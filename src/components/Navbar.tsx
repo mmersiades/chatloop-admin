@@ -18,6 +18,7 @@ import {
   USERS_TITLE,
   INVITES_TITLE,
   ACCOUNT_SETTINGS_TITLE,
+  REFERRALS_TITLE,
 } from '../config/textConstants';
 
 const connectedUrl = process.env.REACT_APP_MONOLITH_BASE_URL;
@@ -67,6 +68,8 @@ const Navbar: FC = () => {
         return USERS_TITLE;
       case '/invites':
         return INVITES_TITLE;
+      case '/referrals':
+        return REFERRALS_TITLE;
       case '/account-settings':
         return ACCOUNT_SETTINGS_TITLE;
     }

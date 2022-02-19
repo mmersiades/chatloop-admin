@@ -7,6 +7,7 @@ export const LOGIN_ERROR = 'Incorrect email or password';
 export const LOG_OUT = 'Log out';
 export const ACCOUNT_SETTINGS = 'Account Settings';
 export const INVITES = 'Invites';
+export const REFERRALS = 'Referrals';
 export const USERS = 'Users';
 export const DASHBOARD = 'Dashboard';
 
@@ -38,6 +39,9 @@ export const INVITE_SETTINGS = 'Invite settings';
 export const INVITE_INTERVAL = 'Invite expiry interval';
 export const INVITE_STATISTICS = 'Invite statistics';
 export const NO_INVITES = 'No invites';
+
+// ReferralsPage
+export const REFERRALS_TITLE = 'Manage Referrals';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';
