@@ -1,4 +1,7 @@
+import React, { FC, useEffect, useState } from 'react';
+import clsx from 'clsx';
 import {
+  CircularProgress,
   createStyles,
   makeStyles,
   Paper,
@@ -13,10 +16,9 @@ import {
   Theme,
 } from '@material-ui/core';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
-import clsx from 'clsx';
-import React, { FC, useEffect, useState } from 'react';
-import { Referral } from '../../@types/interfaces';
+
 import { useAppNav } from '../../contexts/appNavContext';
+import { Referral } from '../../@types/interfaces';
 
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
@@ -55,14 +57,22 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
     idCell: {
       width: '100px',
     },
+    spinnerContainer: {
+      height: '100%',
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
   })
 );
 
 interface Props {
   referrals: Referral[];
+  loading: boolean;
 }
 
-const ReferralsTable: FC<Props> = ({ referrals }) => {
+const ReferralsTable: FC<Props> = ({ referrals, loading }) => {
   // ----------------------------- Component state ------------------------------ //
   // The current table page (for table pagination)
   const [page, setPage] = useState(0);
@@ -105,12 +115,7 @@ const ReferralsTable: FC<Props> = ({ referrals }) => {
   return (
     <>
       <TableContainer
-        classes={{
-          root: clsx(styles.tableContainer, {
-            [styles.tableContainerShift]:
-              showReferralDrawer || showNewReferralForm,
-          }),
-        }}
+        classes={{ root: styles.tableContainer }}
         component={Paper}
       >
         <Table size="small">
@@ -134,24 +139,32 @@ const ReferralsTable: FC<Props> = ({ referrals }) => {
             </TableRow>
           </TableHead>
           <TableBody classes={{ root: styles.tableBody }}>
-            {pageRows.map((referral: Referral) => (
-              <TableRow
-                classes={{ root: styles.tableRow }}
-                key={referral.id}
-                hover
-                onClick={() => {
-                  setShowNewReferralForm(false);
-                  setShowReferralDrawer(referral.id);
-                }}
-              >
-                <TableCell classes={{ root: styles.idCell }} align="center">
-                  {referral.id}
-                </TableCell>
-                <TableCell align="center">{referral.referreeName}</TableCell>
-                <TableCell align="center">{referral.email}</TableCell>
-                <TableCell align="center">{referral.expiresAt}</TableCell>
-              </TableRow>
-            ))}
+            {loading ? (
+              <div className={styles.spinnerContainer}>
+                <CircularProgress color="primary" />
+              </div>
+            ) : (
+              pageRows.map((referral: Referral) => (
+                <TableRow
+                  classes={{ root: styles.tableRow }}
+                  key={referral.id}
+                  hover
+                  onClick={() => {
+                    setShowNewReferralForm(false);
+                    setShowReferralDrawer(referral.id);
+                  }}
+                >
+                  <TableCell classes={{ root: styles.idCell }} align="center">
+                    {referral.id}
+                  </TableCell>
+                  <TableCell align="center">{referral.referreeName}</TableCell>
+                  <TableCell align="center">{referral.email}</TableCell>
+                  <TableCell align="center">
+                    {referral.expiresAt.split('T')[0]}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
           <TableFooter>
             <TableRow>

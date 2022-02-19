@@ -7,7 +7,7 @@ export interface Action<T> {
 export interface Referrer {
   referrerId: number;
   referrerName: string;
-  email: string;
+  referrerEmail: string;
   orgId: number;
   orgName: string;
 }
@@ -20,6 +20,8 @@ export interface Referral {
   role: UserRole;
   referreeName: string;
   status: ReferralStatus;
+  uiLanguage: string;
+  firstLanguages: UserLanguageObject[];
 }
 
 export interface ExtendedReferral extends Referral, Referrer {}

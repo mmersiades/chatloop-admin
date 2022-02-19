@@ -6,20 +6,28 @@ import React, {
   useEffect,
   useReducer,
 } from 'react';
+
+import { useAppNav } from './appNavContext';
+import {
+  getReferralById,
+  getReferralsByRole,
+} from '../services/referralsService';
 import { UserRole } from '../@types/enums';
-import { Action, Referral } from '../@types/interfaces';
-import { getReferralsByRole } from '../services/referralsService';
+import { Action, ExtendedReferral, Referral } from '../@types/interfaces';
 
 export interface ReferralsState {
   fetchingLearners: boolean;
   fetchingPartners: boolean;
+  fetchingReferral: boolean;
   learnerReferrals: Referral[];
   partnerReferrals: Referral[];
+  extendedReferral?: ExtendedReferral;
 }
 
 const initialState: ReferralsState = {
   fetchingLearners: false,
   fetchingPartners: false,
+  fetchingReferral: false,
   learnerReferrals: [],
   partnerReferrals: [],
 };
@@ -55,13 +63,24 @@ interface GetPartnerReferralsSuccess extends Action<'GET_P_REFERRALS_SUCCESS'> {
 interface GetPartnerReferralsFailure
   extends Action<'GET_P_REFERRALS_FAILURE'> {}
 
+interface GetReferralRequest extends Action<'GET_REFERRAL_REQUEST'> {}
+
+interface GetReferralSuccess extends Action<'GET_REFERRAL_SUCCESS'> {
+  extendedReferral: ExtendedReferral;
+}
+
+interface GetReferralFailure extends Action<'GET_REFERRAL_FAILURE'> {}
+
 type Actions =
   | GetLearnerReferralsRequest
   | GetLearnerReferralsSuccess
   | GetLearnerReferralsFailure
   | GetPartnerReferralsRequest
   | GetPartnerReferralsSuccess
-  | GetPartnerReferralsFailure;
+  | GetPartnerReferralsFailure
+  | GetReferralRequest
+  | GetReferralSuccess
+  | GetReferralFailure;
 
 const referralsReducer = (
   state: ReferralsState,
@@ -100,6 +119,22 @@ const referralsReducer = (
         ...state,
         fetchingPartners: false,
       };
+    case 'GET_REFERRAL_REQUEST':
+      return {
+        ...state,
+        fetchingReferral: true,
+      };
+    case 'GET_REFERRAL_SUCCESS':
+      return {
+        ...state,
+        fetchingReferral: false,
+        extendedReferral: action.extendedReferral,
+      };
+    case 'GET_REFERRAL_FAILURE':
+      return {
+        ...state,
+        fetchingReferral: false,
+      };
     default:
       return state;
   }
@@ -112,11 +147,16 @@ interface ReferralsProviderProps {
 export const ReferralsProvider: FC<
   PropsWithChildren<ReferralsProviderProps>
 > = ({ children, injectedState }) => {
+  // ----------------------------- Component state ------------------------------ //
   const [state, dispatch] = useReducer(referralsReducer, {
     ...initialState,
     ...injectedState,
   });
 
+  // ----------------------------- Hooks ---------------------------------------- //
+  const { showReferralDrawer } = useAppNav();
+
+  // ----------------------------- Component functions ------------------------- //
   const getLearnerReferrals = async () => {
     dispatch({ type: 'GET_L_REFERRALS_REQUEST' });
 
@@ -143,13 +183,31 @@ export const ReferralsProvider: FC<
     }
   };
 
+  const getReferral = async (referralId: number) => {
+    dispatch({ type: 'GET_REFERRAL_REQUEST' });
+
+    try {
+      const extendedReferral = await getReferralById(referralId);
+      dispatch({ type: 'GET_REFERRAL_SUCCESS', extendedReferral });
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_REFERRAL_FAILURE' });
+    }
+  };
+
+  // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
     getLearnerReferrals();
     getPartnerReferrals();
   }, []);
 
+  useEffect(() => {
+    showReferralDrawer && getReferral(showReferralDrawer);
+  }, [showReferralDrawer]);
+
   console.log('state', state);
 
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <ReferralsContext.Provider value={{ ...state }}>
       {children}
