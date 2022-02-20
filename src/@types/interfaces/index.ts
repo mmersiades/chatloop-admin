@@ -24,6 +24,11 @@ export interface Referral {
   firstLanguages: UserLanguageObject[];
 }
 
+export interface UiLanguageOption {
+  code: string;
+  language: string;
+}
+
 export interface ExtendedReferral extends Referral, Referrer {}
 
 export interface User {

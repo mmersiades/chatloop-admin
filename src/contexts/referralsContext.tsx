@@ -11,6 +11,8 @@ import { useAppNav } from './appNavContext';
 import {
   getReferralById,
   getReferralsByRole,
+  PostReferralBody,
+  postReferralByRole,
 } from '../services/referralsService';
 import { UserRole } from '../@types/enums';
 import { Action, ExtendedReferral, Referral } from '../@types/interfaces';
@@ -19,6 +21,7 @@ export interface ReferralsState {
   fetchingLearners: boolean;
   fetchingPartners: boolean;
   fetchingReferral: boolean;
+  postingReferral: boolean;
   learnerReferrals: Referral[];
   partnerReferrals: Referral[];
   extendedReferral?: ExtendedReferral;
@@ -28,11 +31,14 @@ const initialState: ReferralsState = {
   fetchingLearners: false,
   fetchingPartners: false,
   fetchingReferral: false,
+  postingReferral: false,
   learnerReferrals: [],
   partnerReferrals: [],
 };
 
-export interface ReferralsContext extends ReferralsState {}
+export interface ReferralsContext extends ReferralsState {
+  postReferral?: (body: PostReferralBody, role: UserRole) => void;
+}
 
 const initialContext: ReferralsContext = { ...initialState };
 
@@ -71,6 +77,15 @@ interface GetReferralSuccess extends Action<'GET_REFERRAL_SUCCESS'> {
 
 interface GetReferralFailure extends Action<'GET_REFERRAL_FAILURE'> {}
 
+interface PostReferralRequest extends Action<'POST_REFERRAL_REQUEST'> {}
+
+interface PostReferralSuccess extends Action<'POST_REFERRAL_SUCCESS'> {
+  referrals: Referral[];
+  role: UserRole;
+}
+
+interface PostReferralFailure extends Action<'POST_REFERRAL_FAILURE'> {}
+
 type Actions =
   | GetLearnerReferralsRequest
   | GetLearnerReferralsSuccess
@@ -80,7 +95,10 @@ type Actions =
   | GetPartnerReferralsFailure
   | GetReferralRequest
   | GetReferralSuccess
-  | GetReferralFailure;
+  | GetReferralFailure
+  | PostReferralRequest
+  | PostReferralSuccess
+  | PostReferralFailure;
 
 const referralsReducer = (
   state: ReferralsState,
@@ -134,6 +152,31 @@ const referralsReducer = (
       return {
         ...state,
         fetchingReferral: false,
+      };
+    case 'POST_REFERRAL_REQUEST':
+      return {
+        ...state,
+        postingReferral: true,
+      };
+    case 'POST_REFERRAL_SUCCESS':
+      if (action.role === UserRole.learner) {
+        return {
+          ...state,
+          postingReferral: false,
+          learnerReferrals: action.referrals,
+        };
+      } else {
+        return {
+          ...state,
+          postingReferral: false,
+          partnerReferrals: action.referrals,
+        };
+      }
+
+    case 'POST_REFERRAL_FAILURE':
+      return {
+        ...state,
+        postingReferral: false,
       };
     default:
       return state;
@@ -195,6 +238,19 @@ export const ReferralsProvider: FC<
     }
   };
 
+  const postReferral = async (body: PostReferralBody, role: UserRole) => {
+    dispatch({ type: 'POST_REFERRAL_REQUEST' });
+
+    try {
+      const referrals = await postReferralByRole(body, role);
+
+      dispatch({ type: 'POST_REFERRAL_SUCCESS', referrals, role });
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'POST_REFERRAL_FAILURE' });
+    }
+  };
+
   // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
     getLearnerReferrals();
@@ -209,7 +265,7 @@ export const ReferralsProvider: FC<
 
   // ----------------------------- Render ---------------------------------------- //
   return (
-    <ReferralsContext.Provider value={{ ...state }}>
+    <ReferralsContext.Provider value={{ ...state, postReferral }}>
       {children}
     </ReferralsContext.Provider>
   );

@@ -84,6 +84,40 @@ const extendedReferrals = [
   extendedPartnerReferral2,
 ];
 
+const partialDummyReferral: Partial<Referral> = {
+  id: Math.floor(Math.random() * 10000),
+  createdAt: '2022-02-20T05:52:27+0000',
+  expiresAt: '2022-03-20T05:52:27+0000',
+  status: ReferralStatus.sent,
+};
+
+export interface PostReferralBody {
+  refereeName: string;
+  refereeEmail: string;
+  role: UserRole;
+  firstLanguage: string; // eg 'eng', 'ara', 'prs' ISO-639-3
+}
+
+export const postReferralByRole = async (
+  body: PostReferralBody,
+  role: UserRole
+): Promise<Referral[]> => {
+  const newReferral: Referral = {
+    ...body,
+    ...partialDummyReferral,
+  } as Referral;
+  let payload: Referral[] = [];
+  if (role === UserRole.learner) {
+    payload = [newReferral, learnerReferral1, learnerReferral2];
+  } else {
+    payload = [newReferral, partnerReferral1, partnerReferral2];
+  }
+
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(payload), 1000);
+  });
+};
+
 export const getReferralsByRole = async (
   role: UserRole
 ): Promise<Referral[]> => {
