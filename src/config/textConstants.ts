@@ -47,6 +47,9 @@ export const REFERRER_NAME = 'Referrer';
 export const REFERRER_EMAIL = 'Referrer email';
 export const NEW_REFERRAL_TITLE = 'New referral';
 export const ADD_REFERRAL_BUTTON = 'ADD REFERRAL';
+export const NAME_FORM_HELPER = 'Recommended: first name only';
+export const EMAIL_FORM_HELPER = 'Invitation sent to this address';
+export const FIRST_LANG_FORM_HELPER = 'Native language / mother tongue';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';

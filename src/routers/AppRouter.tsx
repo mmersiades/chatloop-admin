@@ -10,7 +10,6 @@ import AccountSettings from '../pages/AccountSettings';
 import InvitesPage from '../pages/InvitesPage';
 import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
-import { LanguagesContextProvider } from '../contexts/languagesContext';
 import ReferralsPage from '../pages/ReferralsPage';
 import { ReferralsProvider } from '../contexts/referralsContext';
 
@@ -24,9 +23,7 @@ export const AppRouter = () => {
         path="/users"
         component={() => (
           <UsersContextProvider>
-            <LanguagesContextProvider>
-              <UsersPage />
-            </LanguagesContextProvider>
+            <UsersPage />
           </UsersContextProvider>
         )}
       />

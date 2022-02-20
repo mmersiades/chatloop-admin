@@ -5,6 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { AppPropertiesProvider } from '../contexts/appPropertiesContext';
 import { AppNavContextProvider } from '../contexts/appNavContext';
+import { LanguagesContextProvider } from '../contexts/languagesContext';
 import chatloopTheme from '../assets/chatloopTheme';
 import history from '../helpers/getBrowserHistory';
 
@@ -21,7 +22,9 @@ const Root: FC<RootProps> = ({ children }): JSX.Element => {
       <Router history={history}>
         <ThemeProvider theme={theme}>
           <AppPropertiesProvider>
-            <AppNavContextProvider>{children}</AppNavContextProvider>
+            <LanguagesContextProvider>
+              <AppNavContextProvider>{children}</AppNavContextProvider>
+            </LanguagesContextProvider>
           </AppPropertiesProvider>
         </ThemeProvider>
       </Router>

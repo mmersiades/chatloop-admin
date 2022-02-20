@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import ReactSelect, { OptionTypeBase } from 'react-select';
+import { Controller, useForm } from 'react-hook-form';
 import {
   makeStyles,
   createStyles,
@@ -10,14 +12,20 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Button,
 } from '@material-ui/core';
 
-import { UserRole } from '../../@types/enums';
 import { useLanguages } from '../../contexts/languagesContext';
-import { OptionTypeBase } from 'react-select';
-import { Controller, useForm } from 'react-hook-form';
-import { useAppNav } from '../../contexts/appNavContext';
+import { useReferrals } from '../../contexts/referralsContext';
+import { PostReferralBody } from '../../services/referralsService';
 import { getReadableRoles } from '../../helpers/getReadableRoles';
+import { UserRole } from '../../@types/enums';
+import { handleError } from '../../helpers/handleError';
+import {
+  EMAIL_FORM_HELPER,
+  FIRST_LANG_FORM_HELPER,
+  NAME_FORM_HELPER,
+} from '../../config/textConstants';
 
 interface FormValues {
   refereeName: string;
@@ -26,7 +34,7 @@ interface FormValues {
   firstLanguage: OptionTypeBase; // eg 'eng', 'ara', 'prs' ISO-639-3
 }
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles(({ spacing }) =>
   createStyles({
     formContainer: {
       padding: '12px',
@@ -35,6 +43,9 @@ const useStyles = makeStyles(() =>
     },
     helperTextSpacer: {
       height: 22,
+    },
+    fieldContainer: {
+      marginBottom: spacing(2),
     },
   })
 );
@@ -49,7 +60,7 @@ const defaultValues: FormValues = {
   },
 };
 
-const NewReferralForm = () => {
+const NewReferralForm: FC = () => {
   // ----------------------------- 3rd party hooks ------------------------------- //
   const newReferralSchema = Yup.object().shape({
     refereeName: Yup.string()
@@ -79,6 +90,13 @@ const NewReferralForm = () => {
     defaultValues,
   });
 
+  // ----------------------------- Hooks ---------------------------------------- //
+  const { languages } = useLanguages();
+  const { postReferral, postingReferral } = useReferrals();
+
+  // ----------------------------- Component functions ------------------------- //
+  const styles = useStyles();
+
   const disableButton =
     isSubmitting ||
     !!errors.refereeName ||
@@ -86,125 +104,125 @@ const NewReferralForm = () => {
     !!errors.role ||
     !!errors.firstLanguage ||
     !touchedFields.refereeName ||
-    !touchedFields.refereeEmail ||
-    !touchedFields.role ||
-    !touchedFields.firstLanguage;
+    !touchedFields.refereeEmail;
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(`data`, data);
-    // const body = getPayload(formFor, data);
-    // console.log(`body`, body);
+    const body: PostReferralBody = {
+      ...data,
+      firstLanguage: data.firstLanguage.value,
+    };
 
-    // if (!!body) {
-    //   try {
-    //     await createUser(body);
-    //     if (!!fetchUsersByUserRole) fetchUsersByUserRole(formFor);
-    //     reset();
-    //   } catch (error) {
-    //     handleError(error);
-    //   }
-    // } else {
-    //   throw new Error('Submit called without values');
-    // }
+    if (!!body && !!postReferral) {
+      try {
+        const isSuccess = await postReferral(body, data.role);
+        if (isSuccess) {
+          reset();
+        }
+      } catch (error) {
+        handleError(error);
+      }
+    } else {
+      throw new Error('Submit called without values');
+    }
   });
-
-  // ----------------------------- Hooks ---------------------------------------- //
-  const { languages } = useLanguages();
-  const { showNewReferralForm, setShowNewReferralForm } = useAppNav();
-
-  // ----------------------------- Component functions ------------------------- //
-  const styles = useStyles();
 
   // ----------------------------- Render ---------------------------------------- //
   return (
     <form className={styles.formContainer} onSubmit={onSubmit}>
-      <Controller
-        name="refereeName"
-        control={control}
-        render={({ field }) => (
-          <>
-            <TextField
-              {...field}
-              label="Name"
-              margin="dense"
-              variant="outlined"
-              type="text"
-              fullWidth
-              error={touchedFields.refereeName && !!errors.refereeName}
-            />
-            {touchedFields.refereeName && errors.refereeName ? (
-              <FormHelperText error>
-                {errors.refereeName.message}
-              </FormHelperText>
-            ) : (
-              <FormHelperText>Recommended: first name only</FormHelperText>
-            )}
-          </>
-        )}
-      />
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="refereeName"
+          control={control}
+          render={({ field }) => (
+            <>
+              <TextField
+                {...field}
+                label="Name"
+                margin="dense"
+                variant="outlined"
+                type="text"
+                fullWidth
+                error={touchedFields.refereeName && !!errors.refereeName}
+              />
+              {touchedFields.refereeName && errors.refereeName ? (
+                <FormHelperText error>
+                  {errors.refereeName.message}
+                </FormHelperText>
+              ) : (
+                <FormHelperText>{NAME_FORM_HELPER}</FormHelperText>
+              )}
+            </>
+          )}
+        />
+      </div>
 
-      <Controller
-        name="refereeEmail"
-        control={control}
-        render={({ field }) => (
-          <>
-            <TextField
-              {...field}
-              label="Email"
-              margin="dense"
-              variant="outlined"
-              type="email"
-              fullWidth
-              error={touchedFields.refereeEmail && !!errors.refereeEmail}
-            />
-            {touchedFields.refereeEmail && errors.refereeEmail ? (
-              <FormHelperText error>
-                {errors.refereeEmail.message}
-              </FormHelperText>
-            ) : (
-              <FormHelperText>Invitation sent to this address</FormHelperText>
-            )}
-          </>
-        )}
-      />
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="refereeEmail"
+          control={control}
+          render={({ field }) => (
+            <>
+              <TextField
+                {...field}
+                label="Email"
+                margin="dense"
+                variant="outlined"
+                type="email"
+                fullWidth
+                error={touchedFields.refereeEmail && !!errors.refereeEmail}
+              />
+              {touchedFields.refereeEmail && errors.refereeEmail ? (
+                <FormHelperText error>
+                  {errors.refereeEmail.message}
+                </FormHelperText>
+              ) : (
+                <FormHelperText>{EMAIL_FORM_HELPER}</FormHelperText>
+              )}
+            </>
+          )}
+        />
+      </div>
 
-      <Controller
-        name="role"
-        control={control}
-        render={({ field }) => (
-          <FormControl fullWidth style={{ marginTop: '8px' }}>
-            <InputLabel id="role-label-id" variant="outlined">
-              Role
-            </InputLabel>
-            <Select
-              {...field}
-              labelId="role-label-id"
-              variant="outlined"
-              label="Role"
-              error={touchedFields.role && !!errors.role}
-            >
-              <MenuItem key={UserRole.learner} value={UserRole.learner}>
-                {getReadableRoles(UserRole.learner)}
-              </MenuItem>
-              <MenuItem key={UserRole.partner} value={UserRole.partner}>
-                {getReadableRoles(UserRole.partner)}
-              </MenuItem>
-            </Select>
-            {touchedFields.role && errors.role ? (
-              <FormHelperText error>{errors.role.message}</FormHelperText>
-            ) : (
-              <div className={styles.helperTextSpacer} />
-            )}
-          </FormControl>
-        )}
-      />
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="role"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
+              <InputLabel id="role-label-id" variant="outlined">
+                Role
+              </InputLabel>
+              <Select
+                {...field}
+                labelId="role-label-id"
+                variant="outlined"
+                label="Role"
+                error={touchedFields.role && !!errors.role}
+              >
+                <MenuItem key={UserRole.learner} value={UserRole.learner}>
+                  {getReadableRoles(UserRole.learner)}
+                </MenuItem>
+                <MenuItem key={UserRole.partner} value={UserRole.partner}>
+                  {getReadableRoles(UserRole.partner)}
+                </MenuItem>
+              </Select>
+              {touchedFields.role && errors.role ? (
+                <FormHelperText error>{errors.role.message}</FormHelperText>
+              ) : (
+                <div className={styles.helperTextSpacer} />
+              )}
+            </FormControl>
+          )}
+        />
+      </div>
 
-      <Controller
-        name="firstLanguage"
-        control={control}
-        render={({ field }) => (
-          <FormControl fullWidth style={{ marginTop: '8px' }}>
-            {/* <ReactSelect
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="firstLanguage"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
+              <ReactSelect
                 {...field}
                 id="first-language-select"
                 styles={{
@@ -215,18 +233,27 @@ const NewReferralForm = () => {
                   label: option.language,
                   value: option.code,
                 }))}
-              /> */}
+              />
 
-            {touchedFields.firstLanguage && errors.firstLanguage ? (
-              <FormHelperText error>
-                {errors.firstLanguage.message}
-              </FormHelperText>
-            ) : (
-              <div className={styles.helperTextSpacer} />
-            )}
-          </FormControl>
-        )}
-      />
+              {touchedFields.firstLanguage && errors.firstLanguage ? (
+                <FormHelperText error>
+                  {errors.firstLanguage.message}
+                </FormHelperText>
+              ) : (
+                <FormHelperText>{FIRST_LANG_FORM_HELPER}</FormHelperText>
+              )}
+            </FormControl>
+          )}
+        />
+      </div>
+      <Button
+        type="submit"
+        color="secondary"
+        variant="contained"
+        disabled={disableButton || postingReferral}
+      >
+        SUBMIT
+      </Button>
     </form>
   );
 };

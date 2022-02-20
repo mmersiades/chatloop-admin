@@ -37,7 +37,7 @@ const initialState: ReferralsState = {
 };
 
 export interface ReferralsContext extends ReferralsState {
-  postReferral?: (body: PostReferralBody, role: UserRole) => void;
+  postReferral?: (body: PostReferralBody, role: UserRole) => Promise<boolean>;
 }
 
 const initialContext: ReferralsContext = { ...initialState };
@@ -238,16 +238,21 @@ export const ReferralsProvider: FC<
     }
   };
 
-  const postReferral = async (body: PostReferralBody, role: UserRole) => {
+  const postReferral = async (
+    body: PostReferralBody,
+    role: UserRole
+  ): Promise<boolean> => {
     dispatch({ type: 'POST_REFERRAL_REQUEST' });
 
     try {
       const referrals = await postReferralByRole(body, role);
 
       dispatch({ type: 'POST_REFERRAL_SUCCESS', referrals, role });
+      return true;
     } catch (error) {
       console.error(error);
       dispatch({ type: 'POST_REFERRAL_FAILURE' });
+      return false;
     }
   };
 
