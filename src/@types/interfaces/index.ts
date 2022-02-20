@@ -81,7 +81,7 @@ export interface ExtendedTutor extends Tutor {
 }
 
 export const isExtendedTutor = (item: any): item is ExtendedTutor =>
-  (item as ExtendedTutor).roles[0] === UserRole.tutor;
+  (item as ExtendedTutor).userRole === UserRole.tutor;
 
 export type ExtendedUser = ExtendedLearner | ExtendedPartner | ExtendedTutor;
 
