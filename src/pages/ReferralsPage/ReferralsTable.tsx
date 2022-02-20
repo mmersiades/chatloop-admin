@@ -58,7 +58,7 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
       width: '100px',
     },
     spinnerContainer: {
-      height: '100%',
+      height: 'calc(100vh - 96px)',
       width: '100%',
       display: 'flex',
       alignItems: 'center',
@@ -114,37 +114,38 @@ const ReferralsTable: FC<Props> = ({ referrals, loading }) => {
   // ----------------------------- Render ---------------------------------------- //
   return (
     <>
-      <TableContainer
-        classes={{ root: styles.tableContainer }}
-        component={Paper}
-      >
-        <Table size="small">
-          <TableHead classes={{ root: styles.tableHead }}>
-            <TableRow classes={{ root: styles.tableRow }}>
-              <TableCell
-                classes={{ root: clsx(styles.tableCell, styles.idCell) }}
-                align="center"
-              >
-                id
-              </TableCell>
-              <TableCell classes={{ root: styles.tableCell }} align="center">
-                referreeName
-              </TableCell>
-              <TableCell classes={{ root: styles.tableCell }} align="center">
-                email
-              </TableCell>
-              <TableCell classes={{ root: styles.tableCell }} align="center">
-                expiresAt
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody classes={{ root: styles.tableBody }}>
-            {loading ? (
-              <div className={styles.spinnerContainer}>
-                <CircularProgress color="primary" />
-              </div>
-            ) : (
-              pageRows.map((referral: Referral) => (
+      {loading ? (
+        <div className={styles.spinnerContainer}>
+          <CircularProgress color="primary" />
+        </div>
+      ) : (
+        <TableContainer
+          classes={{ root: styles.tableContainer }}
+          component={Paper}
+        >
+          <Table size="small">
+            <TableHead classes={{ root: styles.tableHead }}>
+              <TableRow classes={{ root: styles.tableRow }}>
+                <TableCell
+                  classes={{ root: clsx(styles.tableCell, styles.idCell) }}
+                  align="center"
+                >
+                  id
+                </TableCell>
+                <TableCell classes={{ root: styles.tableCell }} align="center">
+                  referreeName
+                </TableCell>
+                <TableCell classes={{ root: styles.tableCell }} align="center">
+                  email
+                </TableCell>
+                <TableCell classes={{ root: styles.tableCell }} align="center">
+                  expiresAt
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody classes={{ root: styles.tableBody }}>
+              {pageRows.map((referral: Referral) => (
                 <TableRow
                   classes={{ root: styles.tableRow }}
                   key={referral.id}
@@ -163,23 +164,24 @@ const ReferralsTable: FC<Props> = ({ referrals, loading }) => {
                     {referral.expiresAt.split('T')[0]}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                count={referrals.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
+              ))}
+            </TableBody>
+
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  count={referrals.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+      )}
     </>
   );
 };

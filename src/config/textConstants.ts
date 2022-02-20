@@ -45,6 +45,8 @@ export const REFERRALS_TITLE = 'Manage Referrals';
 export const REFEREE_NAME = 'Referee';
 export const REFERRER_NAME = 'Referrer';
 export const REFERRER_EMAIL = 'Referrer email';
+export const NEW_REFERRAL_TITLE = 'New referral';
+export const ADD_REFERRAL_BUTTON = 'ADD REFERRAL';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';

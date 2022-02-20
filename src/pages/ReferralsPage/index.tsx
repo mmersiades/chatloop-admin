@@ -4,6 +4,8 @@ import { createStyles, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 
 import ReferralDrawer from './ReferralDrawer';
 import ReferralsTable from './ReferralsTable';
+import AddReferralFab from './AddReferralFab';
+import NewReferralDrawer from './NewReferralDrawer';
 import WithNavbar from '../../components/WithNavbar';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useReferrals } from '../../contexts/referralsContext';
@@ -85,6 +87,8 @@ const ReferralsPage = () => {
         )}
       </div>
       <ReferralDrawer />
+      <NewReferralDrawer />
+      <AddReferralFab />
     </div>
   );
 };
