@@ -1,95 +1,10 @@
-import { ReferralStatus, UserRole } from '../@types/enums';
-import { ExtendedReferral, Referral, Referrer } from '../@types/interfaces';
+import {AxiosResponse} from "axios";
 
-const referrer: Referrer = {
-  referrerId: 567890,
-  referrerName: 'Referrer',
-  referrerEmail: 'referrer@email.com',
-  orgId: 678901,
-  orgName: 'Chatloop',
-};
-
-const learnerReferral1: Referral = {
-  id: 123456,
-  email: 'learnerReferral1@email.com',
-  createdAt: '2022-02-19T04:52:27+0000',
-  expiresAt: '2022-03-19T04:52:27+0000',
-  role: UserRole.learner,
-  referreeName: 'Learner Referral 1',
-  status: ReferralStatus.sent,
-  uiLanguage: 'ar',
-  firstLanguages: [{ code: 'ara', language: 'Arabic' }],
-};
-
-const learnerReferral2: Referral = {
-  id: 234567,
-  email: 'learnerReferral2@email.com',
-  createdAt: '2022-02-19T05:52:27+0000',
-  expiresAt: '2022-03-19T05:52:27+0000',
-  role: UserRole.learner,
-  referreeName: 'Learner Referral 2',
-  status: ReferralStatus.sent,
-  uiLanguage: 'ar',
-  firstLanguages: [{ code: 'ara', language: 'Arabic' }],
-};
-
-const partnerReferral1: Referral = {
-  id: 345678,
-  email: 'partnerReferral1@email.com',
-  createdAt: '2022-02-19T04:52:27+0000',
-  expiresAt: '2022-03-19T04:52:27+0000',
-  role: UserRole.partner,
-  referreeName: 'Partner Referral 1',
-  status: ReferralStatus.sent,
-  uiLanguage: 'en',
-  firstLanguages: [{ code: 'eng', language: 'English' }],
-};
-
-const partnerReferral2: Referral = {
-  id: 456789,
-  email: 'partnerReferral2@email.com',
-  createdAt: '2022-02-19T05:52:27+0000',
-  expiresAt: '2022-03-19T05:52:27+0000',
-  role: UserRole.partner,
-  referreeName: 'Partner Referral 2',
-  status: ReferralStatus.sent,
-  uiLanguage: 'en',
-  firstLanguages: [{ code: 'eng', language: 'English' }],
-};
-
-const extendedLearnerReferral1: ExtendedReferral = {
-  ...learnerReferral1,
-  ...referrer,
-};
-
-const extendedLearnerReferral2: ExtendedReferral = {
-  ...learnerReferral2,
-  ...referrer,
-};
-
-const extendedPartnerReferral1: ExtendedReferral = {
-  ...partnerReferral1,
-  ...referrer,
-};
-
-const extendedPartnerReferral2: ExtendedReferral = {
-  ...partnerReferral1,
-  ...referrer,
-};
-
-const extendedReferrals = [
-  extendedLearnerReferral1,
-  extendedLearnerReferral2,
-  extendedPartnerReferral1,
-  extendedPartnerReferral2,
-];
-
-const partialDummyReferral: Partial<Referral> = {
-  id: Math.floor(Math.random() * 10000),
-  createdAt: '2022-02-20T05:52:27+0000',
-  expiresAt: '2022-03-20T05:52:27+0000',
-  status: ReferralStatus.sent,
-};
+import {UserRole} from '../@types/enums';
+import {ExtendedReferral, PageableResponse, Referral} from '../@types/interfaces';
+import {handleError} from "../helpers/handleError";
+import {authHeader} from "../helpers/getAuthHeader";
+import apiChatloopOrg from "../config/axiosConfig";
 
 export interface PostReferralBody {
   refereeName: string;
@@ -98,49 +13,96 @@ export interface PostReferralBody {
   firstLanguage: string; // eg 'eng', 'ara', 'prs' ISO-639-3
 }
 
-export const postReferralByRole = async (
+type PostReferral = ({
+                       body,
+                       page,
+                       size
+                     }: {
   body: PostReferralBody,
-  role: UserRole
-): Promise<Referral[]> => {
-  const newReferral: Referral = {
-    ...body,
-    ...partialDummyReferral,
-  } as Referral;
-  let payload: Referral[] = [];
-  if (role === UserRole.learner) {
-    payload = [newReferral, learnerReferral1, learnerReferral2];
-  } else {
-    payload = [newReferral, partnerReferral1, partnerReferral2];
-  }
+  page: number,
+  size: number
+}) => Promise<AxiosResponse<PageableResponse<Referral>>>
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(payload), 1000);
-  });
-};
+type GetReferrals = ({
+                       page,
+                       size
+                     }: {
+  page: number,
+  size: number
+}) => Promise<AxiosResponse<PageableResponse<Referral>>>
 
-export const getReferralsByRole = async (
-  role: UserRole
-): Promise<Referral[]> => {
-  const payload =
-    role === UserRole.learner
-      ? [learnerReferral1, learnerReferral2]
-      : [partnerReferral1, partnerReferral2];
+type GetReferralById = ({
+                          referralId,
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(payload), 1500);
-  });
-};
-
-export const getReferralById = async (
+                        }: {
   referralId: number
-): Promise<ExtendedReferral> => {
-  const payload = extendedReferrals.find((r) => r.id === referralId);
+}) => Promise<AxiosResponse<ExtendedReferral>>
 
-  return new Promise((resolve, reject) => {
-    if (!payload) {
-      reject();
-    } else {
-      setTimeout(() => resolve(payload), 1500);
-    }
-  });
+interface ReferralsService {
+  postReferral: PostReferral
+  getReferrals: GetReferrals
+  getReferralById: GetReferralById
+}
+
+export const postReferral: PostReferral = async (
+  {body, size, page}
+) => {
+  console.log("service.postReferral")
+  const requestOptions = {
+    headers: {authorization: authHeader()},
+  };
+
+  try {
+    return await apiChatloopOrg.post(
+      `/rest/referrals?page=${page}&size=${size}`, body,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
 };
+
+export const getReferrals: GetReferrals = async (
+  {size, page}
+) => {
+  const requestOptions = {
+    headers: {authorization: authHeader()},
+  };
+
+  try {
+    return await apiChatloopOrg.get(
+      `/rest/referrals?page=${page}&size=${size}`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+};
+
+export const getReferralById: GetReferralById = async (
+  {referralId}
+) => {
+  const requestOptions = {
+    headers: {authorization: authHeader()},
+  };
+
+  try {
+    return await apiChatloopOrg.get(
+      `/rest/referrals/${referralId}`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+};
+
+const referralsService: ReferralsService = {
+  postReferral,
+  getReferralById,
+  getReferrals
+}
+
+export default referralsService

@@ -57,7 +57,7 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
       width: '100%',
       tableLayout: 'fixed',
     },
-    tableCell: {
+    headerTableCell: {
       color: palette.common.white,
     },
     helperTextSpacer: {
@@ -176,35 +176,35 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
                   <TableHead classes={{ root: classes.tableHead }}>
                     <TableRow classes={{ root: classes.tableRow }}>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       ></TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         ID
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         Display name
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         Current learners
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         Max learners
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         First language

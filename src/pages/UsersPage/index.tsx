@@ -27,7 +27,7 @@ const useStyles = makeStyles(({ palette }: Theme) =>
       height: '100%',
       width: '100%',
     },
-    tabs: {
+    innerContainer: {
       width: '100%',
       backgroundColor: palette.common.white,
     },
@@ -91,7 +91,7 @@ const UsersPage: FC = () => {
   // ----------------------------- Render ---------------------------------------- //
   return (
     <div className={classes.usersContainer}>
-      <div className={classes.tabs}>
+      <div className={classes.innerContainer}>
         <Tabs
           value={tab}
           onChange={(event, newValue) => {

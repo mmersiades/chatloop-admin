@@ -38,3 +38,5 @@ export const UI_LANGUAGES: UiLanguageOption[] = [
   { code: 'kar', language: 'Karen' },
   { code: 'my', language: 'Burmese' },
 ];
+
+export const DEFAULT_REFERRAL_PAGE_SIZE = 25

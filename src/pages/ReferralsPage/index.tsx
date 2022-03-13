@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
-import { createStyles, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
+import {createStyles, makeStyles, Theme} from '@material-ui/core';
 
 import ReferralDrawer from './ReferralDrawer';
 import ReferralsTable from './ReferralsTable';
 import AddReferralFab from './AddReferralFab';
 import NewReferralDrawer from './NewReferralDrawer';
 import WithNavbar from '../../components/WithNavbar';
-import { useAppNav } from '../../contexts/appNavContext';
-import { useReferrals } from '../../contexts/referralsContext';
-import { LEARNERS_TAB, PARTNERS_TAB } from '../../config/textConstants';
+import {useAppNav} from '../../contexts/appNavContext';
 
-const useStyles = makeStyles(({ palette, transitions }: Theme) =>
+const useStyles = makeStyles(({palette, transitions}: Theme) =>
   createStyles({
     referralsContainer: {
       height: '100%',
       width: '100%',
     },
-    tabs: {
+    innerContainer: {
+      height: '100%',
       width: '100%',
       backgroundColor: palette.common.white,
     },
-    tabsShift: {
+    innerContainerShift: {
       width: '70%',
       transition: transitions.create('width', {
         easing: transitions.easing.easeOut,
@@ -32,18 +31,9 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
 );
 
 const ReferralsPage = () => {
-  // ----------------------------- Component state ------------------------------ //
-  const [tab, setTab] = useState(0);
 
   // ----------------------------- Hooks ---------------------------------------- //
-  const { showReferralDrawer, showNewReferralForm, setShowReferralDrawer } =
-    useAppNav();
-  const {
-    fetchingLearners,
-    fetchingPartners,
-    learnerReferrals,
-    partnerReferrals,
-  } = useReferrals();
+  const {showReferralDrawer, showNewReferralForm} = useAppNav();
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles();
@@ -52,43 +42,15 @@ const ReferralsPage = () => {
   return (
     <div className={styles.referralsContainer}>
       <div
-        className={clsx(styles.tabs, {
-          [styles.tabsShift]: showReferralDrawer || showNewReferralForm,
+        className={clsx(styles.innerContainer, {
+          [styles.innerContainerShift]: showReferralDrawer || showNewReferralForm,
         })}
       >
-        <Tabs
-          value={tab}
-          onChange={(event, newValue) => {
-            setTab(newValue);
-            setShowReferralDrawer(null);
-          }}
-          indicatorColor="primary"
-          textColor="primary"
-          centered
-          TabIndicatorProps={{
-            style: { backgroundColor: '#45ecff', height: '8px' },
-          }}
-        >
-          <Tab label={LEARNERS_TAB} />
-          <Tab label={PARTNERS_TAB} />
-        </Tabs>
-
-        {tab === 0 && (
-          <ReferralsTable
-            referrals={learnerReferrals}
-            loading={fetchingLearners}
-          />
-        )}
-        {tab === 1 && (
-          <ReferralsTable
-            referrals={partnerReferrals}
-            loading={fetchingPartners}
-          />
-        )}
+        <ReferralsTable/>
       </div>
-      <ReferralDrawer />
-      <NewReferralDrawer />
-      <AddReferralFab />
+      <ReferralDrawer/>
+      <NewReferralDrawer/>
+      <AddReferralFab/>
     </div>
   );
 };

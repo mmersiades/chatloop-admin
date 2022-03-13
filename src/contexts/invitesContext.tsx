@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useReducer,
 } from 'react';
-import { Pageable, PartnerInQueue, Invite } from '../@types/interfaces';
+import { PartnerInQueue, Invite, PageableResponse} from '../@types/interfaces';
 import invitesService from '../services/invitesService';
 import {
   DEV_PARTNER_QUEUE_SIZE,
@@ -19,8 +19,8 @@ interface InvitesContext {
   isFetchingPartnerQueue: boolean;
   isFetchingMoreQueue: boolean;
   isFetchingInvites: boolean;
-  queuePageable?: Pageable<PartnerInQueue[]>;
-  invitesPageable?: Pageable<Invite[]>;
+  queuePageable?: PageableResponse<PartnerInQueue>;
+  invitesPageable?: PageableResponse<Invite>;
   refreshInvitesContext?: () => void;
   fetchQueue?: (page?: number, size?: number) => void;
   fetchMoreQueue?: (page: number, size?: number) => void;

@@ -1,46 +1,53 @@
+// noinspection JSIgnoredPromiseFromCall
+
 import React, {
   createContext,
   FC,
-  PropsWithChildren,
+  PropsWithChildren, useCallback,
   useContext,
   useEffect,
   useReducer,
 } from 'react';
 
-import { useAppNav } from './appNavContext';
-import {
-  getReferralById,
-  getReferralsByRole,
+import {useAppNav} from './appNavContext';
+import referralsService, {
   PostReferralBody,
-  postReferralByRole,
 } from '../services/referralsService';
-import { UserRole } from '../@types/enums';
-import { Action, ExtendedReferral, Referral } from '../@types/interfaces';
+import {Action, ExtendedReferral, PageableResponse, Referral} from '../@types/interfaces';
+import {DEFAULT_REFERRAL_PAGE_SIZE} from "../config/constants";
 
 export interface ReferralsState {
-  fetchingLearners: boolean;
-  fetchingPartners: boolean;
+  fetchingReferrals: boolean;
   fetchingReferral: boolean;
   postingReferral: boolean;
-  learnerReferrals: Referral[];
-  partnerReferrals: Referral[];
+  referrals: Referral[];
   extendedReferral?: ExtendedReferral;
+  page: number
+  size: number
+  totalReferrals: number
 }
 
 const initialState: ReferralsState = {
-  fetchingLearners: false,
-  fetchingPartners: false,
+  fetchingReferrals: false,
   fetchingReferral: false,
   postingReferral: false,
-  learnerReferrals: [],
-  partnerReferrals: [],
+  referrals: [],
+  page: 0,
+  size: DEFAULT_REFERRAL_PAGE_SIZE,
+  totalReferrals: 0,
 };
 
+type PostReferral = (body: PostReferralBody) => Promise<boolean>
+type ChangeReferralsSize = (size: number) => void
+type ChangeReferralsPage = (page: number) => void
+
 export interface ReferralsContext extends ReferralsState {
-  postReferral?: (body: PostReferralBody, role: UserRole) => Promise<boolean>;
+  postReferral?: PostReferral
+  changeReferralsSize?: ChangeReferralsSize
+  changeReferralsPage?: ChangeReferralsPage
 }
 
-const initialContext: ReferralsContext = { ...initialState };
+const initialContext: ReferralsContext = {...initialState};
 
 // eslint-disable-next-line
 export const ReferralsContext = createContext<ReferralsContext>(initialContext);
@@ -49,93 +56,80 @@ export const useReferrals = () => useContext(ReferralsContext);
 
 export const ReferralsConsumer = ReferralsContext.Consumer;
 
-interface GetLearnerReferralsRequest
-  extends Action<'GET_L_REFERRALS_REQUEST'> {}
-
-interface GetLearnerReferralsSuccess extends Action<'GET_L_REFERRALS_SUCCESS'> {
-  learnerReferrals: Referral[];
+interface GetReferralsRequest
+  extends Action<'GET_REFERRALS_REQUEST'> {
 }
 
-interface GetLearnerReferralsFailure
-  extends Action<'GET_L_REFERRALS_FAILURE'> {}
-
-interface GetPartnerReferralsRequest
-  extends Action<'GET_P_REFERRALS_REQUEST'> {}
-
-interface GetPartnerReferralsSuccess extends Action<'GET_P_REFERRALS_SUCCESS'> {
-  partnerReferrals: Referral[];
+interface GetReferralsSuccess extends Action<'GET_REFERRALS_SUCCESS'> {
+  page: PageableResponse<Referral>;
 }
 
-interface GetPartnerReferralsFailure
-  extends Action<'GET_P_REFERRALS_FAILURE'> {}
+interface GetReferralsFailure
+  extends Action<'GET_REFERRALS_FAILURE'> {
+}
 
-interface GetReferralRequest extends Action<'GET_REFERRAL_REQUEST'> {}
+interface GetReferralRequest extends Action<'GET_REFERRAL_REQUEST'> {
+}
 
 interface GetReferralSuccess extends Action<'GET_REFERRAL_SUCCESS'> {
   extendedReferral: ExtendedReferral;
 }
 
-interface GetReferralFailure extends Action<'GET_REFERRAL_FAILURE'> {}
-
-interface PostReferralRequest extends Action<'POST_REFERRAL_REQUEST'> {}
-
-interface PostReferralSuccess extends Action<'POST_REFERRAL_SUCCESS'> {
-  referrals: Referral[];
-  role: UserRole;
+interface GetReferralFailure extends Action<'GET_REFERRAL_FAILURE'> {
 }
 
-interface PostReferralFailure extends Action<'POST_REFERRAL_FAILURE'> {}
+interface PostReferralRequest extends Action<'POST_REFERRAL_REQUEST'> {
+}
+
+interface PostReferralSuccess extends Action<'POST_REFERRAL_SUCCESS'> {
+  page: PageableResponse<Referral>
+}
+
+interface PostReferralFailure extends Action<'POST_REFERRAL_FAILURE'> {
+}
+
+interface SetReferralPage extends Action<'SET_REFERRAL_PAGE'> {
+  page: number
+}
+
+interface SetReferralSize extends Action<'SET_REFERRAL_SIZE'> {
+  size: number
+}
 
 type Actions =
-  | GetLearnerReferralsRequest
-  | GetLearnerReferralsSuccess
-  | GetLearnerReferralsFailure
-  | GetPartnerReferralsRequest
-  | GetPartnerReferralsSuccess
-  | GetPartnerReferralsFailure
+  | GetReferralsRequest
+  | GetReferralsSuccess
+  | GetReferralsFailure
   | GetReferralRequest
   | GetReferralSuccess
   | GetReferralFailure
   | PostReferralRequest
   | PostReferralSuccess
-  | PostReferralFailure;
+  | PostReferralFailure
+  | SetReferralPage
+  | SetReferralSize;
 
 const referralsReducer = (
   state: ReferralsState,
   action: Actions
 ): ReferralsState => {
   switch (action.type) {
-    case 'GET_L_REFERRALS_REQUEST':
+    case 'GET_REFERRALS_REQUEST':
       return {
         ...state,
-        fetchingLearners: true,
+        fetchingReferrals: true,
       };
-    case 'GET_L_REFERRALS_SUCCESS':
+    case 'GET_REFERRALS_SUCCESS':
       return {
         ...state,
-        fetchingLearners: false,
-        learnerReferrals: action.learnerReferrals,
+        fetchingReferrals: false,
+        referrals: action.page.content,
+        totalReferrals: action.page.totalElements
       };
-    case 'GET_L_REFERRALS_FAILURE':
+    case 'GET_REFERRALS_FAILURE':
       return {
         ...state,
-        fetchingLearners: false,
-      };
-    case 'GET_P_REFERRALS_REQUEST':
-      return {
-        ...state,
-        fetchingPartners: true,
-      };
-    case 'GET_P_REFERRALS_SUCCESS':
-      return {
-        ...state,
-        fetchingPartners: false,
-        partnerReferrals: action.partnerReferrals,
-      };
-    case 'GET_P_REFERRALS_FAILURE':
-      return {
-        ...state,
-        fetchingPartners: false,
+        fetchingReferrals: false,
       };
     case 'GET_REFERRAL_REQUEST':
       return {
@@ -159,25 +153,28 @@ const referralsReducer = (
         postingReferral: true,
       };
     case 'POST_REFERRAL_SUCCESS':
-      if (action.role === UserRole.learner) {
-        return {
-          ...state,
-          postingReferral: false,
-          learnerReferrals: action.referrals,
-        };
-      } else {
-        return {
-          ...state,
-          postingReferral: false,
-          partnerReferrals: action.referrals,
-        };
+      return {
+        ...state,
+        postingReferral: false,
+        referrals: action.page.content,
+        totalReferrals: action.page.totalElements
       }
-
     case 'POST_REFERRAL_FAILURE':
       return {
         ...state,
         postingReferral: false,
       };
+    case 'SET_REFERRAL_PAGE':
+      return {
+        ...state,
+        page: action.page
+      }
+    case 'SET_REFERRAL_SIZE':
+      return {
+        ...state,
+        size: action.size,
+        page: 0
+      }
     default:
       return state;
   }
@@ -187,9 +184,11 @@ interface ReferralsProviderProps {
   injectedState?: Partial<ReferralsState>;
 }
 
-export const ReferralsProvider: FC<
-  PropsWithChildren<ReferralsProviderProps>
-> = ({ children, injectedState }) => {
+export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = ({
+                                                                                   children,
+                                                                                   injectedState
+                                                                                 }
+) => {
   // ----------------------------- Component state ------------------------------ //
   const [state, dispatch] = useReducer(referralsReducer, {
     ...initialState,
@@ -197,80 +196,92 @@ export const ReferralsProvider: FC<
   });
 
   // ----------------------------- Hooks ---------------------------------------- //
-  const { showReferralDrawer } = useAppNav();
+  const {showReferralDrawer} = useAppNav();
 
   // ----------------------------- Component functions ------------------------- //
-  const getLearnerReferrals = async () => {
-    dispatch({ type: 'GET_L_REFERRALS_REQUEST' });
+  const getReferrals = useCallback(async () => {
+    dispatch({type: 'GET_REFERRALS_REQUEST'});
 
     try {
-      const learnerReferrals = await getReferralsByRole(UserRole.learner);
+      const {status, data} = await referralsService
+        .getReferrals({page: state.page, size: state.size})
 
-      dispatch({ type: 'GET_L_REFERRALS_SUCCESS', learnerReferrals });
+      if (status === 200) {
+        dispatch({type: 'GET_REFERRALS_SUCCESS', page: data});
+
+      }
     } catch (error) {
       console.error('error', error);
-      dispatch({ type: 'GET_L_REFERRALS_FAILURE' });
+      dispatch({type: 'GET_REFERRALS_FAILURE'});
     }
-  };
-
-  const getPartnerReferrals = async () => {
-    dispatch({ type: 'GET_P_REFERRALS_REQUEST' });
-
-    try {
-      const partnerReferrals = await getReferralsByRole(UserRole.partner);
-
-      dispatch({ type: 'GET_P_REFERRALS_SUCCESS', partnerReferrals });
-    } catch (error) {
-      console.error('error', error);
-      dispatch({ type: 'GET_P_REFERRALS_FAILURE' });
-    }
-  };
+  }, [state.size, state.page]);
 
   const getReferral = async (referralId: number) => {
-    dispatch({ type: 'GET_REFERRAL_REQUEST' });
+    dispatch({type: 'GET_REFERRAL_REQUEST'});
 
     try {
-      const extendedReferral = await getReferralById(referralId);
-      dispatch({ type: 'GET_REFERRAL_SUCCESS', extendedReferral });
+      const {status, data} = await referralsService
+        .getReferralById({referralId});
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_REFERRAL_SUCCESS',
+          extendedReferral: data
+        });
+
+      } else {
+        dispatch({type: 'GET_REFERRAL_FAILURE'});
+      }
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'GET_REFERRAL_FAILURE' });
+      dispatch({type: 'GET_REFERRAL_FAILURE'});
     }
   };
 
   const postReferral = async (
     body: PostReferralBody,
-    role: UserRole
   ): Promise<boolean> => {
-    dispatch({ type: 'POST_REFERRAL_REQUEST' });
+    dispatch({type: 'POST_REFERRAL_REQUEST'});
 
     try {
-      const referrals = await postReferralByRole(body, role);
+      const {status, data} = await referralsService
+        .postReferral({
+          body,
+          page: state.page,
+          size: state.size
+        });
 
-      dispatch({ type: 'POST_REFERRAL_SUCCESS', referrals, role });
-      return true;
+      if (status === 200) {
+        dispatch({type: 'POST_REFERRAL_SUCCESS', page: data});
+        return true;
+
+      } else {
+        dispatch({type: 'POST_REFERRAL_FAILURE'});
+        return false;
+      }
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'POST_REFERRAL_FAILURE' });
+      dispatch({type: 'POST_REFERRAL_FAILURE'});
       return false;
     }
   };
 
+  const changeReferralsSize: ChangeReferralsSize = (size) => dispatch({type: "SET_REFERRAL_SIZE", size})
+
+  const changeReferralsPage: ChangeReferralsPage = (page) => dispatch({type: "SET_REFERRAL_PAGE", page})
+
   // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
-    getLearnerReferrals();
-    getPartnerReferrals();
-  }, []);
+    getReferrals()
+  }, [state.page, state.size, getReferrals]);
 
   useEffect(() => {
     showReferralDrawer && getReferral(showReferralDrawer);
   }, [showReferralDrawer]);
 
-  console.log('state', state);
-
   // ----------------------------- Render ---------------------------------------- //
   return (
-    <ReferralsContext.Provider value={{ ...state, postReferral }}>
+    <ReferralsContext.Provider value={{...state, postReferral, changeReferralsSize, changeReferralsPage}}>
       {children}
     </ReferralsContext.Provider>
   );

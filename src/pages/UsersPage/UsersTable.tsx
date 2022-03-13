@@ -52,7 +52,7 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
       width: '100%',
       tableLayout: 'fixed',
     },
-    tableCell: {
+    headerTableCell: {
       color: palette.common.white,
     },
   })
@@ -164,17 +164,17 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
         <Table size="small">
           <TableHead classes={{ root: classes.tableHead }}>
             <TableRow classes={{ root: classes.tableRow }}>
-              <TableCell classes={{ root: classes.tableCell }} align="center">
+              <TableCell classes={{ root: classes.headerTableCell }} align="center">
                 id
               </TableCell>
-              <TableCell classes={{ root: classes.tableCell }} align="center">
+              <TableCell classes={{ root: classes.headerTableCell }} align="center">
                 displayName
               </TableCell>
-              <TableCell classes={{ root: classes.tableCell }} align="center">
+              <TableCell classes={{ root: classes.headerTableCell }} align="center">
                 email
               </TableCell>
               {tableFor === UserRole.tutor && (
-                <TableCell classes={{ root: classes.tableCell }} align="center">
+                <TableCell classes={{ root: classes.headerTableCell }} align="center">
                   shift
                 </TableCell>
               )}

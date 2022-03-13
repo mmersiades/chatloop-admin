@@ -17,7 +17,6 @@ import {
 import { CloseRounded } from '@material-ui/icons';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useReferrals } from '../../contexts/referralsContext';
-import stringifyLanguages from '../../helpers/stringifyLanguages';
 import {
   FIRST_LANGUAGE,
   INTERFACE_LANGUAGE,
@@ -44,10 +43,10 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
       marginRight: spacing(2),
     },
     appbar: {
-      height: 48,
+      height: 36,
     },
     toolbar: {
-      minHeight: 48,
+      minHeight: 36,
     },
     deleteButton: {
       color: palette.error.main,
@@ -78,7 +77,9 @@ const ReferralDrawer = () => {
     return str;
   };
 
-  // ----------------------------- Render ---------------------------------------- //
+    console.log(extendedReferral);
+
+    // ----------------------------- Render ---------------------------------------- //
   return (
     <Drawer
       classes={{
@@ -115,13 +116,13 @@ const ReferralDrawer = () => {
           <ListItem>
             <ListItemText
               primary={REFEREE_NAME}
-              secondary={extendedReferral.referreeName}
+              secondary={extendedReferral.refereeName}
             />
           </ListItem>
           <ListItem>
             <ListItemText
               primary={FIRST_LANGUAGE}
-              secondary={stringifyLanguages(extendedReferral.firstLanguages)}
+              secondary={extendedReferral.firstLanguage.language}
             />
           </ListItem>
           <ListItem>

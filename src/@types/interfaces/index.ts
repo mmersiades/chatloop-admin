@@ -1,7 +1,36 @@
-import { UserRole, TutorShift, ReferralStatus } from '../enums';
+import {UserRole, TutorShift, ReferralStatus} from '../enums';
 
 export interface Action<T> {
   type: T;
+}
+
+interface PageableSort {
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
+}
+
+export interface Pageable {
+  offset: number;
+  pageNumber: number;
+  pageSize: number;
+  paged: boolean;
+  sort: PageableSort;
+  unpaged: boolean;
+}
+
+export interface PageableResponse<T> {
+  content: T[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: Pageable;
+  size: number;
+  sort: PageableSort;
+  totalElements: number
+  totalPages: number
 }
 
 export interface Referrer {
@@ -18,10 +47,10 @@ export interface Referral {
   createdAt: string;
   expiresAt: string;
   role: UserRole;
-  referreeName: string;
+  refereeName: string;
   status: ReferralStatus;
   uiLanguage: string;
-  firstLanguages: UserLanguageObject[];
+  firstLanguage: UserLanguageObject;
 }
 
 export interface UiLanguageOption {
@@ -29,7 +58,8 @@ export interface UiLanguageOption {
   language: string;
 }
 
-export interface ExtendedReferral extends Referral, Referrer {}
+export interface ExtendedReferral extends Referral, Referrer {
+}
 
 export interface User {
   id: number;
@@ -93,7 +123,7 @@ export interface UserLanguageObject {
 export interface ExpiryInterval {
   value: number;
   /**
-   * Returned from back-end as Spring time units (eg HOURS, HOUR, SECOND),
+   * Returned from back-end as Spring time units (e.g. HOURS, HOUR, SECOND),
    * but should be converted to match Moment.js's units (moment.d.ts)
    *  */
   unit?:
@@ -150,35 +180,6 @@ export interface Invite {
   sentOn: string;
   topic: string;
 }
-
-export type Pageable<T> = {
-  content: T;
-  pageable: {
-    sort: {
-      sorted: boolean;
-      unsorted: boolean;
-      empty: boolean;
-    };
-    pageSize: number;
-    pageNumber: number;
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
-  };
-  last: boolean;
-  totalPages: number;
-  totalElement: number;
-  sort: {
-    sorted: boolean;
-    unsorted: boolean;
-    empty: boolean;
-  };
-  first: boolean;
-  number: number;
-  numberOfElements: number;
-  size: number;
-  empty: boolean;
-};
 
 // An object representing a language as per [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3)
 export interface Language {

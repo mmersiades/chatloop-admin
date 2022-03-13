@@ -114,7 +114,7 @@ const NewReferralForm: FC = () => {
 
     if (!!body && !!postReferral) {
       try {
-        const isSuccess = await postReferral(body, data.role);
+        const isSuccess = await postReferral(body);
         if (isSuccess) {
           reset();
         }

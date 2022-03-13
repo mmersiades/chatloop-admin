@@ -22,7 +22,7 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
       top: 48,
       width: '30%',
       overflowY: 'unset',
-      height: 'calc(100vh - 48px)',
+      height: 'calc(100vh - 36px)',
     },
     dockedWithMenuDrawer: {
       width: 'calc((100vw - 150px) * 0.3)',
@@ -31,10 +31,10 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
       marginRight: spacing(2),
     },
     appbar: {
-      height: 48,
+      height: 36,
     },
     toolbar: {
-      minHeight: 48,
+      minHeight: 36,
     },
   })
 );
