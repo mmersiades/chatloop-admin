@@ -11,7 +11,7 @@ import React, {
 
 import {useAppNav} from './appNavContext';
 import referralsService, {
-  PostReferralBody,
+  PostReferralBody, PutReferralBody,
 } from '../services/referralsService';
 import {Action, ExtendedReferral, PageableResponse, Referral} from '../@types/interfaces';
 import {DEFAULT_REFERRAL_PAGE_SIZE} from "../config/constants";
@@ -19,7 +19,6 @@ import {DEFAULT_REFERRAL_PAGE_SIZE} from "../config/constants";
 export interface ReferralsState {
   fetchingReferrals: boolean;
   fetchingReferral: boolean;
-  postingReferral: boolean;
   referrals: Referral[];
   extendedReferral?: ExtendedReferral;
   page: number
@@ -30,19 +29,28 @@ export interface ReferralsState {
 const initialState: ReferralsState = {
   fetchingReferrals: false,
   fetchingReferral: false,
-  postingReferral: false,
   referrals: [],
   page: 0,
   size: DEFAULT_REFERRAL_PAGE_SIZE,
   totalReferrals: 0,
 };
 
+type GetReferral = (referralId: number) => void
 type PostReferral = (body: PostReferralBody) => Promise<boolean>
+type PutReferral = ({
+                      referralId,
+                      body
+                    }: {
+  referralId: number
+  body: PutReferralBody
+}) => Promise<boolean>
 type ChangeReferralsSize = (size: number) => void
 type ChangeReferralsPage = (page: number) => void
 
 export interface ReferralsContext extends ReferralsState {
+  getReferral?: GetReferral
   postReferral?: PostReferral
+  putReferral?: PutReferral
   changeReferralsSize?: ChangeReferralsSize
   changeReferralsPage?: ChangeReferralsPage
 }
@@ -88,6 +96,16 @@ interface PostReferralSuccess extends Action<'POST_REFERRAL_SUCCESS'> {
 interface PostReferralFailure extends Action<'POST_REFERRAL_FAILURE'> {
 }
 
+interface PutReferralRequest extends Action<'PUT_REFERRAL_REQUEST'> {
+}
+
+interface PutReferralSuccess extends Action<'PUT_REFERRAL_SUCCESS'> {
+  page: PageableResponse<Referral>
+}
+
+interface PutReferralFailure extends Action<'PUT_REFERRAL_FAILURE'> {
+}
+
 interface SetReferralPage extends Action<'SET_REFERRAL_PAGE'> {
   page: number
 }
@@ -106,6 +124,9 @@ type Actions =
   | PostReferralRequest
   | PostReferralSuccess
   | PostReferralFailure
+  | PutReferralRequest
+  | PutReferralSuccess
+  | PutReferralFailure
   | SetReferralPage
   | SetReferralSize;
 
@@ -150,19 +171,36 @@ const referralsReducer = (
     case 'POST_REFERRAL_REQUEST':
       return {
         ...state,
-        postingReferral: true,
+        fetchingReferral: true,
       };
     case 'POST_REFERRAL_SUCCESS':
       return {
         ...state,
-        postingReferral: false,
+        fetchingReferral: false,
         referrals: action.page.content,
         totalReferrals: action.page.totalElements
       }
     case 'POST_REFERRAL_FAILURE':
       return {
         ...state,
-        postingReferral: false,
+        fetchingReferral: false,
+      };
+    case 'PUT_REFERRAL_REQUEST':
+      return {
+        ...state,
+        fetchingReferral: true,
+      };
+    case 'PUT_REFERRAL_SUCCESS':
+      return {
+        ...state,
+        fetchingReferral: false,
+        referrals: action.page.content,
+        totalReferrals: action.page.totalElements
+      }
+    case 'PUT_REFERRAL_FAILURE':
+      return {
+        ...state,
+        fetchingReferral: false,
       };
     case 'SET_REFERRAL_PAGE':
       return {
@@ -216,7 +254,7 @@ export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = 
     }
   }, [state.size, state.page]);
 
-  const getReferral = async (referralId: number) => {
+  const getReferral: GetReferral = async (referralId) => {
     dispatch({type: 'GET_REFERRAL_REQUEST'});
 
     try {
@@ -238,9 +276,7 @@ export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = 
     }
   };
 
-  const postReferral = async (
-    body: PostReferralBody,
-  ): Promise<boolean> => {
+  const postReferral: PostReferral = async (body) => {
     dispatch({type: 'POST_REFERRAL_REQUEST'});
 
     try {
@@ -266,6 +302,33 @@ export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = 
     }
   };
 
+  const putReferral: PutReferral = async ({referralId, body}) => {
+    dispatch({type: 'PUT_REFERRAL_REQUEST'});
+
+    try {
+      const {status, data} = await referralsService
+        .putReferral({
+          referralId,
+          body,
+          page: state.page,
+          size: state.size
+        });
+
+      if (status === 200) {
+        dispatch({type: 'PUT_REFERRAL_SUCCESS', page: data});
+        return true;
+
+      } else {
+        dispatch({type: 'PUT_REFERRAL_FAILURE'});
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({type: 'PUT_REFERRAL_FAILURE'});
+      return false;
+    }
+  };
+
   const changeReferralsSize: ChangeReferralsSize = (size) => dispatch({type: "SET_REFERRAL_SIZE", size})
 
   const changeReferralsPage: ChangeReferralsPage = (page) => dispatch({type: "SET_REFERRAL_PAGE", page})
@@ -281,7 +344,14 @@ export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = 
 
   // ----------------------------- Render ---------------------------------------- //
   return (
-    <ReferralsContext.Provider value={{...state, postReferral, changeReferralsSize, changeReferralsPage}}>
+    <ReferralsContext.Provider value={{
+      ...state,
+      getReferral,
+      postReferral,
+      putReferral,
+      changeReferralsSize,
+      changeReferralsPage
+    }}>
       {children}
     </ReferralsContext.Provider>
   );

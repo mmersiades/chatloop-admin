@@ -13,6 +13,9 @@ export interface PostReferralBody {
   firstLanguage: string; // eg 'eng', 'ara', 'prs' ISO-639-3
 }
 
+export interface PutReferralBody extends PostReferralBody {
+}
+
 type PostReferral = ({
                        body,
                        page,
@@ -20,6 +23,18 @@ type PostReferral = ({
                      }: {
   body: PostReferralBody,
   page: number,
+  size: number
+}) => Promise<AxiosResponse<PageableResponse<Referral>>>
+
+type PutReferral = ({
+                      referralId,
+                      body,
+                      page,
+                      size,
+                    }: {
+  referralId: number
+  body: PutReferralBody
+  page: number
   size: number
 }) => Promise<AxiosResponse<PageableResponse<Referral>>>
 
@@ -40,6 +55,7 @@ type GetReferralById = ({
 
 interface ReferralsService {
   postReferral: PostReferral
+  putReferral: PutReferral
   getReferrals: GetReferrals
   getReferralById: GetReferralById
 }
@@ -47,7 +63,6 @@ interface ReferralsService {
 export const postReferral: PostReferral = async (
   {body, size, page}
 ) => {
-  console.log("service.postReferral")
   const requestOptions = {
     headers: {authorization: authHeader()},
   };
@@ -62,6 +77,24 @@ export const postReferral: PostReferral = async (
   }
   return Promise.reject();
 };
+
+export const putReferral: PutReferral = async (
+  {referralId, body, size, page}
+) => {
+  const requestOptions = {
+    headers: {authorization: authHeader()},
+  };
+
+  try {
+    return await apiChatloopOrg.put(
+      `/rest/referrals/${referralId}?page=${page}&size=${size}`, body,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+}
 
 export const getReferrals: GetReferrals = async (
   {size, page}
@@ -101,6 +134,7 @@ export const getReferralById: GetReferralById = async (
 
 const referralsService: ReferralsService = {
   postReferral,
+  putReferral,
   getReferralById,
   getReferrals
 }
