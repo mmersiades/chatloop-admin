@@ -44,6 +44,7 @@ type PutReferral = ({
   referralId: number
   body: PutReferralBody
 }) => Promise<boolean>
+type DeleteReferral = (referralId: number) => Promise<boolean>
 type ChangeReferralsSize = (size: number) => void
 type ChangeReferralsPage = (page: number) => void
 
@@ -51,6 +52,7 @@ export interface ReferralsContext extends ReferralsState {
   getReferral?: GetReferral
   postReferral?: PostReferral
   putReferral?: PutReferral
+  deleteReferral?: DeleteReferral
   changeReferralsSize?: ChangeReferralsSize
   changeReferralsPage?: ChangeReferralsPage
 }
@@ -106,6 +108,16 @@ interface PutReferralSuccess extends Action<'PUT_REFERRAL_SUCCESS'> {
 interface PutReferralFailure extends Action<'PUT_REFERRAL_FAILURE'> {
 }
 
+interface DeleteReferralRequest extends Action<'DELETE_REFERRAL_REQUEST'> {
+}
+
+interface DeleteReferralSuccess extends Action<'DELETE_REFERRAL_SUCCESS'> {
+  page: PageableResponse<Referral>
+}
+
+interface DeleteReferralFailure extends Action<'DELETE_REFERRAL_FAILURE'> {
+}
+
 interface SetReferralPage extends Action<'SET_REFERRAL_PAGE'> {
   page: number
 }
@@ -127,6 +139,9 @@ type Actions =
   | PutReferralRequest
   | PutReferralSuccess
   | PutReferralFailure
+  | DeleteReferralRequest
+  | DeleteReferralSuccess
+  | DeleteReferralFailure
   | SetReferralPage
   | SetReferralSize;
 
@@ -168,11 +183,19 @@ const referralsReducer = (
         ...state,
         fetchingReferral: false,
       };
+    case 'PUT_REFERRAL_REQUEST':
+    // Deliberately falls through
+    case "DELETE_REFERRAL_REQUEST":
+    // Deliberately falls through
     case 'POST_REFERRAL_REQUEST':
       return {
         ...state,
         fetchingReferral: true,
       };
+    case 'PUT_REFERRAL_SUCCESS':
+    // Deliberately falls through
+    case "DELETE_REFERRAL_SUCCESS":
+    // Deliberately falls through
     case 'POST_REFERRAL_SUCCESS':
       return {
         ...state,
@@ -180,24 +203,11 @@ const referralsReducer = (
         referrals: action.page.content,
         totalReferrals: action.page.totalElements
       }
-    case 'POST_REFERRAL_FAILURE':
-      return {
-        ...state,
-        fetchingReferral: false,
-      };
-    case 'PUT_REFERRAL_REQUEST':
-      return {
-        ...state,
-        fetchingReferral: true,
-      };
-    case 'PUT_REFERRAL_SUCCESS':
-      return {
-        ...state,
-        fetchingReferral: false,
-        referrals: action.page.content,
-        totalReferrals: action.page.totalElements
-      }
     case 'PUT_REFERRAL_FAILURE':
+    // Deliberately falls through
+    case 'DELETE_REFERRAL_FAILURE':
+    // Deliberately falls through
+    case 'POST_REFERRAL_FAILURE':
       return {
         ...state,
         fetchingReferral: false,
@@ -329,6 +339,32 @@ export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = 
     }
   };
 
+  const deleteReferral: DeleteReferral = async (referralId) => {
+    dispatch({type: 'DELETE_REFERRAL_REQUEST'});
+
+    try {
+      const {status, data} = await referralsService
+        .deleteReferral({
+          referralId,
+          page: state.page,
+          size: state.size
+        });
+
+      if (status === 200) {
+        dispatch({type: 'DELETE_REFERRAL_SUCCESS', page: data});
+        return true;
+
+      } else {
+        dispatch({type: 'DELETE_REFERRAL_FAILURE'});
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({type: 'DELETE_REFERRAL_FAILURE'});
+      return false;
+    }
+  };
+
   const changeReferralsSize: ChangeReferralsSize = (size) => dispatch({type: "SET_REFERRAL_SIZE", size})
 
   const changeReferralsPage: ChangeReferralsPage = (page) => dispatch({type: "SET_REFERRAL_PAGE", page})
@@ -349,6 +385,7 @@ export const ReferralsProvider: FC<PropsWithChildren<ReferralsProviderProps>> = 
       getReferral,
       postReferral,
       putReferral,
+      deleteReferral,
       changeReferralsSize,
       changeReferralsPage
     }}>

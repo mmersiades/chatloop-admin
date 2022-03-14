@@ -53,11 +53,22 @@ type GetReferralById = ({
   referralId: number
 }) => Promise<AxiosResponse<ExtendedReferral>>
 
+type DeleteReferral = ({
+                         referralId,
+                         page,
+                         size
+                       }: {
+  referralId: number
+  page: number,
+  size: number
+}) => Promise<AxiosResponse<PageableResponse<Referral>>>
+
 interface ReferralsService {
   postReferral: PostReferral
   putReferral: PutReferral
   getReferrals: GetReferrals
   getReferralById: GetReferralById
+  deleteReferral: DeleteReferral
 }
 
 export const postReferral: PostReferral = async (
@@ -132,11 +143,30 @@ export const getReferralById: GetReferralById = async (
   return Promise.reject();
 };
 
+export const deleteReferral: DeleteReferral = async (
+  {referralId, size, page}
+) => {
+  const requestOptions = {
+    headers: {authorization: authHeader()},
+  };
+
+  try {
+    return await apiChatloopOrg.delete(
+      `/rest/referrals/${referralId}?page=${page}&size=${size}`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+}
+
 const referralsService: ReferralsService = {
   postReferral,
   putReferral,
   getReferralById,
-  getReferrals
+  getReferrals,
+  deleteReferral
 }
 
 export default referralsService

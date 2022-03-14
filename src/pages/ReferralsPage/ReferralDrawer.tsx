@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import {
-  AppBar,
+  AppBar, Button,
   CircularProgress,
   createStyles,
   Drawer,
@@ -37,14 +37,13 @@ const useStyles = makeStyles(({spacing, palette}: Theme) =>
     toolbar: {
       minHeight: 36,
     },
-
     spinnerContainer: {
       height: '100%',
       width: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-    },
+    }
   })
 );
 
@@ -90,9 +89,7 @@ const ReferralDrawer = () => {
           <CircularProgress color="primary"/>
         </div>
       ) : (
-        <>
-          <ReferralForm type="edit" extendedReferral={extendedReferral}/>
-        </>
+        <ReferralForm type="edit" extendedReferral={extendedReferral}/>
       )}
     </Drawer>
   );

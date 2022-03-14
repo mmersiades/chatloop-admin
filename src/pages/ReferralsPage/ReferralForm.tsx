@@ -64,6 +64,8 @@ const useStyles = makeStyles(({spacing, palette}) => {
         width: '100%'
       },
       deleteButton: {
+        width: '100%',
+        marginTop: spacing(2),
         color: palette.error.main,
       },
     })
@@ -124,7 +126,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
   // ----------------------------- Hooks ---------------------------------------- //
   const {languages} = useLanguages();
   const {setShowReferralDrawer} = useAppNav()
-  const {postReferral, putReferral, getReferral, fetchingReferral} = useReferrals();
+  const {fetchingReferral, postReferral, putReferral, deleteReferral} = useReferrals();
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles(type);
@@ -205,6 +207,16 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
     }
     return str;
   };
+
+  const handleDelete = async () => {
+    if (extendedReferral && deleteReferral) {
+      const isDeleted = await deleteReferral(extendedReferral.id)
+      if (isDeleted) {
+        alert(`Referral for ${extendedReferral.refereeName} has been deleted`)
+        setShowReferralDrawer(null)
+      }
+    }
+  }
 
   // ----------------------------- Render ---------------------------------------- //
   return (
@@ -360,6 +372,16 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
       >
         {type === "create" ? "CREATE REFERRAL" : "SUBMIT CHANGES"}
       </Button>
+      {type === "edit" && extendedReferral && (
+        <Button
+          classes={{root: styles.deleteButton}}
+          variant="outlined"
+          disabled={fetchingReferral}
+          onClick={handleDelete}
+        >
+          DELETE REFERRAL
+        </Button>
+      )}
     </form>
   );
 };
