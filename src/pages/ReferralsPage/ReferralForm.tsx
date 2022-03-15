@@ -1,8 +1,8 @@
-import React, {FC} from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
-import {yupResolver} from '@hookform/resolvers/yup';
-import ReactSelect, {OptionTypeBase} from 'react-select';
-import {Controller, useForm} from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import ReactSelect, { OptionTypeBase } from 'react-select';
+import { Controller, useForm } from 'react-hook-form';
 import {
   makeStyles,
   createStyles,
@@ -15,17 +15,20 @@ import {
   Button,
   ListItem,
   ListItemText,
-  List
+  List,
 } from '@material-ui/core';
 
-import {useLanguages} from '../../contexts/languagesContext';
-import {useReferrals} from '../../contexts/referralsContext';
-import {useAppNav} from "../../contexts/appNavContext";
-import {PostReferralBody, PutReferralBody} from '../../services/referralsService';
-import {UserRole} from '../../@types/enums';
-import {ExtendedReferral} from "../../@types/interfaces";
-import {getReadableRoles} from '../../helpers/getReadableRoles';
-import {handleError} from '../../helpers/handleError';
+import { useLanguages } from '../../contexts/languagesContext';
+import { useReferrals } from '../../contexts/referralsContext';
+import { useAppNav } from '../../contexts/appNavContext';
+import {
+  PostReferralBody,
+  PutReferralBody,
+} from '../../services/referralsService';
+import { UserRole } from '../../@types/enums';
+import { ExtendedReferral } from '../../@types/interfaces';
+import { getReadableRoles } from '../../helpers/getReadableRoles';
+import { handleError } from '../../helpers/handleError';
 import {
   EMAIL_FORM_HELPER,
   FIRST_LANG_FORM_HELPER,
@@ -36,8 +39,8 @@ import {
 } from '../../config/textConstants';
 
 interface Props {
-  type: "create" | "edit"
-  extendedReferral?: ExtendedReferral
+  type: 'create' | 'edit';
+  extendedReferral?: ExtendedReferral;
 }
 
 export interface FormValues {
@@ -47,30 +50,29 @@ export interface FormValues {
   firstLanguage: OptionTypeBase; // eg 'eng', 'ara', 'prs' ISO-639-3
 }
 
-const useStyles = makeStyles(({spacing, palette}) => {
-    return createStyles({
-      formContainer: {
-        padding: '12px',
-        overflowY: 'auto',
-        height: '100%',
-      },
-      helperTextSpacer: {
-        height: 22,
-      },
-      fieldContainer: {
-        marginBottom: spacing(2),
-      },
-      button: {
-        width: '100%'
-      },
-      deleteButton: {
-        width: '100%',
-        marginTop: spacing(2),
-        color: palette.error.main,
-      },
-    })
-  }
-);
+const useStyles = makeStyles(({ spacing, palette }) => {
+  return createStyles({
+    formContainer: {
+      padding: '12px',
+      overflowY: 'auto',
+      height: '100%',
+    },
+    helperTextSpacer: {
+      height: 22,
+    },
+    fieldContainer: {
+      marginBottom: spacing(2),
+    },
+    button: {
+      width: '100%',
+    },
+    deleteButton: {
+      width: '100%',
+      marginTop: spacing(2),
+      color: palette.error.main,
+    },
+  });
+});
 
 const defaultValues: FormValues = {
   refereeName: '',
@@ -82,7 +84,7 @@ const defaultValues: FormValues = {
   },
 };
 
-const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
+const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   // ----------------------------- 3rd party hooks ------------------------------- //
   const referralSchema = Yup.object().shape({
     refereeName: Yup.string()
@@ -107,15 +109,17 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
     refereeName: extendedReferral?.refereeName || defaultValues.refereeName,
     refereeEmail: extendedReferral?.email || defaultValues.refereeEmail,
     role: extendedReferral?.role || defaultValues.role,
-    firstLanguage: extendedReferral?.firstLanguage ? {
-      label: extendedReferral.firstLanguage.language,
-      value: extendedReferral.firstLanguage.code
-    } : defaultValues.firstLanguage
-  }
+    firstLanguage: extendedReferral?.firstLanguage
+      ? {
+          label: extendedReferral.firstLanguage.language,
+          value: extendedReferral.firstLanguage.code,
+        }
+      : defaultValues.firstLanguage,
+  };
 
   const {
     handleSubmit,
-    formState: {errors, touchedFields, dirtyFields, isSubmitting},
+    formState: { errors, touchedFields, dirtyFields, isSubmitting },
     reset,
     control,
   } = useForm<FormValues>({
@@ -124,14 +128,14 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
   });
 
   // ----------------------------- Hooks ---------------------------------------- //
-  const {languages} = useLanguages();
-  const {setShowReferralDrawer} = useAppNav()
+  const { languages } = useLanguages();
+  const { setShowReferralDrawer } = useAppNav();
   const {
     fetchingReferral,
     postReferral,
     putReferral,
     getReferral,
-    deleteReferral
+    deleteReferral,
   } = useReferrals();
 
   // ----------------------------- Component functions ------------------------- //
@@ -139,34 +143,38 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
 
   const disableButton = (): boolean => {
     if (type === 'create') {
-      return isSubmitting ||
+      return (
+        isSubmitting ||
         !!errors.refereeName ||
         !!errors.refereeEmail ||
         !!errors.role ||
         !!errors.firstLanguage ||
         !touchedFields.refereeName ||
-        !touchedFields.refereeEmail;
+        !touchedFields.refereeEmail
+      );
     } else {
-      const somethingDirty = dirtyFields.refereeName ||
+      const somethingDirty =
+        dirtyFields.refereeName ||
         dirtyFields.refereeEmail ||
         dirtyFields.role ||
-        dirtyFields.firstLanguage
+        dirtyFields.firstLanguage;
 
-      if (isSubmitting ||
+      if (
+        isSubmitting ||
         !!errors.refereeName ||
         !!errors.refereeEmail ||
         !!errors.role ||
-        !!errors.firstLanguage) {
-        return true
+        !!errors.firstLanguage
+      ) {
+        return true;
       }
 
       return !somethingDirty;
     }
-  }
-
+  };
 
   const onSubmit = handleSubmit(async (data) => {
-    if (type === "create") {
+    if (type === 'create') {
       const body: PostReferralBody = {
         ...data,
         firstLanguage: data.firstLanguage.value,
@@ -192,9 +200,12 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
 
       if (!!body && !!putReferral && !!extendedReferral) {
         try {
-          const isSuccess = await putReferral({referralId: extendedReferral.id, body});
+          const isSuccess = await putReferral({
+            referralId: extendedReferral.id,
+            body,
+          });
           if (isSuccess) {
-            getReferral && getReferral(extendedReferral.id)
+            getReferral && getReferral(extendedReferral.id);
           }
         } catch (error) {
           handleError(error);
@@ -215,13 +226,13 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
 
   const handleDelete = async () => {
     if (extendedReferral && deleteReferral) {
-      const isDeleted = await deleteReferral(extendedReferral.id)
+      const isDeleted = await deleteReferral(extendedReferral.id);
       if (isDeleted) {
-        alert(`Referral for ${extendedReferral.refereeName} has been deleted`)
-        setShowReferralDrawer(null)
+        alert(`Referral for ${extendedReferral.refereeName} has been deleted`);
+        setShowReferralDrawer(null);
       }
     }
-  }
+  };
 
   // ----------------------------- Render ---------------------------------------- //
   return (
@@ -230,7 +241,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         <Controller
           name="refereeName"
           control={control}
-          render={({field}) => (
+          render={({ field }) => (
             <>
               <TextField
                 {...field}
@@ -257,7 +268,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         <Controller
           name="refereeEmail"
           control={control}
-          render={({field}) => (
+          render={({ field }) => (
             <>
               <TextField
                 {...field}
@@ -284,8 +295,8 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         <Controller
           name="role"
           control={control}
-          render={({field}) => (
-            <FormControl fullWidth style={{marginTop: '8px'}}>
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
               <InputLabel id="role-label-id" variant="outlined">
                 Role
               </InputLabel>
@@ -306,7 +317,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
               {touchedFields.role && errors.role ? (
                 <FormHelperText error>{errors.role.message}</FormHelperText>
               ) : (
-                <div className={styles.helperTextSpacer}/>
+                <div className={styles.helperTextSpacer} />
               )}
             </FormControl>
           )}
@@ -317,14 +328,14 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         <Controller
           name="firstLanguage"
           control={control}
-          render={({field}) => (
-            <FormControl fullWidth style={{marginTop: '8px'}}>
+          render={({ field }) => (
+            <FormControl fullWidth style={{ marginTop: '8px' }}>
               <ReactSelect
                 {...field}
                 id="first-language-select"
                 styles={{
                   // Fixes the overlapping problem of the component
-                  menu: (provided) => ({...provided, zIndex: 10}),
+                  menu: (provided) => ({ ...provided, zIndex: 10 }),
                 }}
                 options={languages.map((option) => ({
                   label: option.language,
@@ -343,7 +354,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
           )}
         />
       </div>
-      {type === "edit" && extendedReferral && (
+      {type === 'edit' && extendedReferral && (
         <List>
           <ListItem disableGutters>
             <ListItemText
@@ -369,19 +380,19 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         </List>
       )}
       <Button
-        aria-label={type === "create" ? "Create referral" : "Submit changes"}
+        aria-label={type === 'create' ? 'Create referral' : 'Submit changes'}
         type="submit"
         color="secondary"
         variant="contained"
         disabled={disableButton() || fetchingReferral}
-        classes={{root: styles.button}}
+        classes={{ root: styles.button }}
       >
-        {type === "create" ? "CREATE REFERRAL" : "SUBMIT CHANGES"}
+        {type === 'create' ? 'CREATE REFERRAL' : 'SUBMIT CHANGES'}
       </Button>
-      {type === "edit" && extendedReferral && (
+      {type === 'edit' && extendedReferral && (
         <Button
           aria-label="Delete referral"
-          classes={{root: styles.deleteButton}}
+          classes={{ root: styles.deleteButton }}
           variant="outlined"
           disabled={fetchingReferral}
           onClick={handleDelete}

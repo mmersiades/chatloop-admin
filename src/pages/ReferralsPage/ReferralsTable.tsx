@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, { FC } from 'react';
 import clsx from 'clsx';
 import {
   CircularProgress,
@@ -17,12 +17,12 @@ import {
 } from '@material-ui/core';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 
-import {useAppNav} from '../../contexts/appNavContext';
-import {Referral} from '../../@types/interfaces';
-import {useReferrals} from "../../contexts/referralsContext";
-import {getReadableRoles} from "../../helpers/getReadableRoles";
+import { useAppNav } from '../../contexts/appNavContext';
+import { Referral } from '../../@types/interfaces';
+import { useReferrals } from '../../contexts/referralsContext';
+import { getReadableRoles } from '../../helpers/getReadableRoles';
 
-const useStyles = makeStyles(({palette, transitions}: Theme) =>
+const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
     tableContainer: {
       height: 'calc(100vh - 48px)',
@@ -68,10 +68,10 @@ const useStyles = makeStyles(({palette, transitions}: Theme) =>
       width: '90px',
     },
     roleCell: {
-      width: '90px'
+      width: '90px',
     },
     expiresAtCell: {
-      width: '110px'
+      width: '110px',
     },
     spinnerContainer: {
       height: 'calc(100vh - 48px)',
@@ -83,16 +83,11 @@ const useStyles = makeStyles(({palette, transitions}: Theme) =>
   })
 );
 
-interface Props {
-
-}
+interface Props {}
 
 const ReferralsTable: FC<Props> = () => {
   // ----------------------------- Hooks ---------------------------------------- //
-  const {
-    setShowReferralDrawer,
-    setShowNewReferralForm,
-  } = useAppNav();
+  const { setShowReferralDrawer, setShowNewReferralForm } = useAppNav();
 
   const {
     fetchingReferrals,
@@ -101,83 +96,72 @@ const ReferralsTable: FC<Props> = () => {
     page,
     size,
     changeReferralsPage,
-    changeReferralsSize
-  } = useReferrals()
+    changeReferralsSize,
+  } = useReferrals();
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles();
 
   const handleChangePage = (event: any, newPage: number) =>
-    changeReferralsPage && changeReferralsPage(newPage)
-
+    changeReferralsPage && changeReferralsPage(newPage);
 
   const handleChangeRowsPerPage = (event: any) =>
-    changeReferralsSize && changeReferralsSize(event.target.value)
+    changeReferralsSize && changeReferralsSize(event.target.value);
 
   // ----------------------------- Render ---------------------------------------- //
   const renderTableHead = () => (
-    <TableHead classes={{root: styles.tableHead}}>
-      <TableRow classes={{root: styles.tableRow}}>
+    <TableHead classes={{ root: styles.tableHead }}>
+      <TableRow classes={{ root: styles.tableRow }}>
         <TableCell
-          classes={{root: clsx(styles.headerTableCell, styles.idCell)}}
+          classes={{ root: clsx(styles.headerTableCell, styles.idCell) }}
           align="center"
         >
           id
         </TableCell>
         <TableCell
-          classes={{root: clsx(styles.roleCell, styles.headerTableCell)}}
+          classes={{ root: clsx(styles.roleCell, styles.headerTableCell) }}
           align="center"
         >
           role
         </TableCell>
-        <TableCell
-          classes={{root: styles.headerTableCell}}
-          align="center"
-        >
+        <TableCell classes={{ root: styles.headerTableCell }} align="center">
           refereeName
         </TableCell>
-        <TableCell
-          classes={{root: styles.headerTableCell}}
-          align="center"
-        >
+        <TableCell classes={{ root: styles.headerTableCell }} align="center">
           email
         </TableCell>
         <TableCell
-          classes={{root: clsx(styles.expiresAtCell, styles.headerTableCell)}}
+          classes={{ root: clsx(styles.expiresAtCell, styles.headerTableCell) }}
           align="center"
         >
           expiresAt
         </TableCell>
       </TableRow>
     </TableHead>
-  )
+  );
 
   return (
     <>
       {fetchingReferrals ? (
         <>
-
-          <Table size="small">
-            {renderTableHead()}
-          </Table>
+          <Table size="small">{renderTableHead()}</Table>
 
           <div className={styles.spinnerContainer}>
-            <CircularProgress color="primary"/>
+            <CircularProgress color="primary" />
           </div>
         </>
       ) : (
         <TableContainer
-          classes={{root: styles.tableContainer}}
+          classes={{ root: styles.tableContainer }}
           component={Paper}
         >
           <Table size="small">
-
             {renderTableHead()}
 
-            <TableBody classes={{root: styles.tableBody}}>
+            <TableBody classes={{ root: styles.tableBody }}>
               {referrals.map((referral: Referral) => (
                 <TableRow
-                  classes={{root: styles.tableRow}}
+                  classes={{ root: styles.tableRow }}
                   key={referral.id}
                   hover
                   onClick={() => {
@@ -186,32 +170,34 @@ const ReferralsTable: FC<Props> = () => {
                   }}
                 >
                   <TableCell
-                    classes={{root: clsx(styles.tableCell, styles.idCell)}}
+                    classes={{ root: clsx(styles.tableCell, styles.idCell) }}
                     align="center"
                   >
                     {referral.id}
                   </TableCell>
                   <TableCell
                     align="center"
-                    classes={{root: clsx(styles.roleCell, styles.tableCell)}}
+                    classes={{ root: clsx(styles.roleCell, styles.tableCell) }}
                   >
                     {getReadableRoles(referral.role)}
                   </TableCell>
                   <TableCell
                     align="center"
-                    classes={{root: styles.tableCell}}
+                    classes={{ root: styles.tableCell }}
                   >
                     {referral.refereeName}
                   </TableCell>
                   <TableCell
                     align="center"
-                    classes={{root: styles.tableCell}}
+                    classes={{ root: styles.tableCell }}
                   >
                     {referral.email}
                   </TableCell>
                   <TableCell
                     align="center"
-                    classes={{root: clsx(styles.expiresAtCell, styles.tableCell)}}
+                    classes={{
+                      root: clsx(styles.expiresAtCell, styles.tableCell),
+                    }}
                   >
                     {referral.expiresAt.split('T')[0]}
                   </TableCell>

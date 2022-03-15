@@ -7,10 +7,13 @@ import apiChatloopOrg from '../config/axiosConfig';
 import { refreshHeader, authHeader } from '../helpers/getAuthHeader';
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-const loginWithCredentials = async (username: string, password: string): Promise<{ isAuthError: boolean }> => {
+const loginWithCredentials = async (
+  username: string,
+  password: string
+): Promise<{ isAuthError: boolean }> => {
   const body = {
     username: username,
-    password: password
+    password: password,
   };
 
   try {
@@ -29,11 +32,15 @@ const loginWithCredentials = async (username: string, password: string): Promise
 /** Uses **axios** to log the User in using a refresh token. */
 const loginWithToken = async () => {
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: refreshHeader() }
+    headers: { authorization: refreshHeader() },
   };
 
   try {
-    const response = await apiChatloopOrg.post('/rest/login', undefined, requestOptions);
+    const response = await apiChatloopOrg.post(
+      '/rest/login',
+      undefined,
+      requestOptions
+    );
     if (response.status === 200) {
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('loginToken', response.data.refreshToken);
@@ -60,7 +67,7 @@ const renewTokens = () => {
   }
 
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: refreshHeader() }
+    headers: { authorization: refreshHeader() },
   };
 
   if (elapsed && elapsed > 300000) {
@@ -91,15 +98,19 @@ const renewTokens = () => {
  * @param newPassword The soon-to-be password
  * @param confirmPassword Should be a repeat of `newPassword` for confirmation
  */
-function updatePassword(password: string, newPassword: string, confirmPassword: string): Promise<AxiosResponse> {
+function updatePassword(
+  password: string,
+  newPassword: string,
+  confirmPassword: string
+): Promise<AxiosResponse> {
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: authHeader() }
+    headers: { authorization: authHeader() },
   };
 
   const body = {
     password: password,
     newPassword: newPassword,
-    confirmPassword: confirmPassword
+    confirmPassword: confirmPassword,
   };
 
   return apiChatloopOrg.post('/rest/user/password', body, requestOptions);
@@ -125,7 +136,7 @@ const authService = {
   loginWithCredentials,
   loginWithToken,
   updatePassword,
-  logout
+  logout,
 };
 
 export default authService;

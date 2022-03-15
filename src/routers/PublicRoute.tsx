@@ -35,7 +35,11 @@ interface IPublicRouteProps {
  * If user is logged in, the wrapper redirects paths to the
  * ChatPage component.
  */
-export const PublicRoute = ({ component: Component, path, ...rest }: IPublicRouteProps): JSX.Element => {
+export const PublicRoute = ({
+  component: Component,
+  path,
+  ...rest
+}: IPublicRouteProps): JSX.Element => {
   // Determines login status by looking for JWT in localStorage
   const token: string | null = localStorage.getItem('loginToken');
 
@@ -45,7 +49,9 @@ export const PublicRoute = ({ component: Component, path, ...rest }: IPublicRout
   return (
     <Route
       path={path}
-      render={(routeProps: RouteProps) => (token ? <Redirect to={to} /> : <Component {...routeProps} {...rest} />)}
+      render={(routeProps: RouteProps) =>
+        token ? <Redirect to={to} /> : <Component {...routeProps} {...rest} />
+      }
     />
   );
 };

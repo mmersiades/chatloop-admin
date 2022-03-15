@@ -10,13 +10,13 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core';
-import {CloseRounded} from '@material-ui/icons';
+import { CloseRounded } from '@material-ui/icons';
 
 import ReferralForm from './ReferralForm';
-import {NEW_REFERRAL_TITLE} from '../../config/textConstants';
-import {useAppNav} from '../../contexts/appNavContext';
+import { NEW_REFERRAL_TITLE } from '../../config/textConstants';
+import { useAppNav } from '../../contexts/appNavContext';
 
-const useStyles = makeStyles(({spacing, palette}: Theme) =>
+const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
     docked: {
       top: 48,
@@ -41,7 +41,7 @@ const useStyles = makeStyles(({spacing, palette}: Theme) =>
 
 const NewReferralDrawer = () => {
   // ----------------------------- Hooks ---------------------------------------- //
-  const {showMenuDrawer, showNewReferralForm, setShowNewReferralForm} =
+  const { showMenuDrawer, showNewReferralForm, setShowNewReferralForm } =
     useAppNav();
 
   // ----------------------------- Component functions ------------------------- //
@@ -59,8 +59,8 @@ const NewReferralDrawer = () => {
       anchor="right"
       variant="persistent"
     >
-      <AppBar classes={{root: styles.appbar}} position="relative">
-        <Toolbar classes={{dense: styles.toolbar}} variant="dense">
+      <AppBar classes={{ root: styles.appbar }} position="relative">
+        <Toolbar classes={{ dense: styles.toolbar }} variant="dense">
           <IconButton
             color="inherit"
             aria-label="Close drawer button"
@@ -68,12 +68,12 @@ const NewReferralDrawer = () => {
             edge="start"
             className={styles.closeButton}
           >
-            <CloseRounded/>
+            <CloseRounded />
           </IconButton>
           <Typography>{NEW_REFERRAL_TITLE}</Typography>
         </Toolbar>
       </AppBar>
-      <ReferralForm type="create"/>
+      <ReferralForm type="create" />
     </Drawer>
   );
 };

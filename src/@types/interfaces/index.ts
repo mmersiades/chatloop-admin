@@ -1,4 +1,4 @@
-import {UserRole, TutorShift, ReferralStatus} from '../enums';
+import { UserRole, TutorShift, ReferralStatus } from '../enums';
 
 export interface Action<T> {
   type: T;
@@ -29,8 +29,8 @@ export interface PageableResponse<T> {
   pageable: Pageable;
   size: number;
   sort: PageableSort;
-  totalElements: number
-  totalPages: number
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface Referrer {
@@ -58,8 +58,7 @@ export interface UiLanguageOption {
   language: string;
 }
 
-export interface ExtendedReferral extends Referral, Referrer {
-}
+export interface ExtendedReferral extends Referral, Referrer {}
 
 export interface User {
   id: number;

@@ -1,5 +1,5 @@
-import React from "react";
-import WithNavbar from "../../components/WithNavbar";
+import React from 'react';
+import WithNavbar from '../../components/WithNavbar';
 
 const DashboardPage = () => {
   return <div>Dashboard</div>;

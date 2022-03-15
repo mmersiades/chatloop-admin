@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useReducer,
 } from 'react';
-import { PartnerInQueue, Invite, PageableResponse} from '../@types/interfaces';
+import { PartnerInQueue, Invite, PageableResponse } from '../@types/interfaces';
 import invitesService from '../services/invitesService';
 import {
   DEV_PARTNER_QUEUE_SIZE,

@@ -43,7 +43,9 @@
     "test:ci": "npm test -- --ci && npm run cypress:all",
     "test:combined": "npm test a -- --watchAll=false && npm run cypress:all",
     "test:coverage": "npm run clear:nyc && npm run test:combined && node ./scripts/mergeCoverage.js && open coverage-combined/lcov-report/index.html",
-    "clear:nyc": "if [ -d '.nyc_output/' ]; then rm -rf .nyc_output/; fi"
+    "clear:nyc": "if [ -d '.nyc_output/' ]; then rm -rf .nyc_output/; fi",
+    "prettier:check": "yarn prettier --check .",
+    "prettier:write": "yarn prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -82,6 +84,7 @@
     "cypress-localstorage-commands": "^1.4.5",
     "env-cmd": "^10.1.0",
     "moxios": "^0.4.0",
+    "prettier": "^2.5.1",
     "typescript": "^4.3.2"
   },
   "nyc": {
@@ -92,5 +95,11 @@
     "coverageReporters": [
       "json"
     ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "singleQuote": true,
+    "arrowParens": "always",
+    "semi": true
   }
 }

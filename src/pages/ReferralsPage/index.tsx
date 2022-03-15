@@ -1,15 +1,15 @@
 import React from 'react';
 import clsx from 'clsx';
-import {createStyles, makeStyles, Theme} from '@material-ui/core';
+import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 import ReferralDrawer from './ReferralDrawer';
 import ReferralsTable from './ReferralsTable';
 import AddReferralFab from './AddReferralFab';
 import NewReferralDrawer from './NewReferralDrawer';
 import WithNavbar from '../../components/WithNavbar';
-import {useAppNav} from '../../contexts/appNavContext';
+import { useAppNav } from '../../contexts/appNavContext';
 
-const useStyles = makeStyles(({palette, transitions}: Theme) =>
+const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
     referralsContainer: {
       height: '100%',
@@ -31,9 +31,8 @@ const useStyles = makeStyles(({palette, transitions}: Theme) =>
 );
 
 const ReferralsPage = () => {
-
   // ----------------------------- Hooks ---------------------------------------- //
-  const {showReferralDrawer, showNewReferralForm} = useAppNav();
+  const { showReferralDrawer, showNewReferralForm } = useAppNav();
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles();
@@ -43,14 +42,15 @@ const ReferralsPage = () => {
     <div className={styles.referralsContainer}>
       <div
         className={clsx(styles.innerContainer, {
-          [styles.innerContainerShift]: showReferralDrawer || showNewReferralForm,
+          [styles.innerContainerShift]:
+            showReferralDrawer || showNewReferralForm,
         })}
       >
-        <ReferralsTable/>
+        <ReferralsTable />
       </div>
-      <ReferralDrawer/>
-      <NewReferralDrawer/>
-      <AddReferralFab/>
+      <ReferralDrawer />
+      <NewReferralDrawer />
+      <AddReferralFab />
     </div>
   );
 };
