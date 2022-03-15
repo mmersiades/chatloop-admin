@@ -54,7 +54,7 @@ pipelines:
             - aws s3 sync ./build s3://chatloop-admin
             - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'
 
-  # Runs tests on commits to all branches (except master)
+  # Run tests on commits to all branches (except master)
   default:
     - step: *install
     - step: *test

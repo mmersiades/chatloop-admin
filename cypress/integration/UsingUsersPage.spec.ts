@@ -32,7 +32,7 @@ describe('Using the UsersPage', () => {
     cy.contains(TUTORS_TAB).should('be.visible');
     // cy.contains('button', 'Add Learner').should('be.visible');
     cy.contains(sara.email).should('be.visible');
-    cy.contains('1-7 of 7').should('be.visible');
+    cy.contains('1-8 of 8').should('be.visible');
   });
 
   it('should show Partners and Tutors lists', () => {
