@@ -126,7 +126,13 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
   // ----------------------------- Hooks ---------------------------------------- //
   const {languages} = useLanguages();
   const {setShowReferralDrawer} = useAppNav()
-  const {fetchingReferral, postReferral, putReferral, deleteReferral} = useReferrals();
+  const {
+    fetchingReferral,
+    postReferral,
+    putReferral,
+    getReferral,
+    deleteReferral
+  } = useReferrals();
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles(type);
@@ -188,8 +194,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         try {
           const isSuccess = await putReferral({referralId: extendedReferral.id, body});
           if (isSuccess) {
-            reset()
-            setShowReferralDrawer(null)
+            getReferral && getReferral(extendedReferral.id)
           }
         } catch (error) {
           handleError(error);

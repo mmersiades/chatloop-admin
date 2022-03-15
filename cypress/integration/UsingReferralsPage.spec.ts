@@ -90,15 +90,23 @@ describe('Using the ReferralsPage', () => {
       cy.get('tbody').within(() => {
         cy.get('tr').first().click()
       })
-
+      
       cy.wait('@getReferral')
+
       cy.get('div[data-test="referral-drawer"]').within(() => {
         cy.get('input[name="refereeName"]').focus().clear().type(newName)
         cy.get('button[aria-label="Submit changes"]').scrollIntoView().click();
       })
 
       cy.wait('@putReferral')
-      cy.contains(newName).scrollIntoView().should('be.visible');
+
+      cy.get('tbody').within(() => {
+        cy.contains(newName).scrollIntoView().should('be.visible');
+      })
+
+      cy.get('div[data-test="referral-drawer"]').within(() => {
+        cy.get(`input[value=${newName}]`).should('be.visible');
+      })
     });
 
   });
