@@ -23,7 +23,7 @@ const useStyles = makeStyles(({spacing, palette}: Theme) =>
       top: 48,
       width: '30%',
       overflowY: 'unset',
-      height: 'calc(100vh - 30px)',
+      height: 'calc(100vh - 48px)',
     },
     dockedWithMenuDrawer: {
       width: 'calc((100vw - 150px) * 0.3)',
@@ -59,6 +59,7 @@ const ReferralDrawer = () => {
   // ----------------------------- Render ---------------------------------------- //
   return (
     <Drawer
+      data-test="referral-drawer"
       classes={{
         paperAnchorDockedRight: clsx(styles.docked, {
           [styles.dockedWithMenuDrawer]: showMenuDrawer,

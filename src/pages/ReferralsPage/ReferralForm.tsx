@@ -364,6 +364,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
         </List>
       )}
       <Button
+        aria-label={type === "create" ? "Create referral" : "Submit changes"}
         type="submit"
         color="secondary"
         variant="contained"
@@ -374,6 +375,7 @@ const ReferralForm: FC<Props> = ({type, extendedReferral}) => {
       </Button>
       {type === "edit" && extendedReferral && (
         <Button
+          aria-label="Delete referral"
           classes={{root: styles.deleteButton}}
           variant="outlined"
           disabled={fetchingReferral}

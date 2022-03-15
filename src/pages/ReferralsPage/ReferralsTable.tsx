@@ -222,6 +222,7 @@ const ReferralsTable: FC<Props> = () => {
             <TableFooter>
               <TableRow>
                 <TablePagination
+                  data-test="pagination"
                   count={totalReferrals}
                   rowsPerPage={size}
                   page={page}

@@ -9,9 +9,17 @@ declare global {
       resetDb(): Promise<void>;
       clickTab(tabLabel: string): void;
       deleteUser(email: string): void;
+      countElementsWithText(elemType: string, regex: RegExp, expectedCount: number): void
     }
   }
 }
+
+Cypress.Commands.add('countElementsWithText', (elemType: string, regex: RegExp, expectedCount: number) => {
+  cy.get(elemType).filter((
+    i,
+    elem
+  ) => !!elem.innerText.match(regex)).should('have.length', expectedCount)
+})
 
 Cypress.Commands.add('getAuthTokens', (username: string, password: string) => {
   cy.request({
