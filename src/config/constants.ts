@@ -15,28 +15,18 @@ export const DEV_EXPIRY_INTERVAL = {
 export const PROD_PARTNER_QUEUE_SIZE = 20;
 export const DEV_PARTNER_QUEUE_SIZE = 5;
 
-export const UI_LANGUAGE_CODES = [
-  'ar',
-  'en',
-  'es',
-  'fa',
-  'id',
-  'prs',
-  'sw',
-  'kar',
-  'my',
-];
-
 export const UI_LANGUAGES: UiLanguageOption[] = [
   { code: 'ar', language: 'Arabic' },
   { code: 'en', language: 'English' },
   { code: 'es', language: 'Spanish' },
   { code: 'fa', language: 'Persian' },
   { code: 'id', language: 'Indonesian' },
-  { code: 'prs', language: 'Hazaragi' },
+  { code: 'prs', language: 'Dari' },
   { code: 'sw', language: 'Swahili' },
   { code: 'kar', language: 'Karen' },
   { code: 'my', language: 'Burmese' },
+  { code: 'ta', language: 'Tamil' },
+  { code: 'uk', language: 'Ukrainian' },
 ];
 
 export const DEFAULT_REFERRAL_PAGE_SIZE = 25;
