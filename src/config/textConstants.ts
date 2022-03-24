@@ -35,14 +35,10 @@ export const RESET_PASSWORD = 'RESET PASSWORD';
 export const INVITES_TITLE = 'Manage Invites';
 export const PARTNER_QUEUE = 'Partner queue';
 export const NUMBERS = 'Numbers';
-export const INVITE_SETTINGS = 'Invite settings';
-export const INVITE_INTERVAL = 'Invite expiry interval';
-export const INVITE_STATISTICS = 'Invite statistics';
 export const NO_INVITES = 'No invites';
 
 // ReferralsPage
 export const REFERRALS_TITLE = 'Manage Referrals';
-export const REFEREE_NAME = 'Referee';
 export const REFERRER_NAME = 'Referrer';
 export const REFERRER_EMAIL = 'Referrer email';
 export const NEW_REFERRAL_TITLE = 'New referral';
@@ -50,6 +46,7 @@ export const ADD_REFERRAL_BUTTON = 'ADD REFERRAL';
 export const NAME_FORM_HELPER = 'Recommended: first name only';
 export const EMAIL_FORM_HELPER = 'Invitation sent to this address';
 export const FIRST_LANG_FORM_HELPER = 'Native language / mother tongue';
+export const INVITATION_LINK = 'Link';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';

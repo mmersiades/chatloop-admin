@@ -33,6 +33,7 @@ import {
   EMAIL_FORM_HELPER,
   FIRST_LANG_FORM_HELPER,
   INTERFACE_LANGUAGE,
+  INVITATION_LINK,
   NAME_FORM_HELPER,
   REFERRER_EMAIL,
   REFERRER_NAME,
@@ -375,6 +376,12 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
             <ListItemText
               primary={REFERRER_EMAIL}
               secondary={extendedReferral.referrerEmail}
+            />
+          </ListItem>
+          <ListItem disableGutters>
+            <ListItemText
+              primary={INVITATION_LINK}
+              secondary={extendedReferral.link}
             />
           </ListItem>
         </List>
