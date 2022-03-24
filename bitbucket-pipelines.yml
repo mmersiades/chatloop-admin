@@ -1,25 +1,22 @@
-image: nikolaik/python-nodejs:python3.9-nodejs14-alpine
+image: nikolaik/python-nodejs:lastest
 
 pipelines:
   custom:
     install:
       - step: &install
           name: Install
-#          caches:
-#            - npm
+          caches:
+            - npm
           script:
-            - export CYPRESS_CACHE_FOLDER=/app/.cache
-            - pwd
-            - ls
             - npm ci
     # Run tests
     test:
       - step: &test
           name: E2E tests
           caches:
-#            - npm
+            - npm
             - cypress
-          image: cypress/base:10
+          image: cypress/base:14
           script:
             - node --version
             - python --version
@@ -36,8 +33,8 @@ pipelines:
       - step: &deploy_staging
           name: Deploy to Staging
           deployment: staging
-#          caches:
-#            - node
+          caches:
+            - node
           script: # Modify the commands below to build your repository.
             - npm ci
             - npm run build:staging
@@ -51,8 +48,8 @@ pipelines:
           name: Deploy to Production
           trigger: manual
           deployment: production
-#          caches:
-#            - node
+          caches:
+            - node
           script:
             - npm ci
             - npm run build:prod
@@ -75,5 +72,5 @@ pipelines:
 
 definitions:
   caches:
-#    npm: $HOME/.npm
+    npm: $HOME/.npm
     cypress: /app/.cache/Cypress
