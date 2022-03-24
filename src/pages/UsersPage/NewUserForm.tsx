@@ -24,6 +24,7 @@ import { getReadableRoles } from '../../helpers/getReadableRoles';
 import { handleError } from '../../helpers/handleError';
 import { useLanguages } from '../../contexts/languagesContext';
 import { getTutorsByShift } from '../../helpers/getTutorsByShift';
+import { UI_LANGUAGES } from '../../config/constants';
 
 interface NewUserFormProps {
   formFor: UserRole;
@@ -44,11 +45,6 @@ export interface NewUserPayload extends NewUserFormValues {
   userRole: UserRole;
 }
 
-interface UiLanguageOption {
-  code: string;
-  language: string;
-}
-
 const useStyles = makeStyles(() =>
   createStyles({
     formContainer: {
@@ -61,18 +57,6 @@ const useStyles = makeStyles(() =>
     },
   })
 );
-
-const uiLanguageOptions: UiLanguageOption[] = [
-  { code: 'ar', language: 'Arabic' },
-  { code: 'en', language: 'English' },
-  { code: 'es', language: 'Spanish' },
-  { code: 'fa', language: 'Persian' },
-  { code: 'id', language: 'Indonesian' },
-  { code: 'prs', language: 'Hazaragi' },
-  { code: 'sw', language: 'Swahili' },
-  { code: 'kar', language: 'Karen' },
-  { code: 'my', language: 'Burmese' },
-];
 
 const commonDefaultValues = {
   email: '',
@@ -319,7 +303,7 @@ const NewUserForm: FC<NewUserFormProps> = ({ formFor }) => {
                 label="UI Language"
                 error={touchedFields.uiLanguage && !!errors.uiLanguage}
               >
-                {uiLanguageOptions.map((option) => (
+                {UI_LANGUAGES.map((option) => (
                   <MenuItem key={option.code} value={option.code}>
                     {option.language}
                   </MenuItem>

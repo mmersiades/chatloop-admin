@@ -22,7 +22,7 @@ describe('Logging in as existing user', () => {
     cy.get('input:invalid').should('have.length', 1);
   });
 
-  it.only('should log an existing user in and then log them out', () => {
+  it('should log an existing user in and then log them out', () => {
     cy.get('input[aria-label="email field"]').type(admin.email);
     cy.get('input[aria-label="password field"]').type(admin.password);
     cy.get('button[type="submit"]').click();

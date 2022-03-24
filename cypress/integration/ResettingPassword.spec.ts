@@ -36,7 +36,7 @@ describe('Resetting a password', () => {
     cy.get('button[aria-label="Reset button"]').click();
 
     cy.wait('@resetPassword').then(({ response }) =>
-      expect(response.statusCode).to.equal(200)
+      expect(response?.statusCode).to.equal(200)
     );
     cy.on('window:alert', (str) => {
       expect(str).to.equal('SUCCESS. A new password has been generated.');

@@ -43,7 +43,11 @@ interface IPrivateRouteProps {
  * If user is *not* logged in, the wrapper redirects paths to the
  * LandingPage component.
  */
-export const PrivateRoute = ({ component: Component, path, ...rest }: IPrivateRouteProps): JSX.Element => {
+export const PrivateRoute = ({
+  component: Component,
+  path,
+  ...rest
+}: IPrivateRouteProps): JSX.Element => {
   // Determines login status by looking for JWT in localStorage
   // Determines login status by looking for JWT in localStorage
   const token: string | null = localStorage.getItem('loginToken');
@@ -51,7 +55,9 @@ export const PrivateRoute = ({ component: Component, path, ...rest }: IPrivateRo
   return (
     <Route
       path={path}
-      render={(routeProps: RouteProps) => (token ? <Component {...routeProps} {...rest} /> : <Redirect to="/" />)}
+      render={(routeProps: RouteProps) =>
+        token ? <Component {...routeProps} {...rest} /> : <Redirect to="/" />
+      }
     />
   );
 };

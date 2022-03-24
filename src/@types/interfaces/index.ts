@@ -1,4 +1,64 @@
-import { UserRole, TutorShift } from '../enums';
+import { UserRole, TutorShift, ReferralStatus } from '../enums';
+
+export interface Action<T> {
+  type: T;
+}
+
+interface PageableSort {
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
+}
+
+export interface Pageable {
+  offset: number;
+  pageNumber: number;
+  pageSize: number;
+  paged: boolean;
+  sort: PageableSort;
+  unpaged: boolean;
+}
+
+export interface PageableResponse<T> {
+  content: T[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: Pageable;
+  size: number;
+  sort: PageableSort;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface Referrer {
+  referrerId: number;
+  referrerName: string;
+  referrerEmail: string;
+  orgId: number;
+  orgName: string;
+}
+
+export interface Referral {
+  id: number;
+  email: string;
+  createdAt: string;
+  expiresAt: string;
+  role: UserRole;
+  refereeName: string;
+  status: ReferralStatus;
+  uiLanguage: string;
+  firstLanguage: UserLanguageObject;
+}
+
+export interface UiLanguageOption {
+  code: string;
+  language: string;
+}
+
+export interface ExtendedReferral extends Referral, Referrer {}
 
 export interface User {
   id: number;
@@ -49,6 +109,9 @@ export interface ExtendedTutor extends Tutor {
   assignedLearners: number[]; // array of Learner ids
 }
 
+export const isExtendedTutor = (item: any): item is ExtendedTutor =>
+  (item as ExtendedTutor).userRole === UserRole.tutor;
+
 export type ExtendedUser = ExtendedLearner | ExtendedPartner | ExtendedTutor;
 
 export interface UserLanguageObject {
@@ -59,7 +122,7 @@ export interface UserLanguageObject {
 export interface ExpiryInterval {
   value: number;
   /**
-   * Returned from back-end as Spring time units (eg HOURS, HOUR, SECOND),
+   * Returned from back-end as Spring time units (e.g. HOURS, HOUR, SECOND),
    * but should be converted to match Moment.js's units (moment.d.ts)
    *  */
   unit?:
@@ -116,35 +179,6 @@ export interface Invite {
   sentOn: string;
   topic: string;
 }
-
-export type Pageable<T> = {
-  content: T;
-  pageable: {
-    sort: {
-      sorted: boolean;
-      unsorted: boolean;
-      empty: boolean;
-    };
-    pageSize: number;
-    pageNumber: number;
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
-  };
-  last: boolean;
-  totalPages: number;
-  totalElement: number;
-  sort: {
-    sorted: boolean;
-    unsorted: boolean;
-    empty: boolean;
-  };
-  first: boolean;
-  number: number;
-  numberOfElements: number;
-  size: number;
-  empty: boolean;
-};
 
 // An object representing a language as per [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3)
 export interface Language {

@@ -21,7 +21,7 @@
     "react-hook-form": "^7.15.3",
     "react-infinite-scroll-component": "^6.1.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^4.0.3",
+    "react-scripts": "^5.0.0",
     "react-scroll": "^1.8.2",
     "react-select": "^4.3.1",
     "typeface-lato": "^1.1.13",
@@ -43,7 +43,9 @@
     "test:ci": "npm test -- --ci && npm run cypress:all",
     "test:combined": "npm test a -- --watchAll=false && npm run cypress:all",
     "test:coverage": "npm run clear:nyc && npm run test:combined && node ./scripts/mergeCoverage.js && open coverage-combined/lcov-report/index.html",
-    "clear:nyc": "if [ -d '.nyc_output/' ]; then rm -rf .nyc_output/; fi"
+    "clear:nyc": "if [ -d '.nyc_output/' ]; then rm -rf .nyc_output/; fi",
+    "prettier:check": "yarn prettier --check .",
+    "prettier:write": "yarn prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -71,7 +73,7 @@
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.5.13",
     "@types/moxios": "^0.4.9",
-    "@types/react-dom": "^17.0.7",
+    "@types/react-dom": "^17.0.11",
     "@types/react-infinite-scroll-component": "^5.0.0",
     "@types/react-router-dom": "^5.1.3",
     "@types/react-scroll": "^1.5.4",
@@ -82,6 +84,7 @@
     "cypress-localstorage-commands": "^1.4.5",
     "env-cmd": "^10.1.0",
     "moxios": "^0.4.0",
+    "prettier": "^2.5.1",
     "typescript": "^4.3.2"
   },
   "nyc": {
@@ -92,5 +95,11 @@
     "coverageReporters": [
       "json"
     ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "singleQuote": true,
+    "arrowParens": "always",
+    "semi": true
   }
 }

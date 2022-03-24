@@ -18,7 +18,7 @@ import {
   Radio,
   CircularProgress,
 } from '@material-ui/core';
-import { Tutor, ExtendedTutor } from '../../@types/interfaces';
+import { Tutor, ExtendedTutor, isExtendedTutor } from '../../@types/interfaces';
 import { useUsers } from '../../contexts/usersContext';
 import { TutorShift } from '../../@types/enums';
 
@@ -57,7 +57,7 @@ const useStyles = makeStyles(({ palette, transitions, spacing }: Theme) =>
       width: '100%',
       tableLayout: 'fixed',
     },
-    tableCell: {
+    headerTableCell: {
       color: palette.common.white,
     },
     helperTextSpacer: {
@@ -125,8 +125,10 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
 
   const handleSelect = async (tutor: Tutor) => {
     setValue(tutor.id);
-    const response = await getUser(tutor.id);
-    response.status === 200 && setSelectedTutor({ ...tutor, ...response.data });
+    const { status, data } = await getUser(tutor.id);
+    if (status === 200 && isExtendedTutor(data)) {
+      setSelectedTutor({ ...tutor, ...data });
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -174,35 +176,35 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
                   <TableHead classes={{ root: classes.tableHead }}>
                     <TableRow classes={{ root: classes.tableRow }}>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       ></TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         ID
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         Display name
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         Current learners
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         Max learners
                       </TableCell>
                       <TableCell
-                        classes={{ root: classes.tableCell }}
+                        classes={{ root: classes.headerTableCell }}
                         align="center"
                       >
                         First language

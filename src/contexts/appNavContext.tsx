@@ -4,9 +4,13 @@ interface AppNavContext {
   showMenuDrawer: boolean;
   showUserDrawer: number | null;
   showNewUserForm: boolean;
+  showReferralDrawer: number | null;
+  showNewReferralForm: boolean;
   setShowMenuDrawer: (showMenuDrawer: boolean) => void;
   setShowUserDrawer: (user: number | null) => void;
   setShowNewUserForm: (showNewUserForm: boolean) => void;
+  setShowReferralDrawer: (user: number | null) => void;
+  setShowNewReferralForm: (showNewReferralForm: boolean) => void;
 }
 
 interface AppNavContextProviderProps {
@@ -28,6 +32,10 @@ export const AppNavContextProvider: FC<AppNavContextProviderProps> = ({
   const [showMenuDrawer, setShowMenuDrawer] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState<number | null>(null);
   const [showNewUserForm, setShowNewUserForm] = useState(false);
+  const [showReferralDrawer, setShowReferralDrawer] = useState<number | null>(
+    null
+  );
+  const [showNewReferralForm, setShowNewReferralForm] = useState(false);
 
   return (
     <AppNavContext.Provider
@@ -38,6 +46,10 @@ export const AppNavContextProvider: FC<AppNavContextProviderProps> = ({
         setShowUserDrawer,
         showNewUserForm,
         setShowNewUserForm,
+        showReferralDrawer,
+        setShowReferralDrawer,
+        showNewReferralForm,
+        setShowNewReferralForm,
       }}
     >
       {children}

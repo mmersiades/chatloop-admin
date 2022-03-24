@@ -16,8 +16,11 @@ pipelines:
           caches:
             - npm
             - cypress
-          image: cypress/base:10
+          image: cypress/base:12
           script:
+            - node --version
+            - python --version
+            - npm --version
             - npm ci
             - export CYPRESS_API_HOST=https://staging-api.chatloop.org
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
@@ -70,4 +73,4 @@ pipelines:
 definitions:
   caches:
     npm: $HOME/.npm
-    cypress: $HOME/.cache/Cypress
+    cypress: /app/.cache/Cypress
