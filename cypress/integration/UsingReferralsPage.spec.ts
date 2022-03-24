@@ -41,13 +41,13 @@ describe('Using the ReferralsPage', () => {
       });
       cy.get('[data-value="10"]').click();
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', learnerRegex, 10);
+      cy.countElementsWithText('td', partnerRegex, 10);
       cy.contains(`1-10 of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', learnerRegex, 2);
-      cy.countElementsWithText('td', partnerRegex, 8);
+      cy.countElementsWithText('td', partnerRegex, 2);
+      cy.countElementsWithText('td', learnerRegex, 8);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
     });
   });
@@ -84,7 +84,7 @@ describe('Using the ReferralsPage', () => {
       cy.contains(REFERRER_NAME).should('be.visible');
       cy.contains(REFERRER_EMAIL).should('be.visible');
       cy.contains('ar').should('be.visible');
-      cy.contains('Michael, of Chatloop').should('be.visible');
+      cy.contains('Admin, of Chatloop').should('be.visible');
     });
 
     it('should change name and show new name in table', () => {
