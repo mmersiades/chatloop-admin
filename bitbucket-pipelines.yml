@@ -1,4 +1,4 @@
-image: nikolaik/python3.10-nodejs14-alpine
+image: node:14-alpine
 
 pipelines:
   custom:
@@ -31,6 +31,7 @@ pipelines:
       - step: &deploy_staging
           name: Deploy to Staging
           deployment: staging
+          image: python:3
           caches:
             - node
           script: # Modify the commands below to build your repository.
@@ -45,6 +46,7 @@ pipelines:
       - step: &deploy_production
           name: Deploy to Production
           trigger: manual
+          image: python:3
           deployment: production
           caches:
             - node
