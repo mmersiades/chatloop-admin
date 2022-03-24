@@ -1,4 +1,4 @@
-image: nikolaik/python-nodejs:lastest
+image: nikolaik/python-nodejs:latest
 
 pipelines:
   custom:
@@ -16,7 +16,7 @@ pipelines:
           caches:
             - npm
             - cypress
-          image: cypress/base:14
+          image: cypress/base:16
           script:
             - node --version
             - python --version
