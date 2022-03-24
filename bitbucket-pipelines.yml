@@ -1,4 +1,4 @@
-image: node:14-alpine
+image: nikolaik/python-nodejs:latest
 
 pipelines:
   custom:
@@ -8,7 +8,6 @@ pipelines:
           caches:
             - npm
           script:
-            - ls -l $HOME/.cache/Cypress
             - npm ci
     # Run tests
     test:
@@ -20,6 +19,7 @@ pipelines:
           image: cypress/base:10
           script:
             - node --version
+            - python --version
             - npm ci
             - export CYPRESS_API_HOST=https://staging-api.chatloop.org
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
@@ -32,7 +32,6 @@ pipelines:
       - step: &deploy_staging
           name: Deploy to Staging
           deployment: staging
-          image: python:3
           caches:
             - node
           script: # Modify the commands below to build your repository.
@@ -47,7 +46,6 @@ pipelines:
       - step: &deploy_production
           name: Deploy to Production
           trigger: manual
-          image: python:3
           deployment: production
           caches:
             - node
