@@ -18,6 +18,7 @@ pipelines:
             - cypress
           image: cypress/base:10
           script:
+            - node --version
             - npm ci
             - export CYPRESS_API_HOST=https://staging-api.chatloop.org
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
