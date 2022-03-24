@@ -8,7 +8,7 @@ pipelines:
           caches:
             - npm
           script:
-            - ls -l /root/.cache/Cypress
+            - ls -l $HOME/.cache/Cypress
             - npm ci
     # Run tests
     test:
