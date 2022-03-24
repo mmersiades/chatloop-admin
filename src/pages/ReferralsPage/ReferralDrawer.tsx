@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import {
   AppBar,
-  Button,
   CircularProgress,
   createStyles,
   Drawer,
@@ -18,7 +17,7 @@ import ReferralForm from './ReferralForm';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useReferrals } from '../../contexts/referralsContext';
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) =>
+const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
     docked: {
       top: 48,
