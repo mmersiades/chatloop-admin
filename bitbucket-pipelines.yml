@@ -8,6 +8,7 @@ pipelines:
 #          caches:
 #            - npm
           script:
+            - stat -c 'userid - %u, groupid - %g' $PWD
             - npm ci
     # Run tests
     test:
