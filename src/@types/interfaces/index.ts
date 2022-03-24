@@ -51,6 +51,7 @@ export interface Referral {
   status: ReferralStatus;
   uiLanguage: string;
   firstLanguage: UserLanguageObject;
+  link: string;
 }
 
 export interface UiLanguageOption {
