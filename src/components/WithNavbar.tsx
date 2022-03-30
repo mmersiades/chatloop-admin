@@ -52,7 +52,7 @@ const withNavbar = <P extends object>(
           }}
           container
           alignItems="center"
-          justify="center"
+          justifyContent="center"
         >
           <WrappedComponent {...(props as P)} />
         </Grid>

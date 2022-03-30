@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Router } from 'react-router-dom';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider, createTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { AppPropertiesProvider } from '../contexts/appPropertiesContext';
@@ -9,7 +9,7 @@ import { LanguagesContextProvider } from '../contexts/languagesContext';
 import chatloopTheme from '../assets/chatloopTheme';
 import history from '../helpers/getBrowserHistory';
 
-export const theme = createMuiTheme(chatloopTheme);
+export const theme = createTheme(chatloopTheme);
 
 interface RootProps {
   children: Array<JSX.Element> | JSX.Element;

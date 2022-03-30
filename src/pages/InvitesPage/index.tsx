@@ -282,7 +282,7 @@ const InvitesPage: FC = () => {
             classes={{ root: classes.invitesContainer }}
             container
             spacing={2}
-            justify="space-evenly"
+            justifyContent="space-evenly"
           >
             {invitesPageable?.content.length === 0 ? (
               <p>{NO_INVITES}</p>
@@ -293,7 +293,7 @@ const InvitesPage: FC = () => {
                     <CardContent>
                       <Grid
                         container
-                        justify="space-between"
+                        justifyContent="space-between"
                         alignItems="center"
                       >
                         <Typography variant="body1" color="primary">
@@ -368,7 +368,10 @@ const InvitesPage: FC = () => {
                                     />
                                   }
                                   secondary={
-                                    <Grid container justify="space-between">
+                                    <Grid
+                                      container
+                                      justifyContent="space-between"
+                                    >
                                       <Capacity
                                         maxActivities={
                                           partner.maxNumberOfActivities
@@ -400,7 +403,7 @@ const InvitesPage: FC = () => {
 
                       <Grid
                         container
-                        justify="space-between"
+                        justifyContent="space-between"
                         alignItems="center"
                       >
                         <Typography>

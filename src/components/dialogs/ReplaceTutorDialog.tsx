@@ -251,7 +251,7 @@ const ReplaceTutorDialog: FC<ReplaceTutorDialogProps> = ({
                 <Grid
                   classes={{ root: classes.footerRoot }}
                   container
-                  justify="flex-end"
+                  justifyContent="flex-end"
                   alignItems="center"
                 >
                   {!!selectedTutor && (

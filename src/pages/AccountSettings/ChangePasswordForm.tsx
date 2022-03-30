@@ -291,7 +291,7 @@ const ChangePasswordForm: FC<ChangePasswordFormProps> = ({
             <Grid
               container
               wrap="nowrap"
-              justify="flex-end"
+              justifyContent="flex-end"
               alignItems="center"
             >
               {renderErrorMessage(noMatch)}

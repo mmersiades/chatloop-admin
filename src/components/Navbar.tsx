@@ -86,7 +86,7 @@ const Navbar: FC = () => {
         }}
       >
         <Toolbar variant="dense">
-          <Grid container justify="space-between" alignItems="center">
+          <Grid container justifyContent="space-between" alignItems="center">
             <IconButton
               color="inherit"
               aria-label="open drawer"
