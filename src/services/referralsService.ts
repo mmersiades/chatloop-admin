@@ -12,9 +12,10 @@ import apiChatloopOrg from '../config/axiosConfig';
 
 export interface PostReferralBody {
   refereeName: string;
-  refereeEmail: string;
   role: UserRole;
   firstLanguage: string; // eg 'eng', 'ara', 'prs' ISO-639-3
+  refereeEmail?: string;
+  refereePhone?: string;
 }
 
 export interface PutReferralBody extends PostReferralBody {}

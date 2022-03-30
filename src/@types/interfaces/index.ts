@@ -44,6 +44,7 @@ export interface Referrer {
 export interface Referral {
   id: number;
   email: string;
+  phone: string;
   createdAt: string;
   expiresAt: string;
   role: UserRole;

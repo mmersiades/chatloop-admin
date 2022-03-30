@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import ReactSelect, { OptionTypeBase } from 'react-select';
@@ -17,6 +17,9 @@ import {
   ListItemText,
   List,
 } from '@material-ui/core';
+import ReactPhoneInput from 'react-phone-input-material-ui';
+
+import 'react-phone-input-material-ui/lib/style.css';
 
 import { useLanguages } from '../../contexts/languagesContext';
 import { useReferrals } from '../../contexts/referralsContext';
@@ -35,9 +38,12 @@ import {
   INTERFACE_LANGUAGE,
   INVITATION_LINK,
   NAME_FORM_HELPER,
+  PHONE_FORM_HELPER,
   REFERRER_EMAIL,
   REFERRER_NAME,
 } from '../../config/textConstants';
+import locationService from '../../services/locationService';
+import { removeLeadingZeroFromPhone } from '../../helpers/removeLeadingZeroFromPhone';
 
 interface Props {
   type: 'create' | 'edit';
@@ -47,11 +53,12 @@ interface Props {
 export interface FormValues {
   refereeName: string;
   refereeEmail: string;
+  refereePhone: string;
   role: UserRole;
   firstLanguage: OptionTypeBase; // eg 'eng', 'ara', 'prs' ISO-639-3
 }
 
-const useStyles = makeStyles(({ spacing, palette }) => {
+const useStyles = makeStyles(({ spacing, palette, typography }) => {
   return createStyles({
     formContainer: {
       padding: '12px',
@@ -72,12 +79,16 @@ const useStyles = makeStyles(({ spacing, palette }) => {
       marginTop: spacing(2),
       color: palette.error.main,
     },
+    countryList: {
+      ...typography.body1,
+    },
   });
 });
 
 const defaultValues: FormValues = {
   refereeName: '',
   refereeEmail: '',
+  refereePhone: '',
   role: UserRole.partner,
   firstLanguage: {
     label: 'English',
@@ -86,29 +97,47 @@ const defaultValues: FormValues = {
 };
 
 const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
+  const [countryCode, setCountryCode] = useState('nz');
+  const [dialCode, setDialCode] = useState('64');
   // ----------------------------- 3rd party hooks ------------------------------- //
-  const referralSchema = Yup.object().shape({
-    refereeName: Yup.string()
-      .min(2, 'Referee name too short')
-      .max(25, 'Referee name too long')
-      .required('Referee name is required'),
-    refereeEmail: Yup.string()
-      .email('Invalid email')
-      .required('Email is required'),
-    role: Yup.mixed<UserRole>().oneOf(Object.values(UserRole)),
-    firstLanguage: Yup.object().shape({
-      label: Yup.string().required(),
-      value: Yup.string()
-        .max(3, 'Use IS0639-3 code (usually 3 letters)')
-        .min(2)
-        .required(),
-    }),
-  });
+  const referralSchema = Yup.object().shape(
+    {
+      refereeName: Yup.string()
+        .min(2, 'Referee name too short')
+        .max(25, 'Referee name too long')
+        .required('Referee name is required'),
+      refereeEmail: Yup.string().when('refereePhone', {
+        is: '',
+        then: Yup.string()
+          .email('Invalid email')
+          .required('At least one of email or phone is required'),
+        otherwise: Yup.string().email('Invalid email'),
+      }),
+      refereePhone: Yup.string().when('refereeEmail', {
+        is: '',
+        then: Yup.string()
+          .min(8)
+          .max(16)
+          .required('At least one of email or phone is required'),
+        otherwise: Yup.string().min(8).max(16),
+      }),
+      role: Yup.mixed<UserRole>().oneOf(Object.values(UserRole)),
+      firstLanguage: Yup.object().shape({
+        label: Yup.string().required(),
+        value: Yup.string()
+          .max(3, 'Use IS0639-3 code (usually 3 letters)')
+          .min(2)
+          .required(),
+      }),
+    },
+    [['refereePhone', 'refereeEmail']]
+  );
 
   // Falls back to default values if "create"
   const initialValues: FormValues = {
     refereeName: extendedReferral?.refereeName || defaultValues.refereeName,
     refereeEmail: extendedReferral?.email || defaultValues.refereeEmail,
+    refereePhone: extendedReferral?.phone || defaultValues.refereePhone,
     role: extendedReferral?.role || defaultValues.role,
     firstLanguage: extendedReferral?.firstLanguage
       ? {
@@ -148,10 +177,12 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         isSubmitting ||
         !!errors.refereeName ||
         !!errors.refereeEmail ||
+        !!errors.refereePhone ||
         !!errors.role ||
         !!errors.firstLanguage ||
         !touchedFields.refereeName ||
-        !touchedFields.refereeEmail
+        !touchedFields.refereeEmail ||
+        !touchedFields.refereePhone
       );
     } else {
       const somethingDirty =
@@ -175,9 +206,18 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
+    let refereePhone: string | undefined;
+    if (data.refereePhone) {
+      refereePhone = removeLeadingZeroFromPhone({
+        dialCode,
+        wholeValue: data.refereePhone,
+      });
+    }
+
     if (type === 'create') {
       const body: PostReferralBody = {
         ...data,
+        refereePhone,
         firstLanguage: data.firstLanguage.value,
       };
 
@@ -196,6 +236,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
     } else {
       const body: PutReferralBody = {
         ...data,
+        refereePhone,
         firstLanguage: data.firstLanguage.value,
       };
 
@@ -234,6 +275,17 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
       }
     }
   };
+
+  const getCountryCode = async (): Promise<void> => {
+    const code = await locationService.getCountryCodeByIp();
+    setCountryCode(code.toLowerCase());
+  };
+
+  useEffect(() => {
+    getCountryCode();
+  }, []);
+
+  console.log('dialCode', dialCode);
 
   // ----------------------------- Render ---------------------------------------- //
   return (
@@ -289,6 +341,52 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
               )}
             </>
           )}
+        />
+      </div>
+
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="refereePhone"
+          control={control}
+          render={({ field }) => {
+            return (
+              <>
+                <ReactPhoneInput
+                  {...field}
+                  // Using isValid to get dialCode when component mounts
+                  isValid={(value, country) => {
+                    // @ts-ignore
+                    if (country.dialCode !== dialCode)
+                      // @ts-ignore
+                      setDialCode(country.dialCode);
+                    return true;
+                  }}
+                  // TODO: Only apply this if create, not update
+                  country={countryCode}
+                  autoFormat={false}
+                  showDropdown
+                  inputProps={{
+                    variant: 'outlined',
+                    margin: 'dense',
+                    type: 'phone',
+                    inputProps: {
+                      style: { paddingLeft: '42px' },
+                    },
+                  }}
+                  dropdownClass={styles.countryList}
+                  component={TextField}
+                  countryCodeEditable={false}
+                />
+                {touchedFields.refereePhone && errors.refereePhone ? (
+                  <FormHelperText error>
+                    {errors.refereePhone.message}
+                  </FormHelperText>
+                ) : (
+                  <FormHelperText>{PHONE_FORM_HELPER}</FormHelperText>
+                )}
+              </>
+            );
+          }}
         />
       </div>
 
