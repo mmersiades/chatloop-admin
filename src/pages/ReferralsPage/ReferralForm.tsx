@@ -119,7 +119,13 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
           .min(8)
           .max(16)
           .required('At least one of email or phone is required'),
-        otherwise: Yup.string().min(8).max(16),
+        otherwise: Yup.string().when('refereePhone', {
+          // Don't apply validation if phone is blank
+          is: (refereePhone: string) =>
+            !refereePhone || refereePhone.length === 0,
+          then: Yup.string(),
+          otherwise: Yup.string().min(8).max(16),
+        }),
       }),
       role: Yup.mixed<UserRole>().oneOf(Object.values(UserRole)),
       firstLanguage: Yup.object().shape({
@@ -152,6 +158,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
     formState: { errors, touchedFields, dirtyFields, isSubmitting },
     reset,
     control,
+    resetField,
   } = useForm<FormValues>({
     resolver: yupResolver(referralSchema),
     defaultValues: initialValues,
@@ -170,8 +177,11 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles(type);
+  console.log('errors', errors);
 
   const disableButton = (): boolean => {
+    const phoneOrEmailTouched =
+      touchedFields.refereeEmail || touchedFields.refereePhone;
     if (type === 'create') {
       return (
         isSubmitting ||
@@ -181,13 +191,13 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         !!errors.role ||
         !!errors.firstLanguage ||
         !touchedFields.refereeName ||
-        !touchedFields.refereeEmail ||
-        !touchedFields.refereePhone
+        !phoneOrEmailTouched
       );
     } else {
       const somethingDirty =
         dirtyFields.refereeName ||
         dirtyFields.refereeEmail ||
+        dirtyFields.refereePhone ||
         dirtyFields.role ||
         dirtyFields.firstLanguage;
 
@@ -195,6 +205,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         isSubmitting ||
         !!errors.refereeName ||
         !!errors.refereeEmail ||
+        !!errors.refereePhone ||
         !!errors.role ||
         !!errors.firstLanguage
       ) {
@@ -206,20 +217,24 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
+    console.log('onSubmit');
     let refereePhone: string | undefined;
-    if (data.refereePhone) {
+    if (data.refereePhone && data.refereePhone !== dialCode) {
       refereePhone = removeLeadingZeroFromPhone({
         dialCode,
         wholeValue: data.refereePhone,
       });
     }
 
+    console.log('type', type);
     if (type === 'create') {
       const body: PostReferralBody = {
         ...data,
         refereePhone,
         firstLanguage: data.firstLanguage.value,
       };
+
+      console.log('body', body);
 
       if (!!body && !!postReferral) {
         try {
@@ -285,8 +300,6 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
     getCountryCode();
   }, []);
 
-  console.log('dialCode', dialCode);
-
   // ----------------------------- Render ---------------------------------------- //
   return (
     <form className={styles.formContainer} onSubmit={onSubmit}>
@@ -349,6 +362,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
           name="refereePhone"
           control={control}
           render={({ field }) => {
+            console.log('field.value', field.value);
             return (
               <>
                 <ReactPhoneInput
@@ -361,10 +375,8 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                       setDialCode(country.dialCode);
                     return true;
                   }}
-                  // TODO: Only apply this if create, not update
-                  country={countryCode}
+                  country={field.value === '' ? countryCode : undefined}
                   autoFormat={false}
-                  showDropdown
                   inputProps={{
                     variant: 'outlined',
                     margin: 'dense',
@@ -376,6 +388,10 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                   dropdownClass={styles.countryList}
                   component={TextField}
                   countryCodeEditable={false}
+                  enableSearch
+                  onFocus={() =>
+                    errors.refereePhone && resetField('refereePhone')
+                  }
                 />
                 {touchedFields.refereePhone && errors.refereePhone ? (
                   <FormHelperText error>

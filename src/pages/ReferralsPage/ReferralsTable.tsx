@@ -128,7 +128,7 @@ const ReferralsTable: FC<Props> = () => {
           refereeName
         </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
-          email
+          email / phone
         </TableCell>
         <TableCell
           classes={{ root: clsx(styles.expiresAtCell, styles.headerTableCell) }}
@@ -191,7 +191,9 @@ const ReferralsTable: FC<Props> = () => {
                     align="center"
                     classes={{ root: styles.tableCell }}
                   >
-                    {referral.email}
+                    {`${referral.email}${
+                      referral.email && referral.phone ? ' | ' : ''
+                    }${referral.phone}`}
                   </TableCell>
                   <TableCell
                     align="center"
