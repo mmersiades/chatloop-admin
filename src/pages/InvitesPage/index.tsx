@@ -100,7 +100,7 @@ const InvitesPage: FC = () => {
   const [selectedInviteId, setSelectedInviteId] = useState<
     number | undefined
   >();
-  const [expandedInvite, setexpandedInvite] = useState<number | null>();
+  const [expandedInvite, setExpandedInvite] = useState<number | null>();
   const [currentPage, setCurrentPage] = useState(0);
   const queueDiv = useRef<HTMLDivElement>(null);
 
@@ -304,14 +304,14 @@ const InvitesPage: FC = () => {
                         </Typography>
                         {invite.id === expandedInvite ? (
                           <IconButton
-                            onClick={() => setexpandedInvite(null)}
+                            onClick={() => setExpandedInvite(null)}
                             aria-label="show more"
                           >
                             <ExpandLessRounded />
                           </IconButton>
                         ) : (
                           <IconButton
-                            onClick={() => setexpandedInvite(invite.id)}
+                            onClick={() => setExpandedInvite(invite.id)}
                             aria-label="show more"
                           >
                             <ExpandMoreRounded />
