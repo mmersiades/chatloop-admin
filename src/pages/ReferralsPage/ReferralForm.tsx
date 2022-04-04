@@ -177,7 +177,6 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
 
   // ----------------------------- Component functions ------------------------- //
   const styles = useStyles(type);
-  console.log('errors', errors);
 
   const disableButton = (): boolean => {
     const phoneOrEmailTouched =
@@ -217,7 +216,6 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log('onSubmit');
     let refereePhone: string | undefined;
     if (data.refereePhone && data.refereePhone !== dialCode) {
       refereePhone = removeLeadingZeroFromPhone({
@@ -226,15 +224,12 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
       });
     }
 
-    console.log('type', type);
     if (type === 'create') {
       const body: PostReferralBody = {
         ...data,
         refereePhone,
         firstLanguage: data.firstLanguage.value,
       };
-
-      console.log('body', body);
 
       if (!!body && !!postReferral) {
         try {
