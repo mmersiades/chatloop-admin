@@ -86,7 +86,7 @@ const LoginPage = () => {
       classes={{ root: classes.pageContainer }}
       container
       alignItems="center"
-      justify="center"
+      justifyContent="center"
     >
       <img
         className={classes.contentHeight}
@@ -100,7 +100,7 @@ const LoginPage = () => {
           }}
           container
           direction="column"
-          justify="space-between"
+          justifyContent="space-between"
           alignItems="flex-end"
         >
           {authErrors.length > 0 ? (

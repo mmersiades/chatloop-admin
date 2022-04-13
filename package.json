@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "prettier": {
+    "printWidth": 80,
     "singleQuote": true,
-    "jsxBracketSameLine": false,
     "arrowParens": "always",
-    "printWidth": 80
+    "semi": true
   },
   "dependencies": {
     "@hookform/resolvers": "^2.8.0",
@@ -20,6 +20,7 @@
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.15.3",
     "react-infinite-scroll-component": "^6.1.0",
+    "react-phone-input-material-ui": "^2.17.4",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^5.0.0",
     "react-scroll": "^1.8.2",
@@ -95,11 +96,5 @@
     "coverageReporters": [
       "json"
     ]
-  },
-  "prettier": {
-    "printWidth": 80,
-    "singleQuote": true,
-    "arrowParens": "always",
-    "semi": true
   }
 }
