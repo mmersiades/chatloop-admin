@@ -100,7 +100,7 @@ const InvitesPage: FC = () => {
   const [selectedInviteId, setSelectedInviteId] = useState<
     number | undefined
   >();
-  const [expandedInvite, setexpandedInvite] = useState<number | null>();
+  const [expandedInvite, setExpandedInvite] = useState<number | null>();
   const [currentPage, setCurrentPage] = useState(0);
   const queueDiv = useRef<HTMLDivElement>(null);
 
@@ -282,7 +282,7 @@ const InvitesPage: FC = () => {
             classes={{ root: classes.invitesContainer }}
             container
             spacing={2}
-            justify="space-evenly"
+            justifyContent="space-evenly"
           >
             {invitesPageable?.content.length === 0 ? (
               <p>{NO_INVITES}</p>
@@ -293,7 +293,7 @@ const InvitesPage: FC = () => {
                     <CardContent>
                       <Grid
                         container
-                        justify="space-between"
+                        justifyContent="space-between"
                         alignItems="center"
                       >
                         <Typography variant="body1" color="primary">
@@ -304,14 +304,14 @@ const InvitesPage: FC = () => {
                         </Typography>
                         {invite.id === expandedInvite ? (
                           <IconButton
-                            onClick={() => setexpandedInvite(null)}
+                            onClick={() => setExpandedInvite(null)}
                             aria-label="show more"
                           >
                             <ExpandLessRounded />
                           </IconButton>
                         ) : (
                           <IconButton
-                            onClick={() => setexpandedInvite(invite.id)}
+                            onClick={() => setExpandedInvite(invite.id)}
                             aria-label="show more"
                           >
                             <ExpandMoreRounded />
@@ -368,7 +368,10 @@ const InvitesPage: FC = () => {
                                     />
                                   }
                                   secondary={
-                                    <Grid container justify="space-between">
+                                    <Grid
+                                      container
+                                      justifyContent="space-between"
+                                    >
                                       <Capacity
                                         maxActivities={
                                           partner.maxNumberOfActivities
@@ -400,7 +403,7 @@ const InvitesPage: FC = () => {
 
                       <Grid
                         container
-                        justify="space-between"
+                        justifyContent="space-between"
                         alignItems="center"
                       >
                         <Typography>

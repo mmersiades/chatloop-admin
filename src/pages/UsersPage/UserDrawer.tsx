@@ -199,7 +199,11 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
                 disableTypography
                 secondary={
                   !!extendedUser && !!extendedUser.shiftOneTutor ? (
-                    <Grid container direction="row" justify="space-between">
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="space-between"
+                    >
                       <Typography variant="body2" color="textSecondary">
                         {getTutor(extendedUser.shiftOneTutor).id}
                       </Typography>
@@ -244,7 +248,11 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
                 disableTypography
                 secondary={
                   !!extendedUser && !!extendedUser.shiftTwoTutor ? (
-                    <Grid container direction="row" justify="space-between">
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="space-between"
+                    >
                       <Typography variant="body2" color="textSecondary">
                         {getTutor(extendedUser.shiftTwoTutor).id}
                       </Typography>

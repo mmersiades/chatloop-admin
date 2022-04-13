@@ -218,8 +218,8 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                 count={roleParams.count}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                onPageChange={handleChangePage}
                 ActionsComponent={TablePaginationActions}
               />
             </TableRow>

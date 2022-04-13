@@ -31,9 +31,9 @@ const midBlue = '#43a5e0';
 const errorPink = '#c51162';
 
 /**
- * Data for a [material-ui] theme overide, for theme customisation. <br>
+ * Data for a [material-ui] theme override, for theme customisation. <br>
  * See [Theming](https://material-ui.com/customization/theming/). <br>
- * To be passed to `createMuiTheme()`.
+ * To be passed to `createTheme()`.
  */
 const chatloopTheme = {
   direction: getTextDirection(),

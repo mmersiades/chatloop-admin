@@ -5,9 +5,8 @@ import {
   REFERRER_EMAIL,
   REFERRER_NAME,
 } from '../../src/config/textConstants';
-
+let totalReferrals = 24;
 describe('Using the ReferralsPage', () => {
-  let totalReferrals = 24;
   beforeEach(() => {
     cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/referrals');
@@ -52,7 +51,7 @@ describe('Using the ReferralsPage', () => {
     });
   });
 
-  describe('when creating a Referral', () => {
+  describe('when creating a Referral with email only', () => {
     const refereeName = 'Bob';
     const refereeEmail = 'bob@email.com';
 
@@ -63,15 +62,52 @@ describe('Using the ReferralsPage', () => {
       cy.get('#mui-component-select-role').click();
       cy.get('li[data-value="ROLE_LEARNER"]').click();
       // Ah, fuck it. How hard should it be to use react-select via Cypress?
-      cy.get('button[type="submit"]').click();
-      cy.wait('@postReferrals');
-      totalReferrals++;
-      cy.contains(`1-${totalReferrals} of ${totalReferrals}`).should(
-        'be.visible'
-      );
+      submitForm();
     });
   });
-  //
+
+  describe('when creating a Referral with email and bad phone number', () => {
+    const refereeName = 'Bob2';
+    const refereeEmail = 'bob2@email.com';
+
+    it('should show validation error then allow submit after phone number deleted', () => {
+      cy.get('.MuiFab-root').click();
+      cy.get('input[name="refereeName"]').type(refereeName);
+      cy.get('input[name="refereeEmail"]').type(refereeEmail);
+      cy.get('input[type="phone"]').type('32');
+      cy.get('button[type="submit"]').click();
+      cy.contains('refereePhone must be at least 8 characters');
+      cy.get('input[type="phone"]').focus(); // Focus will clear error and value
+      submitForm();
+    });
+  });
+
+  describe('when creating a Referral with phone only', () => {
+    const refereeName = 'Bob3';
+    const refereePhone = '040533333';
+
+    it('should increase total number of table rows', () => {
+      cy.get('.MuiFab-root').click();
+      cy.get('input[name="refereeName"]').type(refereeName);
+      cy.get('input[type="phone"]').type(refereePhone).blur();
+      submitForm();
+    });
+  });
+
+  describe('when creating a Referral with phone and email', () => {
+    const refereeName = 'Bob4';
+    const refereeEmail = 'bob4@email.com';
+    const refereePhone = '0405444444';
+
+    it('should increase total number of table rows', () => {
+      cy.get('.MuiFab-root').click();
+      cy.get('input[name="refereeName"]').type(refereeName);
+      cy.get('input[name="refereeEmail"]').type(refereeEmail);
+      cy.get('input[type="phone"]').type(refereePhone);
+      submitForm();
+    });
+  });
+
   describe('when updating a Referral', () => {
     it('should show the extended Referral info in drawer', () => {
       cy.get('tbody').within(() => {
@@ -80,9 +116,9 @@ describe('Using the ReferralsPage', () => {
 
       cy.wait('@getReferral');
 
+      cy.contains(REFERRER_EMAIL).scrollIntoView().should('be.visible');
       cy.contains(INTERFACE_LANGUAGE).should('be.visible');
       cy.contains(REFERRER_NAME).should('be.visible');
-      cy.contains(REFERRER_EMAIL).should('be.visible');
       cy.contains('ar').should('be.visible');
       cy.contains('Admin, of Chatloop').should('be.visible');
     });
@@ -121,9 +157,18 @@ describe('Using the ReferralsPage', () => {
       cy.get('button[aria-label="Delete referral"]').scrollIntoView().click();
       cy.wait('@deleteReferral');
       totalReferrals--;
-      cy.contains(`1-${totalReferrals} of ${totalReferrals}`).should(
-        'be.visible'
-      );
+      cy.contains(
+        `1-${totalReferrals > 25 ? '25' : totalReferrals} of ${totalReferrals}`
+      ).should('be.visible');
     });
   });
 });
+
+const submitForm = () => {
+  cy.get('button[type="submit"]').click();
+  cy.wait('@postReferrals');
+  totalReferrals++;
+  cy.contains(
+    `1-${totalReferrals > 25 ? '25' : totalReferrals} of ${totalReferrals}`
+  ).should('be.visible');
+};

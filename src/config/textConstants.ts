@@ -45,6 +45,7 @@ export const NEW_REFERRAL_TITLE = 'New referral';
 export const ADD_REFERRAL_BUTTON = 'ADD REFERRAL';
 export const NAME_FORM_HELPER = 'Recommended: first name only';
 export const EMAIL_FORM_HELPER = 'Invitation sent to this address';
+export const PHONE_FORM_HELPER = 'Invitation sent to this phone number';
 export const FIRST_LANG_FORM_HELPER = 'Native language / mother tongue';
 export const INVITATION_LINK = 'Link';
 
