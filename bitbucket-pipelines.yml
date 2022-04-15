@@ -37,6 +37,7 @@ pipelines:
             - node
           script: # Modify the commands below to build your repository.
             - npm ci
+            - export REACT_APP_IP_LOOKUP_KEY=${IP_LOOKUP_KEY}
             - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
