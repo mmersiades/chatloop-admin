@@ -25,6 +25,7 @@ pipelines:
             - export CYPRESS_API_HOST=https://staging-api.chatloop.org
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
             - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
+            - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - npm run start:staging & npx wait-on http://localhost:3000
             - npm run test:ci
 
@@ -37,7 +38,7 @@ pipelines:
             - node
           script: # Modify the commands below to build your repository.
             - npm ci
-            - export REACT_APP_IP_LOOKUP_KEY=${IP_LOOKUP_KEY}
+            - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
