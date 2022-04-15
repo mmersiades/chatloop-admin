@@ -16,6 +16,11 @@ describe('Using the ReferralsPage', () => {
     cy.intercept('DELETE', '**/rest/referrals/**').as('deleteReferral');
     cy.intercept('POST', '/rest/referrals*').as('postReferrals');
     cy.intercept('GET', '/rest/language').as('getLanguages');
+    cy.intercept('GET', '/json/?key=*', {
+      status: 'success',
+      country: 'Australia',
+      countryCode: 'AU',
+    }).as('ipLookup');
 
     cy.wait('@getReferrals');
     // cy.wait('@getLanguages')
