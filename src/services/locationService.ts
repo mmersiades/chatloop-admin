@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-interface IpApiResponse {
+interface ExtremeIpResponse {
   status: string;
   country: string;
   countryCode: string;
@@ -13,7 +13,11 @@ interface LocationService {
 }
 
 const getCountryCodeByIp: GetCountryCodeByIp = async () => {
-  const { data } = await axios.get<IpApiResponse>('http://ip-api.com/json');
+  const key = process.env.REACT_APP_IP_LOOKUP_KEY;
+  if (!key) throw new Error('Ip lookup key not found');
+  const { data } = await axios.get<ExtremeIpResponse>(
+    `https://extreme-ip-lookup.com/json/?key=${key}`
+  );
   return data.countryCode;
 };
 
