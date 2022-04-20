@@ -20,3 +20,9 @@ export enum ReferralStatus {
   accepted = 'INVITATION_ACCEPTED',
   expired = 'INVITATION_EXPIRED',
 }
+
+export enum Orientation {
+  square = 'SQUARE',
+  landscape = 'LANDSCAPE',
+  portrait = 'PORTRAIT',
+}

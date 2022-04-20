@@ -1,4 +1,4 @@
-import { UserRole, TutorShift, ReferralStatus } from '../enums';
+import { UserRole, TutorShift, ReferralStatus, Orientation } from '../enums';
 
 export interface Action<T> {
   type: T;
@@ -218,4 +218,39 @@ export enum LanguageScopes {
    * * etc...
    */
   macrolanguage = 'M',
+}
+
+export interface Organisation {
+  officialName: string;
+  shortName: string;
+  adminName: string;
+  adminEmail: string;
+  adminPhone: string;
+  addressLevel1: string;
+  addressLevel2: string;
+  addressLevel3: string;
+  addressCountry: string;
+  postcode: string;
+  operationalCountries: Country[];
+  operationalRegions: Region[];
+  onlineOrg: boolean;
+  contactPhone: string;
+  contactEmail: string;
+  websiteUrl: string;
+  logo: string;
+  logoOrientation: Orientation;
+  logomark: string;
+  logomarkOrientation: Orientation;
+  wordmark: string;
+}
+
+export interface Country {
+  countryCode: string;
+  countryName: string;
+}
+
+export interface Region {
+  code: string;
+  countryCode: string;
+  subdivisionName: string;
 }
