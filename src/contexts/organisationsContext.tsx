@@ -3,7 +3,9 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
+  useEffect,
   useReducer,
 } from 'react';
 import organisationsService from '../services/organisationsService';
@@ -76,9 +78,11 @@ interface Props {}
 export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
   children,
 }) => {
+  // ----------------------------- Component state ------------------------------ //
   const [state, dispatch] = useReducer(orgsReducer, initialState);
 
-  const getOrganisations: GetOrganisations = async () => {
+  // ----------------------------- Component functions ------------------------- //
+  const getOrganisations: GetOrganisations = useCallback(async () => {
     dispatch({ type: 'GET_ORGS_REQUEST' });
 
     try {
@@ -93,8 +97,12 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
       console.error('error', error);
       dispatch({ type: 'GET_ORGS_FAILURE' });
     }
-  };
-
+  }, [dispatch]);
+  // ----------------------------- Effects ---------------------------------------- //
+  useEffect(() => {
+    getOrganisations();
+  }, [getOrganisations]);
+  // ----------------------------- Render ---------------------------------------- //
   return (
     <OrganisationsContext.Provider value={{ ...state, getOrganisations }}>
       {children}

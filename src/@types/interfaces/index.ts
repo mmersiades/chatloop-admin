@@ -221,6 +221,7 @@ export enum LanguageScopes {
 }
 
 export interface Organisation {
+  id: number;
   officialName: string;
   shortName: string;
   adminName: string;

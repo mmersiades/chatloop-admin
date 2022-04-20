@@ -21,6 +21,7 @@ import {
   DASHBOARD,
   INVITES,
   LOG_OUT,
+  ORGANISATIONS,
   REFERRALS,
   USERS,
 } from '../config/textConstants';
@@ -116,6 +117,16 @@ const MenuDrawer: FC = () => {
           to={{ pathname: '/referrals' }}
         >
           <ListItemText primary={REFERRALS} />
+        </ListItem>
+        <ListItem
+          classes={
+            location.pathname === '/orgs' ? { root: classes.selectedItem } : {}
+          }
+          button
+          component={Link}
+          to={{ pathname: '/orgs' }}
+        >
+          <ListItemText primary={ORGANISATIONS} />
         </ListItem>
       </List>
       <Divider />

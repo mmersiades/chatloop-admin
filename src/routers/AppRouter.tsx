@@ -8,10 +8,12 @@ import DashboardPage from '../pages/DashboardPage';
 import UsersPage from '../pages/UsersPage';
 import AccountSettings from '../pages/AccountSettings';
 import InvitesPage from '../pages/InvitesPage';
+import OrganisationsPage from '../pages/OrganisationsPage';
+import ReferralsPage from '../pages/ReferralsPage';
 import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
-import ReferralsPage from '../pages/ReferralsPage';
 import { ReferralsProvider } from '../contexts/referralsContext';
+import { OrganisationsProvider } from '../contexts/organisationsContext';
 
 export const AppRouter = () => {
   return (
@@ -41,6 +43,14 @@ export const AppRouter = () => {
           <ReferralsProvider>
             <ReferralsPage />
           </ReferralsProvider>
+        )}
+      />
+      <PrivateRoute
+        path="/orgs"
+        component={() => (
+          <OrganisationsProvider>
+            <OrganisationsPage />
+          </OrganisationsProvider>
         )}
       />
     </Switch>

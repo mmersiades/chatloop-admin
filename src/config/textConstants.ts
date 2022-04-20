@@ -8,6 +8,7 @@ export const LOG_OUT = 'Log out';
 export const ACCOUNT_SETTINGS = 'Account Settings';
 export const INVITES = 'Invites';
 export const REFERRALS = 'Referrals';
+export const ORGANISATIONS = 'Organisations';
 export const USERS = 'Users';
 export const DASHBOARD = 'Dashboard';
 
@@ -48,6 +49,9 @@ export const EMAIL_FORM_HELPER = 'Invitation sent to this address';
 export const PHONE_FORM_HELPER = 'Invitation sent to this phone number';
 export const FIRST_LANG_FORM_HELPER = 'Native language / mother tongue';
 export const INVITATION_LINK = 'Link';
+
+// OrganisationsPage
+export const ORGS_TITLE = 'Partner organisations';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';
