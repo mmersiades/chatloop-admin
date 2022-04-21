@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { ChangeEventHandler, FC, useState } from 'react';
 import {
   CircularProgress,
   createStyles,
@@ -20,6 +20,7 @@ import clsx from 'clsx';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useOrganisations } from '../../contexts/organisationsContext';
 import { Organisation } from '../../@types/interfaces';
+import { DEFAULT_ORGANISATIONS_PAGE_SIZE } from '../../config/constants';
 
 const useStyles = makeStyles(({ palette, transitions }: Theme) =>
   createStyles({
@@ -80,15 +81,31 @@ interface Props {}
 
 const OrganisationsTable: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
-  const { setShowOrgDrawer, setShowNewOrgForm } = useAppNav();
-  const { organisations, fetchingOrganisations } = useOrganisations();
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(DEFAULT_ORGANISATIONS_PAGE_SIZE);
 
   // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
+  const { setShowOrgDrawer, setShowNewOrgForm } = useAppNav();
+  const { organisations, fetchingOrganisations } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useStyles();
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    page: number
+  ) => {
+    setPage(page);
+  };
+
+  const handleChangeRowsPerPage: ChangeEventHandler<
+    HTMLTextAreaElement | HTMLInputElement
+  > = (event) => {
+    setSize(parseInt(event.target.value));
+    setPage(0);
+  };
 
   // -------------------------- Effects ------------------------------------ //
 
@@ -106,10 +123,10 @@ const OrganisationsTable: FC<Props> = () => {
           officialName
         </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
-          country
+          administrativeArea
         </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
-          administrativeArea
+          country
         </TableCell>
       </TableRow>
     </TableHead>
@@ -133,55 +150,57 @@ const OrganisationsTable: FC<Props> = () => {
             {renderTableHead()}
 
             <TableBody classes={{ root: styles.tableBody }}>
-              {organisations.map((org: Organisation) => (
-                <TableRow
-                  classes={{ root: styles.tableRow }}
-                  key={org.id}
-                  hover
-                  onClick={() => {
-                    setShowNewOrgForm(false);
-                    setShowOrgDrawer(org.id);
-                  }}
-                >
-                  <TableCell
-                    classes={{ root: clsx(styles.tableCell, styles.idCell) }}
-                    align="center"
+              {organisations
+                .slice(page * size, page * size + size)
+                .map((org: Organisation) => (
+                  <TableRow
+                    classes={{ root: styles.tableRow }}
+                    key={org.id}
+                    hover
+                    onClick={() => {
+                      setShowNewOrgForm(false);
+                      setShowOrgDrawer(org.id);
+                    }}
                   >
-                    {org.id}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    classes={{ root: styles.tableCell }}
-                  >
-                    {org.officialName}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    classes={{ root: styles.tableCell }}
-                  >
-                    {org.addressCountry}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    classes={{ root: styles.tableCell }}
-                  >
-                    {org.addressLevel3}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell
+                      classes={{ root: clsx(styles.tableCell, styles.idCell) }}
+                      align="center"
+                    >
+                      {org.id}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      classes={{ root: styles.tableCell }}
+                    >
+                      {org.officialName}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      classes={{ root: styles.tableCell }}
+                    >
+                      {org.addressLevel3}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      classes={{ root: styles.tableCell }}
+                    >
+                      {org.addressCountry}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
 
             <TableFooter>
               <TableRow>
-                {/*<TablePagination*/}
-                {/*  data-test="pagination"*/}
-                {/*  count={totalReferrals}*/}
-                {/*  rowsPerPage={size}*/}
-                {/*  page={page}*/}
-                {/*  onPageChange={handleChangePage}*/}
-                {/*  onRowsPerPageChange={handleChangeRowsPerPage}*/}
-                {/*  ActionsComponent={TablePaginationActions}*/}
-                {/*/>*/}
+                <TablePagination
+                  data-test="pagination"
+                  count={organisations.length}
+                  rowsPerPage={size}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
               </TableRow>
             </TableFooter>
           </Table>
