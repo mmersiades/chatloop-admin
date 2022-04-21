@@ -52,6 +52,7 @@ export const INVITATION_LINK = 'Link';
 
 // OrganisationsPage
 export const ORGS_TITLE = 'Partner organisations';
+export const ADD_ORG_BUTTON = 'ADD ORGANISATION';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';

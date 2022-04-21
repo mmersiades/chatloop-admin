@@ -88,6 +88,8 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   } = useAppNav();
   const { learners, partners, tutors } = useUsers();
 
+  console.log('learners', learners);
+
   // ----------------------------- Component functions ------------------------- //
   const handleChangePage = (event: any, newPage: any) => {
     setPage(newPage);
@@ -149,6 +151,8 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
   };
 
   const roleParams = getRoleParams();
+
+  console.log('roleParams', roleParams);
 
   // ----------------------------- Render ---------------------------------------- //
   return (

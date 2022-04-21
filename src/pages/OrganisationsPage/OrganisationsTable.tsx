@@ -1,8 +1,6 @@
 import React, { ChangeEventHandler, FC, useState } from 'react';
 import {
   CircularProgress,
-  createStyles,
-  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -12,7 +10,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Theme,
 } from '@material-ui/core';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
 import clsx from 'clsx';
@@ -20,66 +17,14 @@ import clsx from 'clsx';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useOrganisations } from '../../contexts/organisationsContext';
 import { Organisation } from '../../@types/interfaces';
+import { useTableStyles } from '../styles';
 import { DEFAULT_ORGANISATIONS_PAGE_SIZE } from '../../config/constants';
 
-const useStyles = makeStyles(({ palette, transitions }: Theme) =>
-  createStyles({
-    tableContainer: {
-      height: 'calc(100vh - 48px)',
-      borderRadius: '0px',
-      width: '100%',
-      transition: transitions.create('width', {
-        easing: transitions.easing.sharp,
-        duration: transitions.duration.leavingScreen,
-      }),
-    },
-    tableContainerShift: {
-      width: '70%',
-      transition: transitions.create('width', {
-        easing: transitions.easing.easeOut,
-        duration: transitions.duration.enteringScreen,
-      }),
-    },
-    tableHead: {
-      backgroundColor: palette.primary.main,
-    },
-    tableBody: {
-      height: 'calc(100vh - 138px)',
-      display: 'block',
-      overflow: 'auto',
-    },
-    tableRow: {
-      display: 'table',
-      width: '100%',
-      tableLayout: 'fixed',
-    },
-    headerTableCell: {
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      color: palette.common.white,
-    },
-    tableCell: {
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    idCell: {
-      width: '90px',
-    },
-    spinnerContainer: {
-      height: 'calc(100vh - 48px)',
-      width: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  })
-);
+interface Props {
+  handleRowClick: (org: Organisation) => void;
+}
 
-interface Props {}
-
-const OrganisationsTable: FC<Props> = () => {
+const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
   // -------------------------- Component state ---------------------------- //
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(DEFAULT_ORGANISATIONS_PAGE_SIZE);
@@ -87,11 +32,11 @@ const OrganisationsTable: FC<Props> = () => {
   // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
-  const { setShowOrgDrawer, setShowNewOrgForm } = useAppNav();
+  const { setShowOrgDrawer } = useAppNav();
   const { organisations, fetchingOrganisations } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
-  const styles = useStyles();
+  const styles = useTableStyles();
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -158,8 +103,8 @@ const OrganisationsTable: FC<Props> = () => {
                     key={org.id}
                     hover
                     onClick={() => {
-                      setShowNewOrgForm(false);
-                      setShowOrgDrawer(org.id);
+                      setShowOrgDrawer(true);
+                      handleRowClick(org);
                     }}
                   >
                     <TableCell

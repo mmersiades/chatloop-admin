@@ -1,11 +1,13 @@
 import React, { useEffect, FC, useState, useCallback } from 'react';
-import { Tabs, Tab, Theme, makeStyles, createStyles } from '@material-ui/core';
-import { useUsers } from '../../contexts/usersContext';
-import { useAppNav } from '../../contexts/appNavContext';
+import { Tabs, Tab, makeStyles, createStyles } from '@material-ui/core';
+import clsx from 'clsx';
+
 import Learners from './Learners';
 import Partners from './Partners';
 import Tutors from './Tutors';
 import WithNavbar from '../../components/WithNavbar';
+import { useUsers } from '../../contexts/usersContext';
+import { useAppNav } from '../../contexts/appNavContext';
 import {
   Learner,
   Partner,
@@ -15,27 +17,24 @@ import {
   ExtendedTutor,
 } from '../../@types/interfaces';
 import { getUser } from '../../services/usersService';
+import { usePageStyles } from '../styles';
 import {
   LEARNERS_TAB,
   PARTNERS_TAB,
   TUTORS_TAB,
 } from '../../config/textConstants';
 
-const useStyles = makeStyles(({ palette }: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
-    usersContainer: {
-      height: '100%',
-      width: '100%',
-    },
     innerContainer: {
-      width: '100%',
-      backgroundColor: palette.common.white,
+      height: 'unset',
     },
   })
 );
 
 const UsersPage: FC = () => {
-  const classes = useStyles();
+  const pageStyles = usePageStyles();
+  const styles = useStyles();
 
   // ----------------------------- Component state ------------------------------ //
   const [tab, setTab] = useState(0);
@@ -90,8 +89,8 @@ const UsersPage: FC = () => {
 
   // ----------------------------- Render ---------------------------------------- //
   return (
-    <div className={classes.usersContainer}>
-      <div className={classes.innerContainer}>
+    <div className={pageStyles.container}>
+      <div className={clsx(pageStyles.innerContainer, styles.innerContainer)}>
         <Tabs
           value={tab}
           onChange={(event, newValue) => {

@@ -8,7 +8,6 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Theme,
   List,
   ListItem,
   ListItemText,
@@ -38,32 +37,15 @@ import {
   DELETE,
 } from '../../config/textConstants';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
+import { useDrawerStyles } from '../styles';
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     docked: {
       top: 96,
       width: '30%',
       overflowY: 'unset',
       height: 'calc(100vh - 96px)',
-    },
-    dockedWithMenuDrawer: {
-      width: 'calc((100vw - 150px) * 0.3)',
-    },
-    list: {
-      overflowY: 'auto',
-    },
-    closeButton: {
-      marginRight: spacing(2),
-    },
-    appbar: {
-      height: 36,
-    },
-    toolbar: {
-      minHeight: 36,
-    },
-    deleteButton: {
-      color: palette.error.main,
     },
   })
 );
@@ -75,7 +57,8 @@ interface UserDrawerProps {
 }
 
 const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
-  const classes = useStyles();
+  const styles = useStyles();
+  const drawerStyles = useDrawerStyles();
 
   // ----------------------------- Component state ------------------------------ //
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
@@ -109,8 +92,8 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   return (
     <Drawer
       classes={{
-        paperAnchorDockedRight: clsx(classes.docked, {
-          [classes.dockedWithMenuDrawer]: showMenuDrawer,
+        paperAnchorDockedRight: clsx(styles.docked, {
+          [drawerStyles.dockedWithMenuDrawer]: showMenuDrawer,
         }),
       }}
       open={!!showUserDrawer}
@@ -131,21 +114,21 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           handleClose={() => setShowResetPasswordDialog(false)}
         />
       )}
-      <AppBar classes={{ root: classes.appbar }} position="relative">
-        <Toolbar classes={{ dense: classes.toolbar }} variant="dense">
+      <AppBar classes={{ root: drawerStyles.appbar }} position="relative">
+        <Toolbar classes={{ dense: drawerStyles.toolbar }} variant="dense">
           <IconButton
             color="inherit"
             aria-label="Close drawer button"
             onClick={() => setShowUserDrawer(null)}
             edge="start"
-            className={classes.closeButton}
+            className={drawerStyles.closeButton}
           >
             <CloseRounded />
           </IconButton>
           <Typography>{!!extendedUser ? extendedUser.id : '...'}</Typography>
         </Toolbar>
       </AppBar>
-      <List classes={{ root: classes.list }}>
+      <List classes={{ root: drawerStyles.list }}>
         <ListItem>
           <ListItemText
             primary={DISPLAY_NAME}
@@ -307,7 +290,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             <Button
               fullWidth
               variant="outlined"
-              classes={{ root: classes.deleteButton }}
+              classes={{ root: drawerStyles.deleteButton }}
               onClick={() => setShowDeleteUserDialog(true)}
               aria-label="Delete user button"
             >
