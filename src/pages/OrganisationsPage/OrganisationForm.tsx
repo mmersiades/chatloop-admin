@@ -205,10 +205,16 @@ const OrganisationForm: FC<Props> = ({ org }) => {
   const countryWatch = useWatch({ control, name: 'countryCode' });
 
   // -------------------------- Hooks -------------------------------------- //
-  const { showOrgDrawer } = useAppNav();
+  const { showOrgDrawer, setShowOrgDrawer } = useAppNav();
   const { countryByIp, countries } = useCountries();
-  const { createOrganisation, creating, updateOrganisation, updating } =
-    useOrganisations();
+  const {
+    createOrganisation,
+    creating,
+    updateOrganisation,
+    updating,
+    deleteOrganisation,
+    deleting,
+  } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useStyles();
@@ -293,7 +299,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       };
 
       const isSuccess = await createOrganisation(body);
-      isSuccess && reset();
+      isSuccess && setShowOrgDrawer(false);
     }
   };
 
@@ -322,6 +328,13 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       .filter((r) => countryCodes.includes(r.countryCode))
       .map((r) => r.code);
     setValue('operationalRegions', filteredRegions);
+  };
+
+  const deleteOrg = async () => {
+    if (!!org && deleteOrganisation) {
+      const isSuccess = await deleteOrganisation(org.id);
+      isSuccess && setShowOrgDrawer(false);
+    }
   };
 
   // -------------------------- Effects ------------------------------------ //
@@ -603,6 +616,17 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       >
         {!org ? 'CREATE ORGANISATION' : 'SUBMIT CHANGES'}
       </Button>
+      {!!org && (
+        <Button
+          aria-label="Delete organisation"
+          classes={{ root: styles.deleteButton }}
+          variant="outlined"
+          disabled={deleting}
+          onClick={deleteOrg}
+        >
+          DELETE ORGANISATION
+        </Button>
+      )}
     </form>
   );
 };

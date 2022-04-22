@@ -18,6 +18,7 @@ export interface OrganisationsState {
   fetching: boolean;
   creating: boolean;
   updating: boolean;
+  deleting: boolean;
   organisations: Organisation[];
 }
 
@@ -25,6 +26,7 @@ const initialState: OrganisationsState = {
   fetching: false,
   creating: false,
   updating: false,
+  deleting: false,
   organisations: [],
 };
 
@@ -37,11 +39,13 @@ type UpdateOrganisation = ({
   body: PutOrgBody;
   orgId: number;
 }) => Promise<boolean>;
+type DeleteOrganisation = (orgId: number) => Promise<boolean>;
 
 interface OrganisationsContext extends OrganisationsState {
   getOrganisations?: GetOrganisations;
   createOrganisation?: CreateOrganisation;
   updateOrganisation?: UpdateOrganisation;
+  deleteOrganisation?: DeleteOrganisation;
 }
 
 const initialContext: OrganisationsContext = { ...initialState };
@@ -68,6 +72,11 @@ interface UpdateOrganisationsSuccess extends Action<'UPDATE_ORG_SUCCESS'> {
   orgs: Organisation[];
 }
 interface UpdateOrganisationsFailure extends Action<'UPDATE_ORG_FAILURE'> {}
+interface DeleteOrganisationsRequest extends Action<'DELETE_ORG_REQUEST'> {}
+interface DeleteOrganisationsSuccess extends Action<'DELETE_ORG_SUCCESS'> {
+  orgs: Organisation[];
+}
+interface DeleteOrganisationsFailure extends Action<'DELETE_ORG_FAILURE'> {}
 
 type Actions =
   | GetOrganisationsRequest
@@ -78,7 +87,10 @@ type Actions =
   | CreateOrganisationsFailure
   | UpdateOrganisationsRequest
   | UpdateOrganisationsSuccess
-  | UpdateOrganisationsFailure;
+  | UpdateOrganisationsFailure
+  | DeleteOrganisationsRequest
+  | DeleteOrganisationsSuccess
+  | DeleteOrganisationsFailure;
 
 const orgsReducer = (
   state: OrganisationsState,
@@ -132,6 +144,22 @@ const orgsReducer = (
       return {
         ...state,
         updating: false,
+      };
+    case 'DELETE_ORG_REQUEST':
+      return {
+        ...state,
+        deleting: true,
+      };
+    case 'DELETE_ORG_SUCCESS':
+      return {
+        ...state,
+        organisations: action.orgs,
+        deleting: false,
+      };
+    case 'DELETE_ORG_FAILURE':
+      return {
+        ...state,
+        deleting: false,
       };
     default:
       return state;
@@ -206,6 +234,26 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
       return false;
     }
   };
+
+  const deleteOrganisation: DeleteOrganisation = async (orgId) => {
+    dispatch({ type: 'DELETE_ORG_REQUEST' });
+
+    try {
+      const { status, data } = await organisationsService.deleteOrg(orgId);
+
+      if (status === 200) {
+        dispatch({ type: 'DELETE_ORG_SUCCESS', orgs: data });
+        return true;
+      } else {
+        dispatch({ type: 'DELETE_ORG_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error('error', error);
+      dispatch({ type: 'DELETE_ORG_FAILURE' });
+      return false;
+    }
+  };
   // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
     getOrganisations();
@@ -218,6 +266,7 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
         getOrganisations,
         createOrganisation,
         updateOrganisation,
+        deleteOrganisation,
       }}
     >
       {children}
