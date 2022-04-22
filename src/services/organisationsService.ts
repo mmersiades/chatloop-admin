@@ -1,29 +1,30 @@
-import apiChatloopOrg from '../config/axiosConfig';
 import { AxiosResponse } from 'axios';
+
 import { Organisation } from '../@types/interfaces';
 import { authHeader } from '../helpers/getAuthHeader';
 import { handleError } from '../helpers/handleError';
+import apiChatloopOrg from '../config/axiosConfig';
 
-interface PostOrgBody {
+export interface PostOrgBody {
   officialName: string;
-  shortName?: string;
-  premise?: string;
-  subpremise?: string;
-  streetAddress?: string;
-  administrativeArea?: string;
-  locality?: string;
-  country?: string;
-  countryCode?: string;
-  postalCode?: string;
-  operationalCountries?: string[];
-  operationalRegions?: string[];
-  onlineOrg?: boolean;
-  contactPhone?: string;
-  contactEmail?: string;
-  websiteUrl?: string;
+  operationalCountries: string[];
+  operationalRegions: string[];
+  onlineOrg: boolean;
+  shortName: string | null;
+  premise: string | null;
+  subpremise: string | null;
+  streetAddress: string | null;
+  administrativeArea: string | null;
+  locality: string | null;
+  country: string | null;
+  countryCode: string | null;
+  postalCode: string | null;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  websiteUrl: string | null;
 }
 
-interface PutOrgBody extends PostOrgBody {}
+export interface PutOrgBody extends PostOrgBody {}
 
 type GetOrgs = () => Promise<AxiosResponse<Organisation[]>>;
 type GetOrg = (orgId: number) => Promise<AxiosResponse<Organisation>>;

@@ -53,6 +53,24 @@ export const INVITATION_LINK = 'Link';
 // OrganisationsPage
 export const ORGS_TITLE = 'Partner organisations';
 export const ADD_ORG_BUTTON = 'ADD ORGANISATION';
+export const OFFICIAL_NAME_HELPER =
+  "Organisation's legal name, as registered with government";
+export const SHORT_NAME_HELPER =
+  'The name the organisation is commonly known as';
+export const CONTACT_PHONE_HELPER = "Organisation's public-facing phone number";
+export const CONTACT_EMAIL_HELPER =
+  "Organisation's public-facing email address";
+export const WEBSITE_HELPER = "Organisation's public-facing website url";
+export const OPERATIONAL_COUNTRIES_HELPER =
+  'Countries where the organisation serves clients';
+export const SUBPREMISE_HELPER =
+  'A building within a collection of buildings with a common name';
+export const PREMISE_HELPER =
+  'A building or collection of buildings with a common name';
+export const STREET_ADDRESS_HELPER = 'A precise street address';
+export const LOCALITY_HELPER = '';
+export const ADMINISTRATIVE_AREA_HELPER = '';
+export const POSTAL_CODE_HELPER = '';
 
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';

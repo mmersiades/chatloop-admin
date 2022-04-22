@@ -145,8 +145,8 @@ const ReferralsTable: FC<Props> = () => {
                     classes={{ root: tableStyles.tableCell }}
                   >
                     {`${referral.email}${
-                      referral.email && referral.phone ? ' | ' : ''
-                    }${referral.phone}`}
+                      referral.email ?? referral.phone ? ' | ' : ''
+                    }${referral.phone ?? referral.phone}`}
                   </TableCell>
                   <TableCell
                     align="center"

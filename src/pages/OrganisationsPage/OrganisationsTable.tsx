@@ -33,7 +33,7 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
 
   // -------------------------- Hooks -------------------------------------- //
   const { setShowOrgDrawer } = useAppNav();
-  const { organisations, fetchingOrganisations } = useOrganisations();
+  const { organisations, fetching } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useTableStyles();
@@ -78,7 +78,7 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
   );
   return (
     <>
-      {fetchingOrganisations ? (
+      {fetching ? (
         <>
           <Table size="small">{renderTableHead()}</Table>
 
@@ -123,13 +123,13 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
                       align="center"
                       classes={{ root: styles.tableCell }}
                     >
-                      {org.addressLevel3}
+                      {org.administrativeArea}
                     </TableCell>
                     <TableCell
                       align="center"
                       classes={{ root: styles.tableCell }}
                     >
-                      {org.addressCountry}
+                      {org.country}
                     </TableCell>
                   </TableRow>
                 ))}

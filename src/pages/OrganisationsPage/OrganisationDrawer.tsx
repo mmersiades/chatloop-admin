@@ -9,7 +9,10 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { CloseRounded } from '@material-ui/icons';
+
+import OrganisationForm from './OrganisationForm';
 import { useAppNav } from '../../contexts/appNavContext';
+import { CountriesProvider } from '../../contexts/countriesContext';
 import { useDrawerStyles } from '../styles';
 
 interface Props {
@@ -17,17 +20,11 @@ interface Props {
 }
 
 const OrganisationDrawer: FC<Props> = ({ org }) => {
-  // -------------------------- Component state ---------------------------- //
-
-  // -------------------------- 3rd party hooks ---------------------------- //
-
   // -------------------------- Hooks -------------------------------------- //
   const { showOrgDrawer, showMenuDrawer, setShowOrgDrawer } = useAppNav();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useDrawerStyles();
-
-  // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
   return (
@@ -58,14 +55,9 @@ const OrganisationDrawer: FC<Props> = ({ org }) => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <p>Org drawer</p>
-      {/*{fetchingReferral || !extendedReferral ? (*/}
-      {/*  <div className={styles.spinnerContainer}>*/}
-      {/*    <CircularProgress color="primary" />*/}
-      {/*  </div>*/}
-      {/*) : (*/}
-      {/*  <ReferralForm type="edit" extendedReferral={extendedReferral} />*/}
-      {/*)}*/}
+      <CountriesProvider>
+        <OrganisationForm org={org} />
+      </CountriesProvider>
     </Drawer>
   );
 };

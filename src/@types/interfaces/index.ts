@@ -184,65 +184,55 @@ export interface Invite {
 
 // An object representing a language as per [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3)
 export interface Language {
-  // A unique 6-digit number identifying each language
   id: number;
-
-  /**
-   * A 2- or 3-character code representing a language
-   */
   code?: string;
-
-  // The name of the language, in English
   language: string;
-
-  // Individual (I) or macroLanguage (M). See more at [[LanguageScopes]]
   scope?: LanguageScopes;
-
-  /**
-   * The language code for the selected language's macroLanguage,
-   * if the selected language belongs to a macroLanguage
-   */
   macroLanguage?: string | null;
 }
 
 //These language scopes come from ISO-639-3. [Read more here](https://iso639-3.sil.org/about/scope)
 export enum LanguageScopes {
-  /** An individual scope means that the language codes represents just one, individual language. */
   individual = 'I',
-  /** A macrolanguage scope that the language code represents an umbrella code for a collection of related individual languages.
-   * For example **"ara"** is a macrolanguage code that covers the various Arabic language codes, for example:
-   * * arb - Standard Arabic
-   * * arq - Algerian Arabic
-   * * ars - Nadji Arabic
-   * * arz - Egyptian Arabic
-   * * etc...
-   */
   macrolanguage = 'M',
 }
 
 export interface Organisation {
   id: number;
   officialName: string;
-  shortName: string;
-  adminName: string;
-  adminEmail: string;
-  adminPhone: string;
-  addressLevel1: string;
-  addressLevel2: string;
-  addressLevel3: string;
-  addressCountry: string;
-  postcode: string;
+
+  // Areas of operation
   operationalCountries: Country[];
   operationalRegions: Region[];
   onlineOrg: boolean;
-  contactPhone: string;
-  contactEmail: string;
-  websiteUrl: string;
-  logo: string;
-  logoOrientation: Orientation;
-  logomark: string;
-  logomarkOrientation: Orientation;
-  wordmark: string;
+
+  // Additional info
+  shortName: string | null;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  websiteUrl: string | null;
+
+  // Logo
+  logo: string | null;
+  logoOrientation: Orientation | null;
+  logomark: string | null;
+  logomarkOrientation: Orientation | null;
+  wordmark: string | null;
+
+  // Address
+  premise: string | null;
+  subpremise: string | null;
+  streetAddress: string | null;
+  locality: string | null;
+  administrativeArea: string | null;
+  country: string | null;
+  countryCode: string | null;
+  postalCode: string | null;
+
+  // Org Admin
+  adminName: string | null;
+  adminEmail: string | null;
+  adminPhone: string | null;
 }
 
 export interface Country {
