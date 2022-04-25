@@ -64,6 +64,12 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
         >
           id
         </TableCell>
+        <TableCell
+          classes={{ root: clsx(styles.headerTableCell, styles.logoCell) }}
+          align="center"
+        >
+          logo
+        </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
           officialName
         </TableCell>
@@ -112,6 +118,20 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
                       align="center"
                     >
                       {org.id}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      classes={{
+                        root: clsx(styles.tableCell, styles.logoCell),
+                      }}
+                    >
+                      {org.logo && (
+                        <img
+                          src={org.logo}
+                          height="16px"
+                          style={{ marginTop: '4px' }}
+                        />
+                      )}
                     </TableCell>
                     <TableCell
                       align="center"

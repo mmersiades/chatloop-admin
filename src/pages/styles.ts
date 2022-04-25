@@ -69,6 +69,10 @@ export const useTableStyles = makeStyles(({ palette, transitions }: Theme) =>
     roleCell: {
       width: '90px',
     },
+    logoCell: {
+      padding: '4px',
+      width: '48px',
+    },
     expiresAtCell: {
       width: '110px',
     },
