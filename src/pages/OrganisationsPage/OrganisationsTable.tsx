@@ -130,6 +130,7 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
                           src={org.logo}
                           height="16px"
                           style={{ marginTop: '4px' }}
+                          alt={`${org.shortName || org.officialName}'s logo`}
                         />
                       )}
                     </TableCell>

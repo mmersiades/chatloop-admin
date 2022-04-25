@@ -14,6 +14,7 @@ import OrganisationForm from './OrganisationForm';
 import { useAppNav } from '../../contexts/appNavContext';
 import { CountriesProvider } from '../../contexts/countriesContext';
 import { useDrawerStyles } from '../styles';
+import LogoList from './LogoList';
 
 interface Props {
   org?: Organisation;
@@ -56,6 +57,16 @@ const OrganisationDrawer: FC<Props> = ({ org }) => {
         </Toolbar>
       </AppBar>
       <CountriesProvider>
+        {org && (
+          <LogoList
+            id={org.id}
+            logo={org.logo}
+            logoOrientation={org.logoOrientation}
+            logomark={org.logomark}
+            logomarkOrientation={org.logomarkOrientation}
+            wordmark={org.wordmark}
+          />
+        )}
         <OrganisationForm org={org} />
       </CountriesProvider>
     </Drawer>

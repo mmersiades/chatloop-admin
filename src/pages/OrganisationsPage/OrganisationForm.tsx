@@ -367,8 +367,6 @@ const OrganisationForm: FC<Props> = ({ org }) => {
   // -------------------------- Render ------------------------------------- //
   return (
     <form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
-      <p>Logo goes here</p>
-      <Divider />
       <Typography variant="subtitle1">Contact info</Typography>
       <PlainTextField
         name="officialName"
