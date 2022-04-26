@@ -11,11 +11,13 @@ import {
 
 import WithNavbar from '../../components/WithNavbar';
 import statsService from '../../services/statsService';
+import DauChart from './DauChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
     card: {
       margin: spacing(2),
+      width: 600,
     },
   })
 );
@@ -46,7 +48,13 @@ const DashboardPage: FC = () => {
           </Typography>
         </CardContent>
       </Card>
-      <Card>
+
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <DauChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
         <CardHeader title="Users active last 30 days" />
         <CardContent>
           <Typography variant="h3" align="center">
