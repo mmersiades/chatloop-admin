@@ -127,7 +127,7 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
                     >
                       {org.logo && (
                         <img
-                          src={org.logo}
+                          src={org.wordmark || org.logo}
                           height="16px"
                           style={{ marginTop: '4px' }}
                           alt={`${org.shortName || org.officialName}'s logo`}

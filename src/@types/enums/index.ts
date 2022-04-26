@@ -26,3 +26,9 @@ export enum Orientation {
   landscape = 'LANDSCAPE',
   portrait = 'PORTRAIT',
 }
+
+export enum LogoType {
+  logo = 'LOGO',
+  logomark = 'LOGOMARK',
+  wordmark = 'WORDMARK',
+}

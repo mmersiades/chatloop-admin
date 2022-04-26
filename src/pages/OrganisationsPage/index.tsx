@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import clsx from 'clsx';
 
 import OrganisationsTable from './OrganisationsTable';
@@ -8,25 +8,18 @@ import OrganisationDrawer from './OrganisationDrawer';
 import { Organisation } from '../../@types/interfaces';
 import AddOrganisationFab from './AddOrganisationFab';
 import { usePageStyles } from '../styles';
+import LogoDialog from '../../components/dialogs/LogoDialog';
+import { useOrganisations } from '../../contexts/organisationsContext';
 
 interface Props {}
 
 const OrganisationsPage: FC<Props> = () => {
-  // -------------------------- Component state ---------------------------- //
-  const [selectedOrg, setSelectedOrg] = useState<Organisation | undefined>(
-    undefined
-  );
-
   // -------------------------- Hooks -------------------------------------- //
   const { showOrgDrawer } = useAppNav();
+  const { logoDialog, selectOrg } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = usePageStyles();
-
-  // -------------------------- Effects ------------------------------------ //
-  useEffect(() => {
-    !showOrgDrawer && setSelectedOrg(undefined);
-  }, [showOrgDrawer]);
 
   // -------------------------- Render ------------------------------------- //
   return (
@@ -37,11 +30,13 @@ const OrganisationsPage: FC<Props> = () => {
         })}
       >
         <OrganisationsTable
-          handleRowClick={(org: Organisation) => setSelectedOrg(org)}
+          handleRowClick={(org: Organisation) => selectOrg && selectOrg(org)}
         />
       </div>
-      <OrganisationDrawer org={selectedOrg} />
+      <OrganisationDrawer />
       <AddOrganisationFab />
+
+      {logoDialog && <LogoDialog {...logoDialog} />}
     </div>
   );
 };

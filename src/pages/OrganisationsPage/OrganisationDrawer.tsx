@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { Organisation } from '../../@types/interfaces';
 import {
   AppBar,
   Drawer,
@@ -15,17 +14,22 @@ import { useAppNav } from '../../contexts/appNavContext';
 import { CountriesProvider } from '../../contexts/countriesContext';
 import { useDrawerStyles } from '../styles';
 import LogoList from './LogoList';
+import { useOrganisations } from '../../contexts/organisationsContext';
 
-interface Props {
-  org?: Organisation;
-}
+interface Props {}
 
-const OrganisationDrawer: FC<Props> = ({ org }) => {
+const OrganisationDrawer: FC<Props> = () => {
   // -------------------------- Hooks -------------------------------------- //
   const { showOrgDrawer, showMenuDrawer, setShowOrgDrawer } = useAppNav();
+  const { selectedOrganisation, selectOrg } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useDrawerStyles();
+
+  const handleClose = () => {
+    selectOrg && selectOrg(undefined);
+    setShowOrgDrawer(false);
+  };
 
   // -------------------------- Render ------------------------------------- //
   return (
@@ -45,29 +49,31 @@ const OrganisationDrawer: FC<Props> = ({ org }) => {
           <IconButton
             color="inherit"
             aria-label="Close drawer button"
-            onClick={() => setShowOrgDrawer(false)}
+            onClick={handleClose}
             edge="start"
             className={styles.closeButton}
           >
             <CloseRounded />
           </IconButton>
           <Typography>
-            {!!org ? org.officialName : 'New organisation'}
+            {!!selectedOrganisation
+              ? selectedOrganisation.officialName
+              : 'New organisation'}
           </Typography>
         </Toolbar>
       </AppBar>
       <CountriesProvider>
-        {org && (
+        {selectedOrganisation && (
           <LogoList
-            id={org.id}
-            logo={org.logo}
-            logoOrientation={org.logoOrientation}
-            logomark={org.logomark}
-            logomarkOrientation={org.logomarkOrientation}
-            wordmark={org.wordmark}
+            id={selectedOrganisation.id}
+            logo={selectedOrganisation.logo}
+            logoOrientation={selectedOrganisation.logoOrientation}
+            logomark={selectedOrganisation.logomark}
+            logomarkOrientation={selectedOrganisation.logomarkOrientation}
+            wordmark={selectedOrganisation.wordmark}
           />
         )}
-        <OrganisationForm org={org} />
+        <OrganisationForm org={selectedOrganisation} />
       </CountriesProvider>
     </Drawer>
   );

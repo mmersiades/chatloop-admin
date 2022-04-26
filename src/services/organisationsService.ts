@@ -4,6 +4,7 @@ import { Organisation } from '../@types/interfaces';
 import { authHeader } from '../helpers/getAuthHeader';
 import { handleError } from '../helpers/handleError';
 import apiChatloopOrg from '../config/axiosConfig';
+import { LogoType, Orientation } from '../@types/enums';
 
 export interface PostOrgBody {
   officialName: string;
@@ -26,6 +27,14 @@ export interface PostOrgBody {
 
 export interface PutOrgBody extends PostOrgBody {}
 
+export interface PostLogoArgs {
+  files: File[];
+  type: LogoType;
+  orientation: Orientation;
+  orgId: number;
+}
+
+type PostLogo = (args: PostLogoArgs) => Promise<AxiosResponse<Organisation>>;
 type GetOrgs = () => Promise<AxiosResponse<Organisation[]>>;
 type GetOrg = (orgId: number) => Promise<AxiosResponse<Organisation>>;
 type PostOrg = (body: PostOrgBody) => Promise<AxiosResponse<Organisation[]>>;
@@ -44,6 +53,7 @@ interface OrganisationsService {
   postOrg: PostOrg;
   putOrg: PutOrg;
   deleteOrg: DeleteOrg;
+  postLogo: PostLogo;
 }
 
 const getOrgs: GetOrgs = async () => {
@@ -125,12 +135,35 @@ const deleteOrg: DeleteOrg = async (orgId) => {
   return Promise.reject();
 };
 
+export const postLogo: PostLogo = async ({
+  orgId,
+  orientation,
+  type,
+  files,
+}) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  const formData = new FormData();
+  formData.append('file', files[0], `${type.toLowerCase()}.png`);
+  formData.append('type', type);
+  formData.append('orientation', orientation);
+
+  return apiChatloopOrg.post(
+    `rest/user/organisation/${orgId}/logo`,
+    formData,
+    requestOptions
+  );
+};
+
 const organisationsService: OrganisationsService = {
   getOrgs,
   getOrg,
   postOrg,
   putOrg,
   deleteOrg,
+  postLogo,
 };
 
 export default organisationsService;

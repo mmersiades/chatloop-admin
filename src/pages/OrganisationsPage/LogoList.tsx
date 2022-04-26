@@ -1,20 +1,22 @@
 import { FC, useCallback, useEffect, useState } from 'react';
-import { Orientation } from '../../@types/enums';
+import { LogoType, Orientation } from '../../@types/enums';
 import { Organisation } from '../../@types/interfaces';
 import {
   createStyles,
+  IconButton,
   ImageList,
   ImageListItem,
   ImageListItemBar,
-  IconButton,
   makeStyles,
   Theme,
 } from '@material-ui/core';
 import EditRounded from '@material-ui/icons/EditRounded';
+import { capitalize } from 'lodash';
 
 import logoPlaceholder from '../../assets/logo-placeholder.png';
 import logomarkPlaceholder from '../../assets/logomark-placeholder.png';
 import wordmarkPlaceholder from '../../assets/wordmark-placeholder.png';
+import { useOrganisations } from '../../contexts/organisationsContext';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
@@ -56,7 +58,7 @@ interface Props
 
 interface ImageItem {
   src: string;
-  title: string;
+  type: LogoType;
   orientation: Orientation | null;
 }
 
@@ -73,6 +75,7 @@ const LogoList: FC<Props> = ({
   // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
+  const { openLogoDialog } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useStyles();
@@ -82,22 +85,32 @@ const LogoList: FC<Props> = ({
       {
         src: logo || logoPlaceholder,
         orientation: logoOrientation,
-        title: 'Logo',
+        type: LogoType.logo,
       },
       {
         src: logomark || logomarkPlaceholder,
         orientation: logomarkOrientation,
-        title: 'Logomark',
+        type: LogoType.logomark,
       },
       {
         src: wordmark || wordmarkPlaceholder,
         orientation: Orientation.landscape,
-        title: 'Wordmark',
+        type: LogoType.wordmark,
       },
     ];
 
     setItems(items);
   }, [logo, logomark, wordmark, logoOrientation, logomarkOrientation]);
+
+  const handleClick = (item: ImageItem) =>
+    openLogoDialog &&
+    openLogoDialog({
+      open: true,
+      src: item.src,
+      type: item.type,
+      orgId: id,
+      orientation: item.orientation,
+    });
 
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
@@ -116,16 +129,23 @@ const LogoList: FC<Props> = ({
     <div className={styles.container}>
       <ImageList className={styles.imageList} cols={2.5}>
         {items.map((item) => (
-          <ImageListItem key={item.title}>
-            <img src={item.src} alt={item.title} />
+          <ImageListItem key={item.type}>
+            <img
+              src={item.src}
+              alt={capitalize(item.type)}
+              onClick={() => handleClick(item)}
+            />
             <ImageListItemBar
-              title={item.title}
+              title={capitalize(item.type)}
               classes={{
                 root: styles.titleBar,
                 title: styles.title,
               }}
               actionIcon={
-                <IconButton aria-label={`star ${item.title}`}>
+                <IconButton
+                  aria-label={`edit ${item.type.toLowerCase()}`}
+                  onClick={() => handleClick(item)}
+                >
                   <EditRounded className={styles.title} />
                 </IconButton>
               }

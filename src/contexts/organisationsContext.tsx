@@ -9,10 +9,13 @@ import {
 } from 'react';
 
 import organisationsService, {
+  PostLogoArgs,
   PostOrgBody,
   PutOrgBody,
 } from '../services/organisationsService';
 import { Action, Organisation } from '../@types/interfaces';
+import { LogoDialogProps } from '../components/dialogs/LogoDialog';
+import { useAppNav } from './appNavContext';
 
 export interface OrganisationsState {
   fetching: boolean;
@@ -20,6 +23,8 @@ export interface OrganisationsState {
   updating: boolean;
   deleting: boolean;
   organisations: Organisation[];
+  selectedOrganisation?: Organisation;
+  logoDialog?: LogoDialogProps;
 }
 
 const initialState: OrganisationsState = {
@@ -41,11 +46,20 @@ type UpdateOrganisation = ({
 }) => Promise<boolean>;
 type DeleteOrganisation = (orgId: number) => Promise<boolean>;
 
+type OpenLogoDialog = (props: LogoDialogProps) => void;
+type CloseLogoDialog = () => void;
+type SelectOrg = (org?: Organisation) => void;
+type UpdateLogo = (args: PostLogoArgs) => Promise<boolean>;
+
 interface OrganisationsContext extends OrganisationsState {
   getOrganisations?: GetOrganisations;
   createOrganisation?: CreateOrganisation;
   updateOrganisation?: UpdateOrganisation;
   deleteOrganisation?: DeleteOrganisation;
+  openLogoDialog?: OpenLogoDialog;
+  closeLogoDialog?: CloseLogoDialog;
+  selectOrg?: SelectOrg;
+  updateLogo?: UpdateLogo;
 }
 
 const initialContext: OrganisationsContext = { ...initialState };
@@ -57,26 +71,52 @@ const OrganisationsContext =
 export const useOrganisations = () => useContext(OrganisationsContext);
 
 interface GetOrganisationsRequest extends Action<'GET_ORGS_REQUEST'> {}
+
 interface GetOrganisationsSuccess extends Action<'GET_ORGS_SUCCESS'> {
   orgs: Organisation[];
 }
+
 interface GetOrganisationsFailure extends Action<'GET_ORGS_FAILURE'> {}
 
 interface CreateOrganisationsRequest extends Action<'CREATE_ORG_REQUEST'> {}
+
 interface CreateOrganisationsSuccess extends Action<'CREATE_ORG_SUCCESS'> {
   orgs: Organisation[];
 }
+
 interface CreateOrganisationsFailure extends Action<'CREATE_ORG_FAILURE'> {}
+
 interface UpdateOrganisationsRequest extends Action<'UPDATE_ORG_REQUEST'> {}
+
 interface UpdateOrganisationsSuccess extends Action<'UPDATE_ORG_SUCCESS'> {
   orgs: Organisation[];
 }
+
 interface UpdateOrganisationsFailure extends Action<'UPDATE_ORG_FAILURE'> {}
+
 interface DeleteOrganisationsRequest extends Action<'DELETE_ORG_REQUEST'> {}
+
 interface DeleteOrganisationsSuccess extends Action<'DELETE_ORG_SUCCESS'> {
   orgs: Organisation[];
 }
+
 interface DeleteOrganisationsFailure extends Action<'DELETE_ORG_FAILURE'> {}
+
+interface SetLogoDialog extends Action<'SET_LOGO_DIALOG'> {
+  props?: LogoDialogProps;
+}
+
+interface SetSelectedOrg extends Action<'SET_SELECTED_ORG'> {
+  org?: Organisation;
+}
+
+interface UpdateLogoRequest extends Action<'UPDATE_LOGO_REQUEST'> {}
+
+interface UpdateLogoSuccess extends Action<'UPDATE_LOGO_SUCCESS'> {
+  org: Organisation;
+}
+
+interface UpdateLogoFailure extends Action<'UPDATE_LOGO_FAILURE'> {}
 
 type Actions =
   | GetOrganisationsRequest
@@ -90,7 +130,12 @@ type Actions =
   | UpdateOrganisationsFailure
   | DeleteOrganisationsRequest
   | DeleteOrganisationsSuccess
-  | DeleteOrganisationsFailure;
+  | DeleteOrganisationsFailure
+  | SetLogoDialog
+  | SetSelectedOrg
+  | UpdateLogoRequest
+  | UpdateLogoSuccess
+  | UpdateLogoFailure;
 
 const orgsReducer = (
   state: OrganisationsState,
@@ -161,6 +206,32 @@ const orgsReducer = (
         ...state,
         deleting: false,
       };
+    case 'SET_LOGO_DIALOG':
+      return {
+        ...state,
+        logoDialog: action.props,
+      };
+    case 'SET_SELECTED_ORG':
+      return {
+        ...state,
+        selectedOrganisation: action.org,
+      };
+    case 'UPDATE_LOGO_REQUEST':
+      return {
+        ...state,
+        updating: true,
+      };
+    case 'UPDATE_LOGO_SUCCESS':
+      return {
+        ...state,
+        selectedOrganisation: action.org,
+        updating: false,
+      };
+    case 'UPDATE_LOGO_FAILURE':
+      return {
+        ...state,
+        updating: false,
+      };
     default:
       return state;
   }
@@ -173,6 +244,8 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
 }) => {
   // ----------------------------- Component state ------------------------------ //
   const [state, dispatch] = useReducer(orgsReducer, initialState);
+
+  const { setShowOrgDrawer } = useAppNav();
 
   // ----------------------------- Component functions ------------------------- //
   const getOrganisations: GetOrganisations = useCallback(async () => {
@@ -254,10 +327,43 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
       return false;
     }
   };
+
+  const openLogoDialog: OpenLogoDialog = (props) =>
+    dispatch({ type: 'SET_LOGO_DIALOG', props });
+
+  const closeLogoDialog: CloseLogoDialog = () =>
+    dispatch({ type: 'SET_LOGO_DIALOG' });
+
+  const selectOrg: SelectOrg = (org) => {
+    dispatch({ type: 'SET_SELECTED_ORG', org });
+    setShowOrgDrawer(!!org);
+  };
+
+  const updateLogo: UpdateLogo = async (args) => {
+    dispatch({ type: 'UPDATE_LOGO_REQUEST' });
+
+    try {
+      const { status, data } = await organisationsService.postLogo(args);
+
+      if (status === 200) {
+        dispatch({ type: 'UPDATE_LOGO_SUCCESS', org: data });
+        return true;
+      } else {
+        dispatch({ type: 'UPDATE_LOGO_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error('error', error);
+      dispatch({ type: 'UPDATE_LOGO_FAILURE' });
+      return false;
+    }
+  };
+
   // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
     getOrganisations();
   }, [getOrganisations]);
+
   // ----------------------------- Render ---------------------------------------- //
   return (
     <OrganisationsContext.Provider
@@ -267,6 +373,10 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
         createOrganisation,
         updateOrganisation,
         deleteOrganisation,
+        openLogoDialog,
+        closeLogoDialog,
+        selectOrg,
+        updateLogo,
       }}
     >
       {children}
