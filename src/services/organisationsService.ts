@@ -1,10 +1,10 @@
 import { AxiosResponse } from 'axios';
 
 import { Organisation } from '../@types/interfaces';
+import { LogoType, Orientation } from '../@types/enums';
 import { authHeader } from '../helpers/getAuthHeader';
 import { handleError } from '../helpers/handleError';
 import apiChatloopOrg from '../config/axiosConfig';
-import { LogoType, Orientation } from '../@types/enums';
 
 export interface PostOrgBody {
   officialName: string;
@@ -34,6 +34,11 @@ export interface PostLogoArgs {
   orgId: number;
 }
 
+export interface DeleteLogoArgs {
+  type: LogoType;
+  orgId: number;
+}
+
 type PostLogo = (args: PostLogoArgs) => Promise<AxiosResponse<Organisation>>;
 type GetOrgs = () => Promise<AxiosResponse<Organisation[]>>;
 type GetOrg = (orgId: number) => Promise<AxiosResponse<Organisation>>;
@@ -46,6 +51,9 @@ type PutOrg = ({
   orgId: number;
 }) => Promise<AxiosResponse<Organisation[]>>;
 type DeleteOrg = (orgId: number) => Promise<AxiosResponse<Organisation[]>>;
+type DeleteLogo = (
+  args: DeleteLogoArgs
+) => Promise<AxiosResponse<Organisation>>;
 
 interface OrganisationsService {
   getOrgs: GetOrgs;
@@ -54,6 +62,7 @@ interface OrganisationsService {
   putOrg: PutOrg;
   deleteOrg: DeleteOrg;
   postLogo: PostLogo;
+  deleteLogo: DeleteLogo;
 }
 
 const getOrgs: GetOrgs = async () => {
@@ -135,12 +144,7 @@ const deleteOrg: DeleteOrg = async (orgId) => {
   return Promise.reject();
 };
 
-export const postLogo: PostLogo = async ({
-  orgId,
-  orientation,
-  type,
-  files,
-}) => {
+const postLogo: PostLogo = async ({ orgId, orientation, type, files }) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -157,6 +161,17 @@ export const postLogo: PostLogo = async ({
   );
 };
 
+const deleteLogo: DeleteLogo = ({ orgId, type }) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  return apiChatloopOrg.delete(
+    `rest/user/organisation/${orgId}/logo?type=${type}`,
+    requestOptions
+  );
+};
+
 const organisationsService: OrganisationsService = {
   getOrgs,
   getOrg,
@@ -164,6 +179,7 @@ const organisationsService: OrganisationsService = {
   putOrg,
   deleteOrg,
   postLogo,
+  deleteLogo,
 };
 
 export default organisationsService;

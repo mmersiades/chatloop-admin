@@ -52,6 +52,9 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
     setPage(0);
   };
 
+  const getLogoUrl = (org: Organisation): string | null =>
+    org.wordmark || org.logo;
+
   // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
@@ -125,9 +128,9 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
                         root: clsx(styles.tableCell, styles.logoCell),
                       }}
                     >
-                      {org.logo && (
+                      {!!getLogoUrl(org) && (
                         <img
-                          src={org.wordmark || org.logo}
+                          src={getLogoUrl(org) || ''}
                           height="16px"
                           style={{ marginTop: '4px' }}
                           alt={`${org.shortName || org.officialName}'s logo`}

@@ -71,7 +71,7 @@ export const useTableStyles = makeStyles(({ palette, transitions }: Theme) =>
     },
     logoCell: {
       padding: '4px',
-      width: '48px',
+      width: '130px',
     },
     expiresAtCell: {
       width: '110px',

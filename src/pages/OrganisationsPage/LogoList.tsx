@@ -17,6 +17,7 @@ import logoPlaceholder from '../../assets/logo-placeholder.png';
 import logomarkPlaceholder from '../../assets/logomark-placeholder.png';
 import wordmarkPlaceholder from '../../assets/wordmark-placeholder.png';
 import { useOrganisations } from '../../contexts/organisationsContext';
+import { DeleteRounded } from '@material-ui/icons';
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) =>
   createStyles({
@@ -75,7 +76,7 @@ const LogoList: FC<Props> = ({
   // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
-  const { openLogoDialog } = useOrganisations();
+  const { openLogoDialog, deleteLogo, deleting } = useOrganisations();
 
   // -------------------------- Component functions ------------------------ //
   const styles = useStyles();
@@ -112,6 +113,10 @@ const LogoList: FC<Props> = ({
       orientation: item.orientation,
     });
 
+  const handleDelete = (item: ImageItem) => {
+    deleteLogo && deleteLogo({ orgId: id, type: item.type });
+  };
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     assembleItems();
@@ -142,12 +147,21 @@ const LogoList: FC<Props> = ({
                 title: styles.title,
               }}
               actionIcon={
-                <IconButton
-                  aria-label={`edit ${item.type.toLowerCase()}`}
-                  onClick={() => handleClick(item)}
-                >
-                  <EditRounded className={styles.title} />
-                </IconButton>
+                <>
+                  <IconButton
+                    aria-label={`edit ${item.type.toLowerCase()}`}
+                    onClick={() => handleClick(item)}
+                  >
+                    <EditRounded className={styles.title} />
+                  </IconButton>
+                  <IconButton
+                    aria-label={`edit ${item.type.toLowerCase()}`}
+                    onClick={() => handleDelete(item)}
+                    disabled={deleting}
+                  >
+                    <DeleteRounded className={styles.title} />
+                  </IconButton>
+                </>
               }
             />
           </ImageListItem>

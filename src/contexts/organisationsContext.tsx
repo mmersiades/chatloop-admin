@@ -8,14 +8,15 @@ import {
   useReducer,
 } from 'react';
 
+import { LogoDialogProps } from '../components/dialogs/LogoDialog';
+import { useAppNav } from './appNavContext';
 import organisationsService, {
+  DeleteLogoArgs,
   PostLogoArgs,
   PostOrgBody,
   PutOrgBody,
 } from '../services/organisationsService';
 import { Action, Organisation } from '../@types/interfaces';
-import { LogoDialogProps } from '../components/dialogs/LogoDialog';
-import { useAppNav } from './appNavContext';
 
 export interface OrganisationsState {
   fetching: boolean;
@@ -50,6 +51,7 @@ type OpenLogoDialog = (props: LogoDialogProps) => void;
 type CloseLogoDialog = () => void;
 type SelectOrg = (org?: Organisation) => void;
 type UpdateLogo = (args: PostLogoArgs) => Promise<boolean>;
+type DeleteLogo = (args: DeleteLogoArgs) => Promise<boolean>;
 
 interface OrganisationsContext extends OrganisationsState {
   getOrganisations?: GetOrganisations;
@@ -60,6 +62,7 @@ interface OrganisationsContext extends OrganisationsState {
   closeLogoDialog?: CloseLogoDialog;
   selectOrg?: SelectOrg;
   updateLogo?: UpdateLogo;
+  deleteLogo?: DeleteLogo;
 }
 
 const initialContext: OrganisationsContext = { ...initialState };
@@ -117,6 +120,13 @@ interface UpdateLogoSuccess extends Action<'UPDATE_LOGO_SUCCESS'> {
 }
 
 interface UpdateLogoFailure extends Action<'UPDATE_LOGO_FAILURE'> {}
+interface DeleteLogoRequest extends Action<'DELETE_LOGO_REQUEST'> {}
+
+interface DeleteLogoSuccess extends Action<'DELETE_LOGO_SUCCESS'> {
+  org: Organisation;
+}
+
+interface DeleteLogoFailure extends Action<'DELETE_LOGO_FAILURE'> {}
 
 type Actions =
   | GetOrganisationsRequest
@@ -135,7 +145,10 @@ type Actions =
   | SetSelectedOrg
   | UpdateLogoRequest
   | UpdateLogoSuccess
-  | UpdateLogoFailure;
+  | UpdateLogoFailure
+  | DeleteLogoRequest
+  | DeleteLogoSuccess
+  | DeleteLogoFailure;
 
 const orgsReducer = (
   state: OrganisationsState,
@@ -231,6 +244,22 @@ const orgsReducer = (
       return {
         ...state,
         updating: false,
+      };
+    case 'DELETE_LOGO_REQUEST':
+      return {
+        ...state,
+        deleting: true,
+      };
+    case 'DELETE_LOGO_SUCCESS':
+      return {
+        ...state,
+        selectedOrganisation: action.org,
+        deleting: false,
+      };
+    case 'DELETE_LOGO_FAILURE':
+      return {
+        ...state,
+        deleting: false,
       };
     default:
       return state;
@@ -347,6 +376,7 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
 
       if (status === 200) {
         dispatch({ type: 'UPDATE_LOGO_SUCCESS', org: data });
+        getOrganisations();
         return true;
       } else {
         dispatch({ type: 'UPDATE_LOGO_FAILURE' });
@@ -355,6 +385,27 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
     } catch (error) {
       console.error('error', error);
       dispatch({ type: 'UPDATE_LOGO_FAILURE' });
+      return false;
+    }
+  };
+
+  const deleteLogo: DeleteLogo = async (args) => {
+    dispatch({ type: 'DELETE_LOGO_REQUEST' });
+
+    try {
+      const { status, data } = await organisationsService.deleteLogo(args);
+
+      if (status === 200) {
+        dispatch({ type: 'DELETE_LOGO_SUCCESS', org: data });
+        getOrganisations();
+        return true;
+      } else {
+        dispatch({ type: 'DELETE_LOGO_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error('error', error);
+      dispatch({ type: 'DELETE_LOGO_FAILURE' });
       return false;
     }
   };
@@ -377,6 +428,7 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
         closeLogoDialog,
         selectOrg,
         updateLogo,
+        deleteLogo,
       }}
     >
       {children}

@@ -9,12 +9,11 @@ import {
   DialogProps,
   DialogTitle,
   makeStyles,
-  Theme,
 } from '@material-ui/core';
+
 import { useOrganisations } from '../../contexts/organisationsContext';
 import { LogoType, Orientation } from '../../@types/enums';
 import { resizeImage } from '../../helpers/resizeImage';
-import organisationsService from '../../services/organisationsService';
 import { dataURItoBlob } from '../../helpers/dataURItoBlob';
 import { getImageOrientation } from '../../helpers/getImageOrientation';
 
@@ -22,7 +21,7 @@ import logoPlaceholder from '../../assets/logo-placeholder.png';
 import logomarkPlaceholder from '../../assets/logomark-placeholder.png';
 import wordmarkPlaceholder from '../../assets/wordmark-placeholder.png';
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     image: {
       maxWidth: 500,
@@ -134,10 +133,6 @@ const LogoDialog: FC<LogoDialogProps> = ({
       success && closeLogoDialog && closeLogoDialog();
     }
   };
-
-  console.log(imageUrl);
-
-  // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
   return (
