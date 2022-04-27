@@ -12,6 +12,7 @@ import {
 import WithNavbar from '../../components/WithNavbar';
 import statsService from '../../services/statsService';
 import DauChart from './DauChart';
+import MauChart from './MauChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -52,6 +53,11 @@ const DashboardPage: FC = () => {
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <DauChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <MauChart />
         </CardContent>
       </Card>
       <Card classes={{ root: classes.card }}>

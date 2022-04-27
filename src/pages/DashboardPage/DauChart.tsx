@@ -9,17 +9,10 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import {
-  CircularProgress,
-  Grid,
-  IconButton,
-  Menu,
-  Typography,
-} from '@material-ui/core';
+import { CircularProgress, Grid } from '@material-ui/core';
 import { RangeKeyDict } from 'react-date-range';
-import DateRangePicker from '../../components/base/DateRangePicker';
-import { CalendarTodayRounded } from '@material-ui/icons';
 import { useStats } from '../../contexts/statsContext';
+import ChartWrapper from '../../components/base/ChartWrapper';
 
 ChartJS.register(
   CategoryScale,
@@ -29,8 +22,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-// ChartJS.defaults.font.family = 'Roboto';
 
 export const options = {
   responsive: true,
@@ -51,8 +42,6 @@ const DauChart: FC<Props> = () => {
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
-
-  // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
   const { getDauStats, dauStats, dauEndDate, dauStartDate, fetchingDau } =
@@ -75,51 +64,33 @@ const DauChart: FC<Props> = () => {
       setPickerAnchor(event.currentTarget);
     }
   };
-  // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
   return (
-    <>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Typography variant="h5" component="span">
-          Daily Active Users
-        </Typography>
-        <IconButton onClick={togglePicker}>
-          <CalendarTodayRounded />
-        </IconButton>
-      </div>
-      <Menu
-        anchorEl={pickerAnchor}
-        open={Boolean(pickerAnchor)}
-        onClose={() => setPickerAnchor(null)}
-      >
-        <DateRangePicker
-          handleSelect={handleSelect}
-          startDate={dauStartDate}
-          endDate={dauEndDate}
-        />
-      </Menu>
-
-      {fetchingDau || !dauStats ? (
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          style={{ height: 400 }}
-        >
-          <CircularProgress />
-        </Grid>
-      ) : (
-        <Bar data={dauStats} options={options} />
-      )}
-    </>
+    <ChartWrapper
+      title="Daily Active Users"
+      open={Boolean(pickerAnchor)}
+      togglePicker={togglePicker}
+      handleClose={() => setPickerAnchor(null)}
+      handleSelect={handleSelect}
+      startDate={dauStartDate}
+      endDate={dauEndDate}
+    >
+      <>
+        {fetchingDau || !dauStats ? (
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            style={{ height: 400 }}
+          >
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <Bar data={dauStats} options={options} />
+        )}
+      </>
+    </ChartWrapper>
   );
 };
 

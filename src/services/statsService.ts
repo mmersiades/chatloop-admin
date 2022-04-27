@@ -15,7 +15,7 @@ export interface UsageStatsDTO {
   activeUsersMonthToDate: number;
 }
 
-export interface DauStatsDTO {
+export interface StatsDTO {
   labels: string[];
   datasets: DataSetDTO[];
 }
@@ -26,11 +26,13 @@ export interface DateRange {
 }
 
 type GetUsageStats = () => Promise<AxiosResponse<UsageStatsDTO>>;
-type GetDauStats = (params: DateRange) => Promise<AxiosResponse<DauStatsDTO>>;
+type GetDauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
+type GetMauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 
 interface StatsService {
   getUsageStats: GetUsageStats;
   getDauStats: GetDauStats;
+  getMauStats: GetMauStats;
 }
 
 const getUsageStats: GetUsageStats = async () => {
@@ -53,7 +55,25 @@ const getDauStats: GetDauStats = async ({ startDate, endDate }) => {
 
   try {
     return await apiChatloopOrg.get(
-      `/rest/admin/stats/dao?startDate=${
+      `/rest/admin/stats/dau?startDate=${
+        startDate.toISOString().split('T')[0]
+      }&endDate=${endDate.toISOString().split('T')[0]}`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+};
+
+const getMauStats: GetMauStats = async ({ startDate, endDate }) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  try {
+    return await apiChatloopOrg.get(
+      `/rest/admin/stats/mau?startDate=${
         startDate.toISOString().split('T')[0]
       }&endDate=${endDate.toISOString().split('T')[0]}`,
       requestOptions
@@ -67,6 +87,7 @@ const getDauStats: GetDauStats = async ({ startDate, endDate }) => {
 const statsService: StatsService = {
   getUsageStats,
   getDauStats,
+  getMauStats,
 };
 
 export default statsService;
