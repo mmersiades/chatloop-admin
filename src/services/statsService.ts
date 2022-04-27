@@ -28,11 +28,15 @@ export interface DateRange {
 type GetUsageStats = () => Promise<AxiosResponse<UsageStatsDTO>>;
 type GetDauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetMauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
+type GetTopicTextStats = (
+  params: DateRange
+) => Promise<AxiosResponse<StatsDTO>>;
 
 interface StatsService {
   getUsageStats: GetUsageStats;
   getDauStats: GetDauStats;
   getMauStats: GetMauStats;
+  getTopicTextStats: GetTopicTextStats;
 }
 
 const getUsageStats: GetUsageStats = async () => {
@@ -84,10 +88,29 @@ const getMauStats: GetMauStats = async ({ startDate, endDate }) => {
   return Promise.reject();
 };
 
+const getTopicTextStats: GetTopicTextStats = async ({ startDate, endDate }) => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  try {
+    return await apiChatloopOrg.get(
+      `/rest/admin/stats/topictexts?startDate=${
+        startDate.toISOString().split('T')[0]
+      }&endDate=${endDate.toISOString().split('T')[0]}`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+  return Promise.reject();
+};
+
 const statsService: StatsService = {
   getUsageStats,
   getDauStats,
   getMauStats,
+  getTopicTextStats,
 };
 
 export default statsService;

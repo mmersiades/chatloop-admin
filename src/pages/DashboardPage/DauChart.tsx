@@ -75,6 +75,7 @@ const DauChart: FC<Props> = () => {
       handleSelect={handleSelect}
       startDate={dauStartDate}
       endDate={dauEndDate}
+      anchorEl={pickerAnchor}
     >
       <>
         {fetchingDau || !dauStats ? (

@@ -79,6 +79,7 @@ const MauChart: FC<Props> = () => {
       handleSelect={handleSelect}
       startDate={mauStartDate}
       endDate={mauEndDate}
+      anchorEl={pickerAnchor}
     >
       <>
         {fetchingMau || !mauStats ? (

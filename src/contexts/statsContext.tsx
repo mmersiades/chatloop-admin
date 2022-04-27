@@ -13,12 +13,16 @@ import { Action } from '../@types/interfaces';
 interface StatsState {
   fetchingDau: boolean;
   fetchingMau: boolean;
+  fetchingTopicTexts: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
+  topicTextsStartDate: Date;
   dauEndDate: Date;
   mauEndDate: Date;
+  topicTextsEndDate: Date;
   dauStats?: StatsDTO;
   mauStats?: StatsDTO;
+  topicTextsStats?: StatsDTO;
 }
 
 const defaultDauStartDate = new Date();
@@ -27,22 +31,30 @@ const defaultDauEndDate = new Date();
 const defaultMauStartDate = new Date();
 defaultMauStartDate.setDate(defaultMauStartDate.getDate() - 27);
 const defaultMauEndDate = new Date();
+const defaultTopicTextStartDate = new Date();
+defaultTopicTextStartDate.setDate(defaultTopicTextStartDate.getDate() - 27);
+const defaultTopicTextEndDate = new Date();
 
 const initialState: StatsState = {
   fetchingDau: false,
   fetchingMau: false,
+  fetchingTopicTexts: false,
   dauStartDate: defaultDauStartDate,
   mauStartDate: defaultMauStartDate,
+  topicTextsStartDate: defaultTopicTextStartDate,
   dauEndDate: defaultDauEndDate,
   mauEndDate: defaultMauEndDate,
+  topicTextsEndDate: defaultTopicTextEndDate,
 };
 
 type GetDauStats = (args: DateRange) => Promise<boolean>;
 type GetMauStats = (args: DateRange) => Promise<boolean>;
+type GetTopicTextsStats = (args: DateRange) => Promise<boolean>;
 
 interface StatsContext extends StatsState {
   getDauStats?: GetDauStats;
   getMauStats?: GetMauStats;
+  getTopicTextsStats?: GetTopicTextsStats;
 }
 
 const initialContext: StatsContext = { ...initialState };
@@ -66,6 +78,13 @@ interface GetMauSuccess extends Action<'GET_MAU_SUCCESS'> {
   endDate: Date;
 }
 interface GetMauFailure extends Action<'GET_MAU_FAILURE'> {}
+interface GetTopicTextsRequest extends Action<'GET_TOPICTEXTS_REQUEST'> {}
+interface GetTopicTextsSuccess extends Action<'GET_TOPICTEXTS_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetTopicTextsFailure extends Action<'GET_TOPICTEXTS_FAILURE'> {}
 
 type Actions =
   | GetDauRequest
@@ -73,7 +92,10 @@ type Actions =
   | GetDauFailure
   | GetMauRequest
   | GetMauSuccess
-  | GetMauFailure;
+  | GetMauFailure
+  | GetTopicTextsRequest
+  | GetTopicTextsSuccess
+  | GetTopicTextsFailure;
 
 const statsReducer = (state: StatsState, action: Actions): StatsState => {
   switch (action.type) {
@@ -112,6 +134,24 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
       return {
         ...state,
         fetchingMau: false,
+      };
+    case 'GET_TOPICTEXTS_REQUEST':
+      return {
+        ...state,
+        fetchingTopicTexts: true,
+      };
+    case 'GET_TOPICTEXTS_SUCCESS':
+      return {
+        ...state,
+        fetchingTopicTexts: false,
+        topicTextsStats: action.dto,
+        topicTextsEndDate: action.endDate,
+        topicTextsStartDate: action.startDate,
+      };
+    case 'GET_TOPICTEXTS_FAILURE':
+      return {
+        ...state,
+        fetchingTopicTexts: false,
       };
     default:
       return state;
@@ -179,17 +219,49 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getTopicTextsStats: GetTopicTextsStats = async (params) => {
+    dispatch({ type: 'GET_TOPICTEXTS_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getTopicTextStats(params);
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_TOPICTEXTS_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_TOPICTEXTS_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_TOPICTEXTS_FAILURE' });
+      return false;
+    }
+  };
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
     getDauStats({ startDate: defaultDauStartDate, endDate: defaultDauEndDate });
     // noinspection JSIgnoredPromiseFromCall
     getMauStats({ startDate: defaultMauStartDate, endDate: defaultMauEndDate });
+    // noinspection JSIgnoredPromiseFromCall
+    getTopicTextsStats({
+      startDate: defaultTopicTextStartDate,
+      endDate: defaultTopicTextEndDate,
+    });
   }, []);
 
   // -------------------------- Render ------------------------------------- //
   return (
-    <StatsContext.Provider value={{ ...state, getDauStats, getMauStats }}>
+    <StatsContext.Provider
+      value={{ ...state, getDauStats, getMauStats, getTopicTextsStats }}
+    >
       {children}
     </StatsContext.Provider>
   );
