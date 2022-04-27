@@ -12,12 +12,20 @@ import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
 import ReferralsPage from '../pages/ReferralsPage';
 import { ReferralsProvider } from '../contexts/referralsContext';
+import { StatsProvider } from '../contexts/statsContext';
 
 export const AppRouter = () => {
   return (
     <Switch>
       <PublicRoute exact path="/" component={LoginPage} />
-      <PrivateRoute path="/dashboard" component={DashboardPage} />
+      <PrivateRoute
+        path="/dashboard"
+        component={() => (
+          <StatsProvider>
+            <DashboardPage />
+          </StatsProvider>
+        )}
+      />
       <PrivateRoute path="/account-settings" component={AccountSettings} />
       <PrivateRoute
         path="/users"
