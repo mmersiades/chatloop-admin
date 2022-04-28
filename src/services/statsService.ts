@@ -10,11 +10,6 @@ interface DataSetDTO {
   backgroundColor: string;
 }
 
-export interface UsageStatsDTO {
-  activeUsersToday: number;
-  activeUsersMonthToDate: number;
-}
-
 export interface StatsDTO {
   labels: string[];
   datasets: DataSetDTO[];
@@ -25,7 +20,6 @@ export interface DateRange {
   endDate: Date;
 }
 
-type GetUsageStats = () => Promise<AxiosResponse<UsageStatsDTO>>;
 type GetDauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetMauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetTopicTextStats = (
@@ -34,25 +28,11 @@ type GetTopicTextStats = (
 type GetMessagesStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 
 interface StatsService {
-  getUsageStats: GetUsageStats;
   getDauStats: GetDauStats;
   getMauStats: GetMauStats;
   getTopicTextStats: GetTopicTextStats;
   getMessagesStats: GetMessagesStats;
 }
-
-const getUsageStats: GetUsageStats = async () => {
-  const requestOptions = {
-    headers: { authorization: authHeader() },
-  };
-
-  try {
-    return await apiChatloopOrg.get(`/rest/admin/usage-stats`, requestOptions);
-  } catch (error) {
-    handleError(error);
-  }
-  return Promise.reject();
-};
 
 const getDauStats: GetDauStats = async ({ startDate, endDate }) =>
   await getStats('dau', startDate, endDate);
@@ -85,7 +65,6 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
 };
 
 const statsService: StatsService = {
-  getUsageStats,
   getDauStats,
   getMauStats,
   getTopicTextStats,
