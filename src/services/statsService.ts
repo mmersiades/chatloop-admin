@@ -31,12 +31,14 @@ type GetMauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetTopicTextStats = (
   params: DateRange
 ) => Promise<AxiosResponse<StatsDTO>>;
+type GetMessagesStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 
 interface StatsService {
   getUsageStats: GetUsageStats;
   getDauStats: GetDauStats;
   getMauStats: GetMauStats;
   getTopicTextStats: GetTopicTextStats;
+  getMessagesStats: GetMessagesStats;
 }
 
 const getUsageStats: GetUsageStats = async () => {
@@ -52,50 +54,26 @@ const getUsageStats: GetUsageStats = async () => {
   return Promise.reject();
 };
 
-const getDauStats: GetDauStats = async ({ startDate, endDate }) => {
+const getDauStats: GetDauStats = async ({ startDate, endDate }) =>
+  await getStats('dau', startDate, endDate);
+
+const getMauStats: GetMauStats = async ({ startDate, endDate }) =>
+  await getStats('mau', startDate, endDate);
+
+const getTopicTextStats: GetTopicTextStats = async ({ startDate, endDate }) =>
+  await getStats('topictexts', startDate, endDate);
+
+const getMessagesStats: GetMessagesStats = async ({ startDate, endDate }) =>
+  await getStats('messages', startDate, endDate);
+
+const getStats = async (type: string, startDate: Date, endDate: Date) => {
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
 
   try {
     return await apiChatloopOrg.get(
-      `/rest/admin/stats/dau?startDate=${
-        startDate.toISOString().split('T')[0]
-      }&endDate=${endDate.toISOString().split('T')[0]}`,
-      requestOptions
-    );
-  } catch (error) {
-    handleError(error);
-  }
-  return Promise.reject();
-};
-
-const getMauStats: GetMauStats = async ({ startDate, endDate }) => {
-  const requestOptions = {
-    headers: { authorization: authHeader() },
-  };
-
-  try {
-    return await apiChatloopOrg.get(
-      `/rest/admin/stats/mau?startDate=${
-        startDate.toISOString().split('T')[0]
-      }&endDate=${endDate.toISOString().split('T')[0]}`,
-      requestOptions
-    );
-  } catch (error) {
-    handleError(error);
-  }
-  return Promise.reject();
-};
-
-const getTopicTextStats: GetTopicTextStats = async ({ startDate, endDate }) => {
-  const requestOptions = {
-    headers: { authorization: authHeader() },
-  };
-
-  try {
-    return await apiChatloopOrg.get(
-      `/rest/admin/stats/topictexts?startDate=${
+      `/rest/admin/stats/${type}?startDate=${
         startDate.toISOString().split('T')[0]
       }&endDate=${endDate.toISOString().split('T')[0]}`,
       requestOptions
@@ -111,6 +89,7 @@ const statsService: StatsService = {
   getDauStats,
   getMauStats,
   getTopicTextStats,
+  getMessagesStats,
 };
 
 export default statsService;

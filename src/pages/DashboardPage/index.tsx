@@ -14,6 +14,7 @@ import statsService from '../../services/statsService';
 import DauChart from './DauChart';
 import MauChart from './MauChart';
 import TopicTextsChart from './TopicTextsChart';
+import MessagesChart from './MessagesChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -64,6 +65,11 @@ const DashboardPage: FC = () => {
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <TopicTextsChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <MessagesChart />
         </CardContent>
       </Card>
       <Card classes={{ root: classes.card }}>
