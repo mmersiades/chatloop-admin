@@ -1,57 +1,55 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import {
   Card,
   CardContent,
-  CardHeader,
   createStyles,
   makeStyles,
   Theme,
-  Typography,
 } from '@material-ui/core';
 
 import WithNavbar from '../../components/WithNavbar';
-import statsService from '../../services/statsService';
+import DauChart from './DauChart';
+import MauChart from './MauChart';
+import TopicTextsChart from './TopicTextsChart';
+import MessagesChart from './MessagesChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
     card: {
       margin: spacing(2),
+      width: 600,
+    },
+    container: {
+      minHeight: 'calc(100vh - 48px)',
+      display: 'flex',
+      flexDirection: 'row',
     },
   })
 );
 
 const DashboardPage: FC = () => {
   const classes = useStyles();
-  const [activeUsersToday, setActiveUsersToday] = useState(0);
-  const [activeUsersMonthToDate, setActiveUsersMonthToDate] = useState(0);
-
-  const setStats = async () => {
-    const { data } = await statsService.getUsageStats();
-
-    setActiveUsersMonthToDate(data.activeUsersMonthToDate);
-    setActiveUsersToday(data.activeUsersToday);
-  };
-
-  useEffect(() => {
-    setStats();
-  }, []);
 
   return (
     <>
       <Card classes={{ root: classes.card }}>
-        <CardHeader title="Users active today" />
         <CardContent>
-          <Typography variant="h3" align="center">
-            {activeUsersToday}
-          </Typography>
+          <DauChart />
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader title="Users active last 30 days" />
+      <Card classes={{ root: classes.card }}>
         <CardContent>
-          <Typography variant="h3" align="center">
-            {activeUsersMonthToDate}
-          </Typography>
+          <MauChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TopicTextsChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <MessagesChart />
         </CardContent>
       </Card>
     </>

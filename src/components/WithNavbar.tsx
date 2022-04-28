@@ -12,10 +12,10 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
       flexGrow: 1,
       position: 'absolute',
       top: 48,
-      bottom: 0,
       left: 0,
       right: 0,
       width: 'unset',
+      minHeight: 'calc(100vh - 48px)',
       transition: transitions.create('left', {
         easing: transitions.easing.sharp,
         duration: transitions.duration.leavingScreen,
