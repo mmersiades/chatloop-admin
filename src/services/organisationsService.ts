@@ -23,6 +23,7 @@ export interface PostOrgBody {
   contactPhone: string | null;
   contactEmail: string | null;
   websiteUrl: string | null;
+  adminIds: number[];
 }
 
 export interface PutOrgBody extends PostOrgBody {}

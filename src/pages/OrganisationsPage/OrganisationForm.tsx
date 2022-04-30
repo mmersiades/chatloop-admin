@@ -32,13 +32,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import IntlPhoneInput from '../../components/base/IntlPhoneInput';
 import CountriesField from '../../components/base/CountriesField';
 import RegionsField from '../../components/base/RegionsField';
+import OrgAdminList from './OrgAdminList';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useCountries } from '../../contexts/countriesContext';
 import { useOrganisations } from '../../contexts/organisationsContext';
 import { PostOrgBody, PutOrgBody } from '../../services/organisationsService';
 import { CountryDTO } from '../../services/countriesService';
 import regionsService, { RegionDTO } from '../../services/regionsService';
-import { Organisation } from '../../@types/interfaces';
+import { OrgAdminDTO, Organisation } from '../../@types/interfaces';
 import { replaceNull } from '../../helpers/replaceNull';
 import {
   CONTACT_EMAIL_HELPER,
@@ -69,6 +70,7 @@ const useStyles = makeStyles(({ spacing, palette, typography }) => {
       marginBottom: spacing(2),
     },
     button: {
+      marginTop: spacing(2),
       width: '100%',
     },
     deleteButton: {
@@ -87,7 +89,7 @@ const useStyles = makeStyles(({ spacing, palette, typography }) => {
   });
 });
 
-interface FormValues {
+export interface OrgFormValues {
   officialName: string;
   operationalCountries: string[];
   operationalRegions: string[];
@@ -103,9 +105,10 @@ interface FormValues {
   contactPhone: string | null;
   contactEmail: string | null;
   websiteUrl: string | null;
+  adminIds: OrgAdminDTO[]; // Using DTOs, rather than just ids, so that whole org admin can be displayed in form
 }
 
-const defaultValues: FormValues = {
+const defaultValues: OrgFormValues = {
   officialName: '',
   shortName: '',
   premise: '',
@@ -121,6 +124,7 @@ const defaultValues: FormValues = {
   contactPhone: '',
   contactEmail: '',
   websiteUrl: '',
+  adminIds: [],
 };
 
 interface Props {
@@ -136,7 +140,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
 
   // -------------------------- 3rd party hooks ---------------------------- //
   // @ts-ignore
-  const schema: Yup.SchemaOf<FormValues> = Yup.object().shape({
+  const schema: Yup.SchemaOf<OrgFormValues> = Yup.object().shape({
     officialName: Yup.string().min(3).required('Please enter an official name'),
     operationalCountries: Yup.array().of(Yup.string().min(2).max(3)).required(),
     operationalRegions: Yup.array().of(Yup.string().min(2).max(7)).required(),
@@ -186,15 +190,16 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       .url()
       .nullable()
       .transform((value) => (value === '' ? null : value)),
+    adminIds: Yup.array(),
   });
 
   const {
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     control,
     setValue,
-  } = useForm<FormValues>({
+  } = useForm<OrgFormValues>({
     resolver: yupResolver(schema),
     defaultValues,
   });
@@ -203,6 +208,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
   const regionsWatch = useWatch({ control, name: 'operationalRegions' });
   const onlineWatch = useWatch({ control, name: 'onlineOrg' });
   const countryWatch = useWatch({ control, name: 'countryCode' });
+  const adminsWatch = useWatch({ control, name: 'adminIds' });
 
   // -------------------------- Hooks -------------------------------------- //
   const { showOrgDrawer, setShowOrgDrawer } = useAppNav();
@@ -253,7 +259,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
   };
 
   const getDefaultValues = useCallback(
-    (): FormValues => ({
+    (): OrgFormValues => ({
       ...defaultValues,
       operationalCountries: [countryByIp],
       countryCode: countryByIp,
@@ -261,7 +267,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
     [countryByIp]
   );
 
-  const getInitialValues = useCallback((): FormValues => {
+  const getInitialValues = useCallback((): OrgFormValues => {
     let orgWithNoNulls = {};
     let operationalCountries: string[] = [countryByIp];
     if (org) {
@@ -286,16 +292,18 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       operationalCountries,
       operationalRegions: org?.operationalRegions?.map((r) => r.code) || [],
       countryCode: org?.countryCode ?? countryByIp,
+      adminIds: org?.admins || [],
     };
   }, [org, countryByIp]);
 
-  const createOrg = async (data: FormValues) => {
+  const createOrg = async (data: OrgFormValues) => {
     if (createOrganisation && !creating) {
       const body: PostOrgBody = {
         ...data,
         country:
           countries.find((c) => c.countryCode === data.countryCode)
             ?.countryName || null,
+        adminIds: data.adminIds.map((admin) => admin.adminId),
       };
 
       const isSuccess = await createOrganisation(body);
@@ -303,13 +311,14 @@ const OrganisationForm: FC<Props> = ({ org }) => {
     }
   };
 
-  const updateOrg = async (data: FormValues) => {
+  const updateOrg = async (data: OrgFormValues) => {
     if (!!org && updateOrganisation && !updating) {
       const body: PutOrgBody = {
         ...data,
         country:
           countries.find((c) => c.countryCode === data.countryCode)
             ?.countryName || null,
+        adminIds: data.adminIds.map((admin) => admin.adminId),
       };
 
       const isSuccess = await updateOrganisation({ body, orgId: org.id });
@@ -317,7 +326,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
     }
   };
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = (data: OrgFormValues) => {
     !!org ? updateOrg(data) : createOrg(data);
   };
 
@@ -335,6 +344,17 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       const isSuccess = await deleteOrganisation(org.id);
       isSuccess && setShowOrgDrawer(false);
     }
+  };
+
+  const removeAdmin = (admin: OrgAdminDTO) => {
+    const filteredAdminIds: OrgAdminDTO[] = adminsWatch.filter(
+      (value) => value.adminId !== admin.adminId
+    );
+    setValue('adminIds', filteredAdminIds, {
+      shouldValidate: true,
+      shouldTouch: true,
+      shouldDirty: true,
+    });
   };
 
   // -------------------------- Effects ------------------------------------ //
@@ -604,12 +624,34 @@ const OrganisationForm: FC<Props> = ({ org }) => {
         helperText={POSTAL_CODE_HELPER}
         errors={errors.postalCode}
       />
+      {org && (
+        <>
+          <Divider />
+          <Typography variant="subtitle1" paragraph>
+            Administrators
+          </Typography>
+          <div className={styles.fieldContainer}>
+            <Controller
+              name="adminIds"
+              control={control}
+              render={({ field }) => (
+                <OrgAdminList
+                  orgName={org?.shortName || org?.officialName}
+                  fieldProps={field}
+                  handleDeleteAdmin={removeAdmin}
+                />
+              )}
+            />
+          </div>
+        </>
+      )}
+      <Divider />
       <Button
         aria-label={!!org ? 'Create organisation' : 'Submit changes'}
         type="submit"
         color="secondary"
         variant="contained"
-        disabled={creating || updating}
+        disabled={creating || updating || (!!org && !isDirty)}
         classes={{ root: styles.button }}
       >
         {!org ? 'CREATE ORGANISATION' : 'SUBMIT CHANGES'}

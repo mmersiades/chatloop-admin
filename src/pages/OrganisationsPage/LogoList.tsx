@@ -43,6 +43,9 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) =>
       background:
         'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.3) 100%)',
     },
+    image: {
+      cursor: 'pointer',
+    },
   })
 );
 
@@ -139,6 +142,7 @@ const LogoList: FC<Props> = ({
               src={item.src}
               alt={capitalize(item.type)}
               onClick={() => handleClick(item)}
+              className={styles.image}
             />
             <ImageListItemBar
               title={capitalize(item.type)}
@@ -147,21 +151,13 @@ const LogoList: FC<Props> = ({
                 title: styles.title,
               }}
               actionIcon={
-                <>
-                  <IconButton
-                    aria-label={`edit ${item.type.toLowerCase()}`}
-                    onClick={() => handleClick(item)}
-                  >
-                    <EditRounded className={styles.title} />
-                  </IconButton>
-                  <IconButton
-                    aria-label={`edit ${item.type.toLowerCase()}`}
-                    onClick={() => handleDelete(item)}
-                    disabled={deleting}
-                  >
-                    <DeleteRounded className={styles.title} />
-                  </IconButton>
-                </>
+                <IconButton
+                  aria-label={`edit ${item.type.toLowerCase()}`}
+                  onClick={() => handleDelete(item)}
+                  disabled={deleting}
+                >
+                  <DeleteRounded className={styles.title} />
+                </IconButton>
               }
             />
           </ImageListItem>

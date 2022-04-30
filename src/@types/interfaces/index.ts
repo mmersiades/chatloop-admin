@@ -197,6 +197,13 @@ export enum LanguageScopes {
   macrolanguage = 'M',
 }
 
+export interface OrgAdminDTO {
+  adminId: number;
+  name: string;
+  email?: string;
+  phone?: string;
+}
+
 export interface Organisation {
   id: number;
   officialName: string;
@@ -230,9 +237,7 @@ export interface Organisation {
   postalCode: string | null;
 
   // Org Admin
-  adminName: string | null;
-  adminEmail: string | null;
-  adminPhone: string | null;
+  admins: OrgAdminDTO[];
 }
 
 export interface Country {
