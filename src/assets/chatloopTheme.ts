@@ -8,7 +8,7 @@ import getTextDirection from '../helpers/getTextDirection';
 /**
  * Chatloop Navy, used as:
  * * palette.primary.main */
-const navy = '#3b6180';
+export const navy = '#3b6180';
 
 /** Chatloop Dark Navy, used as:
  * * palette.common.black
@@ -16,13 +16,13 @@ const navy = '#3b6180';
  * * the basis for the grey tones
  * * palette.grey[800]
  */
-const darkNavy = '#3c4a52';
+export const darkNavy = '#3c4a52';
 
 /**
  * Chatloop Mid-Blue, used as:
  * * palette.secondary.main
  */
-const midBlue = '#43a5e0';
+export const midBlue = '#43a5e0';
 
 /**
  * Chatloop Pink, used as:
