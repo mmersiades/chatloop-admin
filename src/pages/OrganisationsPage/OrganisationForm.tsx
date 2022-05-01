@@ -33,6 +33,7 @@ import IntlPhoneInput from '../../components/base/IntlPhoneInput';
 import CountriesField from '../../components/base/CountriesField';
 import RegionsField from '../../components/base/RegionsField';
 import OrgAdminList from './OrgAdminList';
+import RemoveOrgAdminDialog from '../../components/dialogs/RemoveOrgAdminDialog';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useCountries } from '../../contexts/countriesContext';
 import { useOrganisations } from '../../contexts/organisationsContext';
@@ -137,6 +138,9 @@ const OrganisationForm: FC<Props> = ({ org }) => {
   const [loadingRegions, setLoadingRegions] = useState(false);
   const [addressRegions, setAddressRegions] = useState<RegionDTO[]>([]);
   const [loadingAddressRegions, setLoadingAddressRegions] = useState(false);
+  const [adminToRemove, setAdminToRemove] = useState<OrgAdminDTO | undefined>(
+    undefined
+  );
 
   // -------------------------- 3rd party hooks ---------------------------- //
   // @ts-ignore
@@ -346,15 +350,18 @@ const OrganisationForm: FC<Props> = ({ org }) => {
     }
   };
 
-  const removeAdmin = (admin: OrgAdminDTO) => {
-    const filteredAdminIds: OrgAdminDTO[] = adminsWatch.filter(
-      (value) => value.adminId !== admin.adminId
-    );
-    setValue('adminIds', filteredAdminIds, {
-      shouldValidate: true,
-      shouldTouch: true,
-      shouldDirty: true,
-    });
+  const removeAdmin = () => {
+    if (!!adminToRemove) {
+      const filteredAdminIds: OrgAdminDTO[] = adminsWatch.filter(
+        (value) => value.adminId !== adminToRemove.adminId
+      );
+      setValue('adminIds', filteredAdminIds, {
+        shouldValidate: true,
+        shouldTouch: true,
+        shouldDirty: true,
+      });
+      setAdminToRemove(undefined);
+    }
   };
 
   // -------------------------- Effects ------------------------------------ //
@@ -387,6 +394,14 @@ const OrganisationForm: FC<Props> = ({ org }) => {
   // -------------------------- Render ------------------------------------- //
   return (
     <form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
+      {adminToRemove && (
+        <RemoveOrgAdminDialog
+          handleCancel={() => setAdminToRemove(undefined)}
+          handleRemove={removeAdmin}
+          orgAdmin={adminToRemove}
+          open={!!adminToRemove}
+        />
+      )}
       <Typography variant="subtitle1">Contact info</Typography>
       <PlainTextField
         name="officialName"
@@ -638,7 +653,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
                 <OrgAdminList
                   orgName={org?.shortName || org?.officialName}
                   fieldProps={field}
-                  handleDeleteAdmin={removeAdmin}
+                  handleDeleteAdmin={setAdminToRemove}
                 />
               )}
             />

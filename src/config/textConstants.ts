@@ -15,6 +15,7 @@ export const DASHBOARD = 'Dashboard';
 // Common
 export const CANCEL = 'CANCEL';
 export const DELETE = 'DELETE';
+export const REMOVE = 'REMOVE';
 
 // UsersPage
 export const USERS_TITLE = 'Manage Users';
@@ -85,3 +86,6 @@ export const RESET = 'RESET';
 
 // DeleteUserDialog
 export const DELETE_USER_DIALOG_TITLE = 'Delete user?';
+
+// RemoveOrgAdminDialog
+export const REMOVE_ORG_ADMIN_TITLE = 'Remove administrator?';
