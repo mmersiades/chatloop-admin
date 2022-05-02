@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import ReactSelect, { OptionTypeBase } from 'react-select';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
   makeStyles,
   createStyles,
@@ -44,6 +44,7 @@ import {
 } from '../../config/textConstants';
 import locationService from '../../services/locationService';
 import { removeLeadingZeroFromPhone } from '../../helpers/removeLeadingZeroFromPhone';
+import { useOrganisations } from '../../contexts/organisationsContext';
 
 interface Props {
   type: 'create' | 'edit';
@@ -56,6 +57,7 @@ export interface FormValues {
   refereePhone: string;
   role: UserRole;
   firstLanguage: OptionTypeBase; // eg 'eng', 'ara', 'prs' ISO-639-3
+  targetOrgId?: number;
 }
 
 const useStyles = makeStyles(({ spacing, palette, typography }) => {
@@ -99,6 +101,7 @@ const defaultValues: FormValues = {
 const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   const [countryCode, setCountryCode] = useState('nz');
   const [dialCode, setDialCode] = useState('64');
+  const { organisations } = useOrganisations();
   // ----------------------------- 3rd party hooks ------------------------------- //
   const referralSchema = Yup.object().shape(
     {
@@ -135,8 +138,18 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
           .min(2)
           .required(),
       }),
+      targetOrgId: Yup.number().when('role', {
+        is: UserRole.orgAdmin,
+        then: Yup.number().required(
+          'Organisation admins must be assigned to an organisation'
+        ),
+        otherwise: Yup.number(),
+      }),
     },
-    [['refereePhone', 'refereeEmail']]
+    [
+      ['refereePhone', 'refereeEmail'],
+      ['targetOrgId', 'role'],
+    ]
   );
 
   // Falls back to default values if "create"
@@ -151,6 +164,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
           value: extendedReferral.firstLanguage.code,
         }
       : defaultValues.firstLanguage,
+    targetOrgId: extendedReferral?.targetOrgId || 0,
   };
 
   const {
@@ -163,6 +177,8 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
     resolver: yupResolver(referralSchema),
     defaultValues: initialValues,
   });
+
+  const roleWatch = useWatch({ control, name: 'role' });
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { languages } = useLanguages();
@@ -356,48 +372,45 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         <Controller
           name="refereePhone"
           control={control}
-          render={({ field }) => {
-            console.log('field.value', field.value);
-            return (
-              <>
-                <ReactPhoneInput
-                  {...field}
-                  // Using isValid to get dialCode when component mounts
-                  isValid={(value, country) => {
+          render={({ field }) => (
+            <>
+              <ReactPhoneInput
+                {...field}
+                // Using isValid to get dialCode when component mounts
+                isValid={(value, country) => {
+                  // @ts-ignore
+                  if (country.dialCode !== dialCode)
                     // @ts-ignore
-                    if (country.dialCode !== dialCode)
-                      // @ts-ignore
-                      setDialCode(country.dialCode);
-                    return true;
-                  }}
-                  country={field.value === '' ? countryCode : undefined}
-                  autoFormat={false}
-                  inputProps={{
-                    variant: 'outlined',
-                    margin: 'dense',
-                    type: 'phone',
-                    inputProps: {
-                      style: { paddingLeft: '42px' },
-                    },
-                  }}
-                  dropdownClass={styles.countryList}
-                  component={TextField}
-                  countryCodeEditable={false}
-                  enableSearch
-                  onFocus={() =>
-                    errors.refereePhone && resetField('refereePhone')
-                  }
-                />
-                {touchedFields.refereePhone && errors.refereePhone ? (
-                  <FormHelperText error>
-                    {errors.refereePhone.message}
-                  </FormHelperText>
-                ) : (
-                  <FormHelperText>{PHONE_FORM_HELPER}</FormHelperText>
-                )}
-              </>
-            );
-          }}
+                    setDialCode(country.dialCode);
+                  return true;
+                }}
+                country={field.value === '' ? countryCode : undefined}
+                autoFormat={false}
+                inputProps={{
+                  variant: 'outlined',
+                  margin: 'dense',
+                  type: 'phone',
+                  inputProps: {
+                    style: { paddingLeft: '42px' },
+                  },
+                }}
+                dropdownClass={styles.countryList}
+                component={TextField}
+                countryCodeEditable={false}
+                enableSearch
+                onFocus={() =>
+                  errors.refereePhone && resetField('refereePhone')
+                }
+              />
+              {touchedFields.refereePhone && errors.refereePhone ? (
+                <FormHelperText error>
+                  {errors.refereePhone.message}
+                </FormHelperText>
+              ) : (
+                <FormHelperText>{PHONE_FORM_HELPER}</FormHelperText>
+              )}
+            </>
+          )}
         />
       </div>
 
@@ -423,6 +436,9 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                 <MenuItem key={UserRole.partner} value={UserRole.partner}>
                   {getReadableRoles(UserRole.partner)}
                 </MenuItem>
+                <MenuItem key={UserRole.orgAdmin} value={UserRole.orgAdmin}>
+                  {getReadableRoles(UserRole.orgAdmin)}
+                </MenuItem>
               </Select>
               {touchedFields.role && errors.role ? (
                 <FormHelperText error>{errors.role.message}</FormHelperText>
@@ -433,6 +449,42 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
           )}
         />
       </div>
+
+      {roleWatch === UserRole.orgAdmin && (
+        <div className={styles.fieldContainer}>
+          <Controller
+            name="targetOrgId"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth style={{ marginTop: '8px' }}>
+                <InputLabel id="org-label-id" variant="outlined">
+                  Organisation
+                </InputLabel>
+                <Select
+                  {...field}
+                  labelId="org-label-id"
+                  variant="outlined"
+                  label="Organisation"
+                  error={!!errors.targetOrgId}
+                >
+                  {organisations.map((org) => (
+                    <MenuItem key={org.id} value={org.id}>
+                      {org.shortName || org.officialName}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.targetOrgId ? (
+                  <FormHelperText error>
+                    {errors.targetOrgId.message}
+                  </FormHelperText>
+                ) : (
+                  <div className={styles.helperTextSpacer} />
+                )}
+              </FormControl>
+            )}
+          />
+        </div>
+      )}
 
       <div className={styles.fieldContainer}>
         <Controller

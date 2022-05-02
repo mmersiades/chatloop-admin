@@ -3,6 +3,7 @@ export enum UserRole {
   partner = 'ROLE_PARTNER',
   tutor = 'ROLE_TUTOR',
   admin = 'ROLE_ADMIN',
+  orgAdmin = 'ROLE_ORG_ADMIN',
 }
 
 export enum TutorShift {

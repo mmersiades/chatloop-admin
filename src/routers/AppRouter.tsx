@@ -48,9 +48,11 @@ export const AppRouter = () => {
       <PrivateRoute
         path="/referrals"
         component={() => (
-          <ReferralsProvider>
-            <ReferralsPage />
-          </ReferralsProvider>
+          <OrganisationsProvider>
+            <ReferralsProvider>
+              <ReferralsPage />
+            </ReferralsProvider>
+          </OrganisationsProvider>
         )}
       />
       <PrivateRoute

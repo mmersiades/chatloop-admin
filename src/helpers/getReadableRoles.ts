@@ -8,6 +8,8 @@ export const getReadableRoles = (userRole: UserRole) => {
       return 'partner';
     case UserRole.tutor:
       return 'tutor';
+    case UserRole.orgAdmin:
+      return 'organisation admin';
     default:
       return 'user';
   }

@@ -53,6 +53,7 @@ export interface Referral {
   uiLanguage: string;
   firstLanguage: UserLanguageObject;
   link: string;
+  targetOrgId?: number;
 }
 
 export interface UiLanguageOption {

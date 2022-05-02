@@ -16,6 +16,7 @@ export interface PostReferralBody {
   firstLanguage: string; // eg 'eng', 'ara', 'prs' ISO-639-3
   refereeEmail?: string;
   refereePhone?: string;
+  targetOrgId?: number;
 }
 
 export interface PutReferralBody extends PostReferralBody {}
