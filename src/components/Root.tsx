@@ -6,6 +6,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { AppPropertiesProvider } from '../contexts/appPropertiesContext';
 import { AppNavContextProvider } from '../contexts/appNavContext';
 import { LanguagesContextProvider } from '../contexts/languagesContext';
+import { AuthProvider } from '../contexts/authContext';
+import { OrganisationsProvider } from '../contexts/organisationsContext';
 import chatloopTheme from '../assets/chatloopTheme';
 import history from '../helpers/getBrowserHistory';
 
@@ -22,9 +24,13 @@ const Root: FC<RootProps> = ({ children }): JSX.Element => {
       <Router history={history}>
         <ThemeProvider theme={theme}>
           <AppPropertiesProvider>
-            <LanguagesContextProvider>
-              <AppNavContextProvider>{children}</AppNavContextProvider>
-            </LanguagesContextProvider>
+            <AuthProvider>
+              <LanguagesContextProvider>
+                <OrganisationsProvider>
+                  <AppNavContextProvider>{children}</AppNavContextProvider>
+                </OrganisationsProvider>
+              </LanguagesContextProvider>
+            </AuthProvider>
           </AppPropertiesProvider>
         </ThemeProvider>
       </Router>

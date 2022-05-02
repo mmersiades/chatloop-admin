@@ -13,7 +13,6 @@ import ReferralsPage from '../pages/ReferralsPage';
 import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
 import { ReferralsProvider } from '../contexts/referralsContext';
-import { OrganisationsProvider } from '../contexts/organisationsContext';
 import { StatsProvider } from '../contexts/statsContext';
 
 export const AppRouter = () => {
@@ -48,21 +47,12 @@ export const AppRouter = () => {
       <PrivateRoute
         path="/referrals"
         component={() => (
-          <OrganisationsProvider>
-            <ReferralsProvider>
-              <ReferralsPage />
-            </ReferralsProvider>
-          </OrganisationsProvider>
+          <ReferralsProvider>
+            <ReferralsPage />
+          </ReferralsProvider>
         )}
       />
-      <PrivateRoute
-        path="/orgs"
-        component={() => (
-          <OrganisationsProvider>
-            <OrganisationsPage />
-          </OrganisationsProvider>
-        )}
-      />
+      <PrivateRoute path="/orgs" component={() => <OrganisationsPage />} />
     </Switch>
   );
 };

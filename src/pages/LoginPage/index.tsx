@@ -12,13 +12,13 @@ import {
   FormHelperText,
 } from '@material-ui/core';
 
-import authService from '../../services/authServices';
-import logo from '../../assets/splashLogo.svg';
+import { useAuth } from '../../contexts/authContext';
 import { LOGIN_ERROR } from '../../config/textConstants';
+
+import logo from '../../assets/splashLogo.svg';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
-    // LAYOUT
     pageContainer: {
       height: '100%',
     },
@@ -31,17 +31,16 @@ const useStyles = makeStyles(({ spacing }: Theme) =>
       minHeight: spacing(20),
       height: '30vh',
     },
-    // STYLING
   })
 );
 
 interface FormData {
-  email: string;
+  username: string;
   password: string;
 }
 
 const defaultValues: FormData = {
-  email: '',
+  username: '',
   password: '',
 };
 
@@ -61,26 +60,27 @@ const LoginPage = () => {
     defaultValues,
   });
 
+  // ----------------------------- Hooks ---------------------------------------- //
+  const { loginWithCredentials } = useAuth();
+
   // ----------------------------- Component functions ------------------------- //
   const onSubmit = handleSubmit(async (data: FormData) => {
-    const response = await authService.loginWithCredentials(
-      data.email,
-      data.password
-    );
+    if (loginWithCredentials) {
+      const success = await loginWithCredentials(data);
 
-    if (!response.isAuthError) {
-      reset();
-      history.push({
-        pathname: '/dashboard',
-        state: 'Dashboard',
-      });
-    } else {
-      setAuthErrors((prevState) => [...prevState, LOGIN_ERROR]);
+      if (success) {
+        reset();
+        history.push({
+          pathname: '/dashboard',
+          state: 'Dashboard',
+        });
+      } else {
+        setAuthErrors((prevState) => [...prevState, LOGIN_ERROR]);
+      }
     }
   });
 
   // ----------------------------- Render ---------------------------------------- //
-
   return (
     <Grid
       classes={{ root: classes.pageContainer }}
@@ -117,7 +117,7 @@ const LoginPage = () => {
             <FormHelperText> </FormHelperText>
           )}
           <Controller
-            name="email"
+            name="username"
             control={control}
             render={({ field }) => (
               <TextField

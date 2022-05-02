@@ -14,8 +14,9 @@ import {
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useLocation, Link } from 'react-router-dom';
-import authService from '../services/authServices';
+
 import { useAppNav } from '../contexts/appNavContext';
+import { useAuth } from '../contexts/authContext';
 import {
   ACCOUNT_SETTINGS,
   DASHBOARD,
@@ -53,6 +54,7 @@ const MenuDrawer: FC = () => {
   const theme = useTheme();
   const location = useLocation();
   const { showMenuDrawer, setShowMenuDrawer } = useAppNav();
+  const { logout } = useAuth();
 
   return (
     <Drawer
@@ -147,7 +149,7 @@ const MenuDrawer: FC = () => {
           button
           component={Link}
           to={{ pathname: '/' }}
-          onClick={(e: any) => authService.logout()}
+          onClick={() => logout && logout()}
         >
           <ListItemText primary={LOG_OUT} />
         </ListItem>

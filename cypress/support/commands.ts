@@ -2,10 +2,15 @@
 import 'cypress-localstorage-commands';
 import { AxiosResponse } from 'axios';
 
+import admin from '../fixtures/users/admin.json';
+
 declare global {
   namespace Cypress {
     interface Chainable {
       getAuthTokens(username: string, password: string): Promise<AxiosResponse>;
+      visitUsersPage(): void;
+      visitDashboardPage(): void;
+      visitInvitesPage(): void;
       resetDb(): Promise<void>;
       clickTab(tabLabel: string): void;
       deleteUser(email: string): void;
@@ -83,4 +88,72 @@ Cypress.Commands.add('deleteUser', (email: string) => {
   cy.get('button[aria-label="Confirm delete user button"]').click();
   cy.get('button[aria-label="Close drawer button"]').should('not.be.visible');
   cy.contains(email).should('not.be.visible');
+});
+
+Cypress.Commands.add('visitUsersPage', () => {
+  cy.intercept('POST', '/rest/login').as('postLogin');
+  cy.intercept('GET', '/rest/user/organisation').as('getOrganisations');
+  cy.intercept('GET', '/rest/user/filter-users?role=ROLE_LEARNER').as(
+    'getLearners'
+  );
+  cy.intercept('GET', '/rest/user/filter-users?role=ROLE_PARTNER').as(
+    'getPartners'
+  );
+  cy.intercept(
+    'GET',
+    '/rest/user/filter-users?role=ROLE_TUTOR&shift=SHIFT_ONE'
+  ).as('getTutors1');
+  cy.intercept(
+    'GET',
+    '/rest/user/filter-users?role=ROLE_TUTOR&shift=SHIFT_TWO'
+  ).as('getTutors2');
+  cy.intercept('GET', '/rest/language').as('getLanguages');
+
+  // noinspection JSIgnoredPromiseFromCall
+  cy.getAuthTokens(admin.email, admin.password);
+  cy.visit('/users');
+
+  cy.wait('@postLogin');
+  cy.wait('@getOrganisations');
+  cy.wait('@getLearners');
+  cy.wait('@getPartners');
+  cy.wait('@getTutors1');
+  cy.wait('@getTutors2');
+  cy.wait('@getLanguages');
+});
+
+Cypress.Commands.add('visitDashboardPage', () => {
+  cy.intercept('POST', '/rest/login').as('postLogin');
+  cy.intercept('GET', '/rest/user/organisation').as('getOrganisations');
+  cy.intercept('GET', '/rest/language').as('getLanguages');
+  cy.intercept('GET', '/rest/admin/stats/dau?**').as('getDau');
+  cy.intercept('GET', '/rest/admin/stats/mau?**').as('getMau');
+  cy.intercept('GET', '/rest/admin/stats/topictexts?**').as('getTopicTexts');
+  cy.intercept('GET', '/rest/admin/stats/messages?**').as('getMessages');
+
+  // noinspection JSIgnoredPromiseFromCall
+  cy.getAuthTokens(admin.email, admin.password);
+  cy.visit('/dashboard');
+
+  cy.wait('@postLogin');
+  cy.wait('@getOrganisations');
+  cy.wait('@getLanguages');
+  cy.wait('@getDau');
+  cy.wait('@getMau');
+  cy.wait('@getTopicTexts');
+  cy.wait('@getMessages');
+});
+
+Cypress.Commands.add('visitInvitesPage', () => {
+  cy.intercept('POST', '/rest/login').as('postLogin');
+  cy.intercept('GET', '/rest/user/organisation').as('getOrganisations');
+  cy.intercept('GET', '/rest/language').as('getLanguages');
+
+  // noinspection JSIgnoredPromiseFromCall
+  cy.getAuthTokens(admin.email, admin.password);
+  cy.visit('/invites');
+
+  cy.wait('@postLogin');
+  cy.wait('@getOrganisations');
+  cy.wait('@getLanguages');
 });

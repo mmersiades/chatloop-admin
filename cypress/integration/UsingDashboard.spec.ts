@@ -1,8 +1,6 @@
-import admin from '../fixtures/users/admin.json';
 describe('Using the Dashboard', () => {
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/dashboard');
+    cy.visitDashboardPage();
   });
 
   it('should render Dashboard in initial state', () => {
@@ -11,3 +9,5 @@ describe('Using the Dashboard', () => {
     cy.contains(Cypress.env('API_HOST')).should('be.visible');
   });
 });
+
+export default {};

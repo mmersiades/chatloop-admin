@@ -5,15 +5,17 @@ import {
   REFERRER_EMAIL,
   REFERRER_NAME,
 } from '../../src/config/textConstants';
+
 let totalReferrals = 24;
+
 describe('Using the ReferralsPage', () => {
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/referrals');
-    cy.intercept('GET', '**/rest/referrals?**').as('getReferrals');
-    cy.intercept('GET', '**/rest/referrals/**').as('getReferral');
-    cy.intercept('PUT', '**/rest/referrals/**').as('putReferral');
-    cy.intercept('DELETE', '**/rest/referrals/**').as('deleteReferral');
+    cy.intercept('POST', '/rest/login').as('postLogin');
+    cy.intercept('GET', '/rest/referrals?**').as('getReferrals');
+    cy.intercept('GET', '/rest/referrals/**').as('getReferral');
+    cy.intercept('GET', '/rest/user/organisation').as('getOrganisations');
+    cy.intercept('PUT', '/rest/referrals/**').as('putReferral');
+    cy.intercept('DELETE', '/rest/referrals/**').as('deleteReferral');
     cy.intercept('POST', '/rest/referrals*').as('postReferrals');
     cy.intercept('GET', '/rest/language').as('getLanguages');
     cy.intercept('GET', '/json/?key=*', {
@@ -21,9 +23,14 @@ describe('Using the ReferralsPage', () => {
       country: 'Australia',
       countryCode: 'AU',
     }).as('ipLookup');
+    cy.getAuthTokens(admin.email, admin.password);
+    cy.visit('/referrals');
 
+    cy.wait('@postLogin');
+    cy.wait('@getOrganisations');
+    cy.wait('@ipLookup');
     cy.wait('@getReferrals');
-    // cy.wait('@getLanguages')
+    cy.wait('@getLanguages');
   });
 
   describe('when reading referrals', () => {
