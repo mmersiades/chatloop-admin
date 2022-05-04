@@ -123,7 +123,30 @@ export interface ExtendedTutor extends Tutor {
 export const isExtendedTutor = (item: any): item is ExtendedTutor =>
   (item as ExtendedTutor).userRole === UserRole.tutor;
 
-export type ExtendedUser = ExtendedLearner | ExtendedPartner | ExtendedTutor;
+export interface ExtendedOrgAdmin extends OrgAdmin {
+  userRole: UserRole.orgAdmin;
+}
+
+export interface ExtendedReferrer extends Referrer {
+  userRole: UserRole.referrer;
+}
+
+export const hasNumberOfActivities = (
+  item: any
+): item is ExtendedLearner | ExtendedPartner =>
+  !!(item as ExtendedLearner | ExtendedPartner).numberOfActivities;
+
+export const hasFirstLanguage = (
+  item: any
+): item is ExtendedLearner | ExtendedPartner | ExtendedTutor =>
+  !!(item as ExtendedLearner | ExtendedPartner | ExtendedTutor).firstLanguages;
+
+export type ExtendedUser =
+  | ExtendedLearner
+  | ExtendedPartner
+  | ExtendedTutor
+  | ExtendedOrgAdmin
+  | ExtendedReferrer;
 
 export interface UserLanguageObject {
   code: string;

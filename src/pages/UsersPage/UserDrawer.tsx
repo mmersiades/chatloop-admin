@@ -1,18 +1,18 @@
 import React, { FC, useState } from 'react';
 import clsx from 'clsx';
 import {
-  Drawer,
-  makeStyles,
-  createStyles,
   AppBar,
-  Toolbar,
+  Button,
+  createStyles,
+  Drawer,
+  Grid,
   IconButton,
-  Typography,
   List,
   ListItem,
   ListItemText,
-  Button,
-  Grid,
+  makeStyles,
+  Toolbar,
+  Typography,
 } from '@material-ui/core';
 import { CloseRounded } from '@material-ui/icons';
 
@@ -21,20 +21,25 @@ import { ShowReplaceTutorDialog } from './Learners';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useUsers } from '../../contexts/usersContext';
 import { UserRole } from '../../@types/enums';
-import { Tutor, ExtendedUser } from '../../@types/interfaces';
+import {
+  ExtendedUser,
+  hasFirstLanguage,
+  hasNumberOfActivities,
+  Tutor,
+} from '../../@types/interfaces';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
 import {
+  CURRENT_ACTIVITIES,
+  CURRENT_LEARNERS,
+  DELETE,
   DISPLAY_NAME,
   EMAIL,
   FIRST_LANGUAGE,
   INTERFACE_LANGUAGE,
-  CURRENT_ACTIVITIES,
-  CURRENT_LEARNERS,
-  SHIFT_ONE_TUTOR,
   REPLACE_TUTOR,
-  SHIFT_TWO_TUTOR,
   RESET_PASSWORD,
-  DELETE,
+  SHIFT_ONE_TUTOR,
+  SHIFT_TWO_TUTOR,
 } from '../../config/textConstants';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { useDrawerStyles } from '../styles';
@@ -141,23 +146,25 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             secondary={extendedUser ? extendedUser.email : '...'}
           />
         </ListItem>
-        <ListItem>
-          <ListItemText
-            primary={FIRST_LANGUAGE}
-            secondary={
-              extendedUser
-                ? stringifyLanguages(extendedUser.firstLanguages)
-                : '...'
-            }
-          />
-        </ListItem>
+        {extendedUser && hasFirstLanguage(extendedUser) && (
+          <ListItem>
+            <ListItemText
+              primary={FIRST_LANGUAGE}
+              secondary={
+                extendedUser
+                  ? stringifyLanguages(extendedUser.firstLanguages)
+                  : '...'
+              }
+            />
+          </ListItem>
+        )}
         <ListItem>
           <ListItemText
             primary={INTERFACE_LANGUAGE}
             secondary={extendedUser ? extendedUser.uiLanguage : '...'}
           />
         </ListItem>
-        {!!extendedUser && extendedUser.userRole !== UserRole.tutor && (
+        {!!extendedUser && hasNumberOfActivities(extendedUser) && (
           <ListItem>
             <ListItemText
               primary={CURRENT_ACTIVITIES}
