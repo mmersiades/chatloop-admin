@@ -4,6 +4,7 @@ export enum UserRole {
   tutor = 'ROLE_TUTOR',
   admin = 'ROLE_ADMIN',
   orgAdmin = 'ROLE_ORG_ADMIN',
+  referrer = 'ROLE_REFERRER',
 }
 
 export enum TutorShift {

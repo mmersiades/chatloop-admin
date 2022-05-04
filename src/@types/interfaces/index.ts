@@ -90,6 +90,14 @@ export interface Partner extends User {
   roles: [UserRole.partner];
 }
 
+export interface OrgAdmin extends User {
+  roles: [UserRole.orgAdmin];
+}
+
+export interface Referrer extends User {
+  roles: [UserRole.referrer];
+}
+
 export interface ExtendedPartner extends Partner {
   userRole: UserRole.partner;
   id: number; // Partner's id

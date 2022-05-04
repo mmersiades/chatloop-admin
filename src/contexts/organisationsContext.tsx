@@ -17,6 +17,7 @@ import organisationsService, {
   PutOrgBody,
 } from '../services/organisationsService';
 import { Action, Organisation } from '../@types/interfaces';
+import { useAuth } from './authContext';
 
 export interface OrganisationsState {
   fetching: boolean;
@@ -275,6 +276,7 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
   const [state, dispatch] = useReducer(orgsReducer, initialState);
 
   const { setShowOrgDrawer } = useAppNav();
+  const { loggedIn } = useAuth();
 
   // ----------------------------- Component functions ------------------------- //
   const getOrganisations: GetOrganisations = useCallback(async () => {
@@ -412,8 +414,8 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
 
   // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
-    getOrganisations();
-  }, [getOrganisations]);
+    loggedIn && getOrganisations();
+  }, [loggedIn, getOrganisations]);
 
   // ----------------------------- Render ---------------------------------------- //
   return (

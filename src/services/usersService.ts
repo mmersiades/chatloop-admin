@@ -8,6 +8,12 @@ import { AxiosResponse } from 'axios';
 import { usersAction } from '../contexts/usersContext';
 import { NewUserPayload } from '../pages/UsersPage/NewUserForm';
 
+export interface UserListDTO<T> {
+  message: string;
+  status: string;
+  users: T[];
+}
+
 export const getUser = async (
   userId: number
 ): Promise<AxiosResponse<ExtendedUser>> => {
@@ -39,7 +45,7 @@ export const getLearners = async (dispatch: React.Dispatch<usersAction>) => {
     const learners: Array<Learner> = response.data.users.map(
       (learner: any) => learner
     );
-    dispatch({ type: 'SET_LEARNERS', payload: learners });
+    // dispatch({ type: 'SET_LEARNERS', payload: learners });
   } catch (error) {
     /* istanbul ignore next */
     handleError(error);
@@ -59,16 +65,19 @@ export const getPartners = async (dispatch: React.Dispatch<usersAction>) => {
     const partners: Array<Partner> = response.data.users.map(
       (partner: any) => partner
     );
-    dispatch({ type: 'SET_PARTNERS', payload: partners });
+    // dispatch({ type: 'SET_PARTNERS', payload: partners });
   } catch (error) {
     /* istanbul ignore next */
     handleError(error);
   }
 };
 
-export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
-  let shiftOneTutors: Array<Tutor> = [];
-  let shiftTwoTutors: Array<Tutor> = [];
+export const getAllTutors = async <T>(): Promise<
+  AxiosResponse<UserListDTO<T>>
+> => {
+  let shiftOneTutors: T[] = [];
+  let shiftTwoTutors: T[] = [];
+
   const requestOptions = {
     headers: { authorization: authHeader() },
   };
@@ -91,31 +100,39 @@ export const getTutors = async (dispatch: React.Dispatch<usersAction>) => {
       tutor.shift = TutorShift.two;
       return tutor;
     });
-    dispatch({
-      type: 'SET_TUTORS',
-      payload: shiftOneTutors.concat(shiftTwoTutors),
-    });
+
+    return {
+      status: 200,
+      data: {
+        users: shiftOneTutors.concat(shiftTwoTutors),
+        status: '200',
+        message: 'success',
+      },
+    } as AxiosResponse<UserListDTO<T>>;
   } catch (error) {
     /* istanbul ignore next */
     handleError(error);
+    return {
+      status: 400,
+      data: { status: '400', message: 'failure' },
+    } as AxiosResponse;
   }
 };
 
-export const getUsersByUserRole = (
-  userRole: UserRole,
-  dispatch: React.Dispatch<usersAction>
-) => {
-  switch (userRole) {
-    case UserRole.learner:
-      getLearners(dispatch);
-      break;
-    case UserRole.partner:
-      getPartners(dispatch);
-      break;
-    case UserRole.tutor:
-      getTutors(dispatch);
-      break;
-    default:
+export const getUsersByRole = async <T>(
+  role: UserRole
+): Promise<AxiosResponse<UserListDTO<T>>> => {
+  const requestOptions = {
+    headers: { authorization: authHeader() },
+  };
+
+  if (role === UserRole.tutor) {
+    return (await getAllTutors<T>()) as AxiosResponse<UserListDTO<T>>;
+  } else {
+    return await apiChatloopOrg.get(
+      `/rest/user/filter-users?role=${role}`,
+      requestOptions
+    );
   }
 };
 
