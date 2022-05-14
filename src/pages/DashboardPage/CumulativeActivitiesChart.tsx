@@ -37,7 +37,7 @@ export const options = {
 
 interface Props {}
 
-const TopicTextsChart: FC<Props> = () => {
+const CumulativeActivitiesChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
@@ -47,19 +47,22 @@ const TopicTextsChart: FC<Props> = () => {
 
   // -------------------------- Hooks -------------------------------------- //
   const {
-    getTopicTextsStats,
-    topicTextsStats,
-    topicTextsEndDate,
-    topicTextsStartDate,
-    fetchingTopicTexts,
+    getCumulativeActivitiesStats,
+    cumulativeActivitiesStats,
+    cumulativeActivitiesEndDate,
+    cumulativeActivitiesStartDate,
+    fetchingCumulativeActivities,
   } = useStats();
 
   // -------------------------- Component functions ------------------------ //
 
   const handleSelect = async (ranges: RangeKeyDict) => {
     const { startDate, endDate } = ranges['selection'];
-    if (startDate && endDate && getTopicTextsStats) {
-      const success = await getTopicTextsStats({ startDate, endDate });
+    if (startDate && endDate && getCumulativeActivitiesStats) {
+      const success = await getCumulativeActivitiesStats({
+        startDate,
+        endDate,
+      });
 
       success && setPickerAnchor(null);
     }
@@ -78,17 +81,17 @@ const TopicTextsChart: FC<Props> = () => {
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title="TopicTexts"
+      title="Cumulative Activities"
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
       handleSelect={handleSelect}
-      startDate={topicTextsStartDate}
-      endDate={topicTextsEndDate}
+      startDate={cumulativeActivitiesStartDate}
+      endDate={cumulativeActivitiesEndDate}
       anchorEl={pickerAnchor}
     >
       <>
-        {fetchingTopicTexts || !topicTextsStats ? (
+        {fetchingCumulativeActivities || !cumulativeActivitiesStats ? (
           <Grid
             container
             alignItems="center"
@@ -98,11 +101,11 @@ const TopicTextsChart: FC<Props> = () => {
             <CircularProgress />
           </Grid>
         ) : (
-          <Bar data={topicTextsStats} options={options} />
+          <Bar data={cumulativeActivitiesStats} options={options} />
         )}
       </>
     </ChartWrapper>
   );
 };
 
-export default TopicTextsChart;
+export default CumulativeActivitiesChart;
