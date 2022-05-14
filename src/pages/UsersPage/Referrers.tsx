@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { createStyles, makeStyles } from '@material-ui/core';
-import { ExtendedLearner, ExtendedReferrer } from '../../@types/interfaces';
+import { ExtendedReferrer } from '../../@types/interfaces';
 import { UserRole } from '../../@types/enums';
 import UsersTable from './UsersTable';
 import UserDrawer from './UserDrawer';

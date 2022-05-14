@@ -6,7 +6,8 @@ import {
   REFERRER_NAME,
 } from '../../src/config/textConstants';
 
-let totalReferrals = 24;
+let totalReferrals = 36;
+let pageSize = 25;
 
 describe('Using the ReferralsPage', () => {
   beforeEach(() => {
@@ -38,9 +39,7 @@ describe('Using the ReferralsPage', () => {
       cy.contains(REFERRALS_TITLE).should('be.visible');
       cy.contains('learner').should('be.visible');
       cy.contains('partner').should('be.visible');
-      cy.contains(`1-${totalReferrals} of ${totalReferrals}`).should(
-        'be.visible'
-      );
+      cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
     });
 
     it('should change row size and navigate to next page', () => {
@@ -51,15 +50,17 @@ describe('Using the ReferralsPage', () => {
         cy.get('div[aria-haspopup="listbox"]').click();
       });
       cy.get('[data-value="10"]').click();
+      pageSize = 10;
       cy.wait('@getReferrals');
       cy.countElementsWithText('td', partnerRegex, 10);
-      cy.contains(`1-10 of ${totalReferrals}`).should('be.visible');
+      cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
       cy.countElementsWithText('td', partnerRegex, 2);
       cy.countElementsWithText('td', learnerRegex, 8);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
+      pageSize = 25;
     });
   });
 
@@ -170,7 +171,9 @@ describe('Using the ReferralsPage', () => {
       cy.wait('@deleteReferral');
       totalReferrals--;
       cy.contains(
-        `1-${totalReferrals > 25 ? '25' : totalReferrals} of ${totalReferrals}`
+        `1-${
+          totalReferrals > pageSize ? pageSize : totalReferrals
+        } of ${totalReferrals}`
       ).should('be.visible');
     });
   });
@@ -181,6 +184,8 @@ const submitForm = () => {
   cy.wait('@postReferrals');
   totalReferrals++;
   cy.contains(
-    `1-${totalReferrals > 25 ? '25' : totalReferrals} of ${totalReferrals}`
+    `1-${
+      totalReferrals > pageSize ? pageSize : totalReferrals
+    } of ${totalReferrals}`
   ).should('be.visible');
 };

@@ -427,7 +427,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
             <IntlPhoneInput
               inputProps={{
                 label: 'Contact phone',
-                placeholder: 'Example',
+                placeholder: '07 33333333',
                 margin: 'dense',
                 variant: 'outlined',
                 type: 'text',
