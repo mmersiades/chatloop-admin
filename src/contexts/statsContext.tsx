@@ -37,10 +37,10 @@ const today = new Date();
 const defaultDauStartDate = new Date();
 defaultDauStartDate.setDate(defaultDauStartDate.getDate() - 6);
 const defaultMauStartDate = new Date();
-defaultMauStartDate.setDate(defaultMauStartDate.getDate() - 27);
+defaultMauStartDate.setDate(defaultMauStartDate.getDate() - 83);
 const defaultCumulativeActivitiesStartDate = new Date();
 defaultCumulativeActivitiesStartDate.setDate(
-  defaultCumulativeActivitiesStartDate.getDate() - 27
+  defaultCumulativeActivitiesStartDate.getDate() - 83
 );
 const defaultActivitiesInProgressStartDate = new Date();
 defaultActivitiesInProgressStartDate.setDate(
@@ -420,6 +420,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         getDauStats,
         getMauStats,
         getCumulativeActivitiesStats,
+        getActivitiesInProgressStats,
         getMessagesStats,
       }}
     >

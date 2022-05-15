@@ -8,10 +8,11 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useStats } from '../../contexts/statsContext';
-import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
+import { RangeKeyDict } from 'react-date-range';
 import { Bar } from 'react-chartjs-2';
+
+import { useStats } from '../../contexts/statsContext';
 import ChartWrapper from '../../components/base/ChartWrapper';
 
 ChartJS.register(
@@ -37,7 +38,7 @@ export const options = {
 
 interface Props {}
 
-const ActivitiesInProgressChart: FC<Props> = ({}) => {
+const ActivitiesInProgressChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
