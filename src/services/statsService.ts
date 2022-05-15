@@ -59,7 +59,7 @@ const getMessagesStats: GetMessagesStats = async ({ startDate, endDate }) =>
 
 const getStats = async (type: string, startDate: Date, endDate: Date) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {

@@ -5,7 +5,7 @@ import { handleError } from '../helpers/handleError';
 
 export const getLanguages = async (): Promise<AxiosResponse> => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {

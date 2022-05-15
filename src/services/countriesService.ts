@@ -17,7 +17,7 @@ interface CountriesService {
 
 const getCountries: GetCountries = async () => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {

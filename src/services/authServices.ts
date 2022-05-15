@@ -25,7 +25,7 @@ const loginWithCredentials: LoginWithCredentials = async (body) => {
 
 const loginWithToken: LoginWithToken = async () => {
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: refreshHeader() },
+    headers: { Authorization: refreshHeader() },
   };
 
   return await apiChatloopOrg.post('/rest/login', undefined, requestOptions);
@@ -46,7 +46,7 @@ const renewTokens = () => {
   }
 
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: refreshHeader() },
+    headers: { Authorization: refreshHeader() },
   };
 
   if (elapsed && elapsed > 300000) {
@@ -83,7 +83,7 @@ function updatePassword(
   confirmPassword: string
 ): Promise<AxiosResponse> {
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   const body = {

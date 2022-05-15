@@ -5,7 +5,7 @@ import { AxiosResponse } from 'axios';
 
 const getPartnerQueue = async (page: number, size: number) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -21,7 +21,7 @@ const getPartnerQueue = async (page: number, size: number) => {
 
 const getInvites = async () => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -37,7 +37,7 @@ const getInvites = async () => {
 
 const deleteInvite = async (id: number) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {

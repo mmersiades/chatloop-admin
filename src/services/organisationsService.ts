@@ -68,7 +68,7 @@ interface OrganisationsService {
 
 const getOrgs: GetOrgs = async () => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -81,7 +81,7 @@ const getOrgs: GetOrgs = async () => {
 
 const getOrg: GetOrg = async (orgId) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -97,7 +97,7 @@ const getOrg: GetOrg = async (orgId) => {
 
 const postOrg: PostOrg = async (body) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -114,7 +114,7 @@ const postOrg: PostOrg = async (body) => {
 
 const putOrg: PutOrg = async ({ body, orgId }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -131,7 +131,7 @@ const putOrg: PutOrg = async ({ body, orgId }) => {
 
 const deleteOrg: DeleteOrg = async (orgId) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -147,7 +147,7 @@ const deleteOrg: DeleteOrg = async (orgId) => {
 
 const postLogo: PostLogo = async ({ orgId, orientation, type, files }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   const formData = new FormData();
@@ -164,7 +164,7 @@ const postLogo: PostLogo = async ({ orgId, orientation, type, files }) => {
 
 const deleteLogo: DeleteLogo = ({ orgId, type }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   return apiChatloopOrg.delete(

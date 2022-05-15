@@ -20,7 +20,7 @@ interface RegionsService {
 
 const getRegionsByCountry: GetRegionsByCountry = async (countryCode) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {

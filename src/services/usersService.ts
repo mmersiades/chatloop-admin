@@ -17,7 +17,7 @@ export const getUser = async (
   userId: number
 ): Promise<AxiosResponse<ExtendedUser>> => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -38,7 +38,7 @@ export const getAllTutors = async <T>(): Promise<
   let shiftTwoTutors: T[] = [];
 
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -82,7 +82,7 @@ export const getUsersByRole = async <T>(
   role: UserRole
 ): Promise<AxiosResponse<UserListDTO<T>>> => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   if (role === UserRole.tutor) {
@@ -97,7 +97,7 @@ export const getUsersByRole = async <T>(
 
 export const createUser = async (body: NewUserPayload) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -119,7 +119,7 @@ export const replaceTutor = async (
   learner: number
 ) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   const body = { oldTutor, newTutor, learner };
@@ -138,7 +138,7 @@ export const replaceTutor = async (
 
 export const deleteUser = async (userId: number) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -155,7 +155,7 @@ export const deleteUser = async (userId: number) => {
 
 export const resetPassword = async (email: string) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   const body = { email };
