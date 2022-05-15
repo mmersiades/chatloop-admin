@@ -1,4 +1,4 @@
-import { UserRole, TutorShift, ReferralStatus } from '../enums';
+import { UserRole, TutorShift, ReferralStatus, Orientation } from '../enums';
 
 export interface Action<T> {
   type: T;
@@ -53,6 +53,7 @@ export interface Referral {
   uiLanguage: string;
   firstLanguage: UserLanguageObject;
   link: string;
+  targetOrgId?: number;
 }
 
 export interface UiLanguageOption {
@@ -89,6 +90,14 @@ export interface Partner extends User {
   roles: [UserRole.partner];
 }
 
+export interface OrgAdmin extends User {
+  roles: [UserRole.orgAdmin];
+}
+
+export interface Referrer extends User {
+  roles: [UserRole.referrer];
+}
+
 export interface ExtendedPartner extends Partner {
   userRole: UserRole.partner;
   id: number; // Partner's id
@@ -114,7 +123,30 @@ export interface ExtendedTutor extends Tutor {
 export const isExtendedTutor = (item: any): item is ExtendedTutor =>
   (item as ExtendedTutor).userRole === UserRole.tutor;
 
-export type ExtendedUser = ExtendedLearner | ExtendedPartner | ExtendedTutor;
+export interface ExtendedOrgAdmin extends OrgAdmin {
+  userRole: UserRole.orgAdmin;
+}
+
+export interface ExtendedReferrer extends Referrer {
+  userRole: UserRole.referrer;
+}
+
+export const hasNumberOfActivities = (
+  item: any
+): item is ExtendedLearner | ExtendedPartner =>
+  !!(item as ExtendedLearner | ExtendedPartner).numberOfActivities;
+
+export const hasFirstLanguage = (
+  item: any
+): item is ExtendedLearner | ExtendedPartner | ExtendedTutor =>
+  !!(item as ExtendedLearner | ExtendedPartner | ExtendedTutor).firstLanguages;
+
+export type ExtendedUser =
+  | ExtendedLearner
+  | ExtendedPartner
+  | ExtendedTutor
+  | ExtendedOrgAdmin
+  | ExtendedReferrer;
 
 export interface UserLanguageObject {
   code: string;
@@ -184,38 +216,69 @@ export interface Invite {
 
 // An object representing a language as per [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3)
 export interface Language {
-  // A unique 6-digit number identifying each language
   id: number;
-
-  /**
-   * A 2- or 3-character code representing a language
-   */
   code?: string;
-
-  // The name of the language, in English
   language: string;
-
-  // Individual (I) or macroLanguage (M). See more at [[LanguageScopes]]
   scope?: LanguageScopes;
-
-  /**
-   * The language code for the selected language's macroLanguage,
-   * if the selected language belongs to a macroLanguage
-   */
   macroLanguage?: string | null;
 }
 
 //These language scopes come from ISO-639-3. [Read more here](https://iso639-3.sil.org/about/scope)
 export enum LanguageScopes {
-  /** An individual scope means that the language codes represents just one, individual language. */
   individual = 'I',
-  /** A macrolanguage scope that the language code represents an umbrella code for a collection of related individual languages.
-   * For example **"ara"** is a macrolanguage code that covers the various Arabic language codes, for example:
-   * * arb - Standard Arabic
-   * * arq - Algerian Arabic
-   * * ars - Nadji Arabic
-   * * arz - Egyptian Arabic
-   * * etc...
-   */
   macrolanguage = 'M',
+}
+
+export interface OrgAdminDTO {
+  adminId: number;
+  name: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface Organisation {
+  id: number;
+  officialName: string;
+
+  // Areas of operation
+  operationalCountries: Country[];
+  operationalRegions: Region[];
+  onlineOrg: boolean;
+
+  // Additional info
+  shortName: string | null;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  websiteUrl: string | null;
+
+  // Logo
+  logo: string | null;
+  logoOrientation: Orientation | null;
+  logomark: string | null;
+  logomarkOrientation: Orientation | null;
+  wordmark: string | null;
+
+  // Address
+  premise: string | null;
+  subpremise: string | null;
+  streetAddress: string | null;
+  locality: string | null;
+  administrativeArea: string | null;
+  country: string | null;
+  countryCode: string | null;
+  postalCode: string | null;
+
+  // Org Admin
+  admins: OrgAdminDTO[];
+}
+
+export interface Country {
+  countryCode: string;
+  countryName: string;
+}
+
+export interface Region {
+  code: string;
+  countryCode: string;
+  subdivisionName: string;
 }

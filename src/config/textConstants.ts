@@ -8,18 +8,22 @@ export const LOG_OUT = 'Log out';
 export const ACCOUNT_SETTINGS = 'Account Settings';
 export const INVITES = 'Invites';
 export const REFERRALS = 'Referrals';
+export const ORGANISATIONS = 'Organisations';
 export const USERS = 'Users';
 export const DASHBOARD = 'Dashboard';
 
 // Common
 export const CANCEL = 'CANCEL';
 export const DELETE = 'DELETE';
+export const REMOVE = 'REMOVE';
 
 // UsersPage
 export const USERS_TITLE = 'Manage Users';
 export const LEARNERS_TAB = 'LEARNERS';
 export const PARTNERS_TAB = 'PARTNERS';
 export const TUTORS_TAB = 'TUTORS';
+export const ORG_ADMINS_TAB = 'ORG ADMINS';
+export const REFERRERS_TAB = 'REFERRERS';
 export const DISPLAY_NAME = 'Display name';
 export const EMAIL = 'Email';
 export const FIRST_LANGUAGE = 'First language';
@@ -49,12 +53,39 @@ export const PHONE_FORM_HELPER = 'Invitation sent to this phone number';
 export const FIRST_LANG_FORM_HELPER = 'Native language / mother tongue';
 export const INVITATION_LINK = 'Link';
 
+// OrganisationsPage
+export const ORGS_TITLE = 'Partner organisations';
+export const ADD_ORG_BUTTON = 'ADD ORGANISATION';
+export const OFFICIAL_NAME_HELPER =
+  "Organisation's legal name, as registered with government";
+export const SHORT_NAME_HELPER =
+  'The name the organisation is commonly known as';
+export const CONTACT_PHONE_HELPER = "Organisation's public-facing phone number";
+export const CONTACT_EMAIL_HELPER =
+  "Organisation's public-facing email address";
+export const WEBSITE_HELPER = "Organisation's public-facing website url";
+export const OPERATIONAL_COUNTRIES_HELPER =
+  'Countries where the organisation serves clients';
+export const SUBPREMISE_HELPER =
+  'A building within a collection of buildings with a common name';
+export const PREMISE_HELPER =
+  'A building or collection of buildings with a common name';
+export const STREET_ADDRESS_HELPER = 'A precise street address';
+export const LOCALITY_HELPER = '';
+export const ADMINISTRATIVE_AREA_HELPER = '';
+export const POSTAL_CODE_HELPER = '';
+
 // AccountSettings
 export const ACCOUNT_SETTINGS_TITLE = 'Account Settings';
 export const PASSWORD_LABEL = 'Password';
 
 // Dashboard
 export const DASHBOARD_TITLE = 'Chatloop Admin';
+export const DAU_TITLE = 'Daily Active Users';
+export const MAU_TITLE = 'Monthly Active Users';
+export const ACTIVITIES_IN_PROGRESS_TITLE = 'Activities In Progress';
+export const CUMULATIVE_ACTIVITIES_TITLE = 'Cumulative Activities';
+export const MESSAGES_TITLE = 'Messages';
 
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';
@@ -62,3 +93,6 @@ export const RESET = 'RESET';
 
 // DeleteUserDialog
 export const DELETE_USER_DIALOG_TITLE = 'Delete user?';
+
+// RemoveOrgAdminDialog
+export const REMOVE_ORG_ADMIN_TITLE = 'Remove administrator?';

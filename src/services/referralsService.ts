@@ -14,8 +14,9 @@ export interface PostReferralBody {
   refereeName: string;
   role: UserRole;
   firstLanguage: string; // eg 'eng', 'ara', 'prs' ISO-639-3
-  refereeEmail?: string;
-  refereePhone?: string;
+  refereeEmail: string | null;
+  refereePhone: string | null;
+  targetOrgId: number | null;
 }
 
 export interface PutReferralBody extends PostReferralBody {}
@@ -76,7 +77,7 @@ interface ReferralsService {
 
 export const postReferral: PostReferral = async ({ body, size, page }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -98,7 +99,7 @@ export const putReferral: PutReferral = async ({
   page,
 }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -115,7 +116,7 @@ export const putReferral: PutReferral = async ({
 
 export const getReferrals: GetReferrals = async ({ size, page }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -131,7 +132,7 @@ export const getReferrals: GetReferrals = async ({ size, page }) => {
 
 export const getReferralById: GetReferralById = async ({ referralId }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -151,7 +152,7 @@ export const deleteReferral: DeleteReferral = async ({
   page,
 }) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {

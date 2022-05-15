@@ -1,31 +1,11 @@
-/**
- * @module routes
- */
-
-/** */
 import React from 'react';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 
-/** Props for PublicRoute component */
+import { useAuth } from '../contexts/authContext';
+
 interface IPublicRouteProps {
-  /**
-   * The component to be rendered as a child of PublicRoute<br>
-   * Passed in by the parent component (AppRouter)
-   *  */
   component: any;
-
-  /**
-   * "When true, will only match if the path matches the location.pathname exactly."
-   * See [exact](https://reacttraining.com/react-router/web/api/Route/exact-bool).<br>
-   * Passed in by the parent component (AppRouter)
-   */
   exact?: boolean;
-
-  /**
-   * "Any valid URL path or array of paths that path-to-regexp@^1.7.0 understands."
-   * See [path](https://reacttraining.com/react-router/web/api/Route/path-string-string).<br>
-   * Passed in by the parent component (AppRouter)
-   */
   path?: string;
 }
 
@@ -40,8 +20,7 @@ export const PublicRoute = ({
   path,
   ...rest
 }: IPublicRouteProps): JSX.Element => {
-  // Determines login status by looking for JWT in localStorage
-  const token: string | null = localStorage.getItem('loginToken');
+  const { loggedIn } = useAuth();
 
   // Where redirect to if logged in
   const to = '/dashboard';
@@ -50,7 +29,11 @@ export const PublicRoute = ({
     <Route
       path={path}
       render={(routeProps: RouteProps) =>
-        token ? <Redirect to={to} /> : <Component {...routeProps} {...rest} />
+        loggedIn ? (
+          <Redirect to={to} />
+        ) : (
+          <Component {...routeProps} {...rest} />
+        )
       }
     />
   );

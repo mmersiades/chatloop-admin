@@ -1,16 +1,13 @@
-import admin from '../fixtures/users/admin.json';
 import { OperatingSystem, TutorShift } from '../../src/@types/enums';
-import { grey } from '@material-ui/core/colors';
 
 describe('Creating new users', () => {
-  const userDisplayName = 'fakename014';
-  const userEmail = 'fakename014@gmail.com';
+  const userDisplayName = 'somebody';
+  const userEmail = 'somebody@gmail.com';
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/users');
+    cy.visitUsersPage();
   });
 
-  it('should create a Partner', () => {
+  it.only('should create a Partner', () => {
     cy.clickTab('PARTNERS');
     cy.contains('button', 'ADD PARTNER').should('not.be.disabled');
     cy.contains('button', 'ADD PARTNER').click();

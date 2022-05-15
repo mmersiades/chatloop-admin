@@ -14,6 +14,6 @@ export const removeLeadingZeroFromPhone: RemoveLeadingZeroFromPhone = ({
   if (phoneNumber[0] === '0') {
     phoneNumber = phoneNumber.substring(1);
   }
-  console.log('phoneNumber', phoneNumber);
+
   return dialCode.concat(phoneNumber);
 };

@@ -1,17 +1,14 @@
-import { AxiosError } from 'axios';
 import {
   CANCEL,
   RESET,
   RESET_PASSWORD,
   RESET_PASSWORD_DIALOG_TITLE,
 } from '../../src/config/textConstants';
-import admin from '../fixtures/users/admin.json';
 import sara from '../fixtures/users/sara.json';
 
 describe('Resetting a password', () => {
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/users');
+    cy.visitUsersPage();
   });
 
   it("should reset a Learner's password", () => {

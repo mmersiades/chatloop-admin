@@ -14,13 +14,11 @@ import {
   TUTORS_TAB,
   USERS_TITLE,
 } from '../../src/config/textConstants';
-import admin from '../fixtures/users/admin.json';
 import sara from '../fixtures/users/sara.json';
 
 describe('Using the UsersPage', () => {
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/users');
+    cy.visitUsersPage();
   });
 
   it('should render UsersPage in initial state', () => {

@@ -1,11 +1,9 @@
 import { DELETE_USER_DIALOG_TITLE } from '../../src/config/textConstants';
-import admin from '../fixtures/users/admin.json';
 
 describe('Deleting a user', () => {
   const userEmail = 'learner4@gmail.com';
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/users');
+    cy.visitUsersPage();
   });
 
   it('should delete a user', () => {

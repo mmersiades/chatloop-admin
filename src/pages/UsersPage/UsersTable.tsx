@@ -86,7 +86,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
     showNewUserForm,
     setShowNewUserForm,
   } = useAppNav();
-  const { learners, partners, tutors } = useUsers();
+  const { learners, partners, tutors, orgAdmins, referrers } = useUsers();
 
   // ----------------------------- Component functions ------------------------- //
   const handleChangePage = (event: any, newPage: any) => {
@@ -139,6 +139,30 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                   page * rowsPerPage + rowsPerPage
                 ) || []
               : tutors || [],
+        };
+        break;
+      case UserRole.orgAdmin:
+        roleParams = {
+          count: orgAdmins.length || 0,
+          rows:
+            rowsPerPage > 0
+              ? orgAdmins.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                ) || []
+              : orgAdmins || [],
+        };
+        break;
+      case UserRole.referrer:
+        roleParams = {
+          count: referrers.length || 0,
+          rows:
+            rowsPerPage > 0
+              ? referrers.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                ) || []
+              : referrers || [],
         };
         break;
       default:
@@ -226,10 +250,12 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
           </TableFooter>
         </Table>
       </TableContainer>
-      <AddUserFab
-        fabFor={tableFor}
-        handleClick={() => setShowNewUserForm(!showNewUserForm)}
-      />
+      {tableFor !== UserRole.orgAdmin && tableFor !== UserRole.referrer && (
+        <AddUserFab
+          fabFor={tableFor}
+          handleClick={() => setShowNewUserForm(!showNewUserForm)}
+        />
+      )}
     </>
   );
 };
