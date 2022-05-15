@@ -3,6 +3,8 @@ export enum UserRole {
   partner = 'ROLE_PARTNER',
   tutor = 'ROLE_TUTOR',
   admin = 'ROLE_ADMIN',
+  orgAdmin = 'ROLE_ORG_ADMIN',
+  referrer = 'ROLE_REFERRER',
 }
 
 export enum TutorShift {
@@ -19,4 +21,16 @@ export enum ReferralStatus {
   sent = 'INVITATION_SENT',
   accepted = 'INVITATION_ACCEPTED',
   expired = 'INVITATION_EXPIRED',
+}
+
+export enum Orientation {
+  square = 'SQUARE',
+  landscape = 'LANDSCAPE',
+  portrait = 'PORTRAIT',
+}
+
+export enum LogoType {
+  logo = 'LOGO',
+  logomark = 'LOGOMARK',
+  wordmark = 'WORDMARK',
 }

@@ -5,8 +5,10 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { Language } from '../@types/interfaces';
+
+import { useAuth } from './authContext';
 import { getLanguages } from '../services/languagesService';
+import { Language } from '../@types/interfaces';
 
 interface LanguagesContext {
   languages: Language[];
@@ -29,6 +31,7 @@ export const LanguagesContextProvider: FC<LanguagesContextProviderProps> = ({
   children,
 }) => {
   const [languages, setLanguages] = useState<Language[]>([]);
+  const { loggedIn } = useAuth();
 
   const fetchLanguages = async () => {
     try {
@@ -40,8 +43,8 @@ export const LanguagesContextProvider: FC<LanguagesContextProviderProps> = ({
   };
 
   useEffect(() => {
-    fetchLanguages();
-  }, []);
+    loggedIn && fetchLanguages();
+  }, [loggedIn]);
 
   return (
     <LanguagesContext.Provider value={{ languages }}>

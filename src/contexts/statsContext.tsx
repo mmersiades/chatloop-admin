@@ -13,19 +13,23 @@ import { Action } from '../@types/interfaces';
 interface StatsState {
   fetchingDau: boolean;
   fetchingMau: boolean;
-  fetchingTopicTexts: boolean;
+  fetchingCumulativeActivities: boolean;
+  fetchingActivitiesInProgress: boolean;
   fetchingMessages: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
-  topicTextsStartDate: Date;
+  cumulativeActivitiesStartDate: Date;
+  activitiesInProgressStartDate: Date;
   messagesStartDate: Date;
   dauEndDate: Date;
   mauEndDate: Date;
-  topicTextsEndDate: Date;
+  cumulativeActivitiesEndDate: Date;
+  activitiesInProgressEndDate: Date;
   messagesEndDate: Date;
   dauStats?: StatsDTO;
   mauStats?: StatsDTO;
-  topicTextsStats?: StatsDTO;
+  cumulativeActivitiesStats?: StatsDTO;
+  activitiesInProgressStats?: StatsDTO;
   messagesStats?: StatsDTO;
 }
 
@@ -33,36 +37,47 @@ const today = new Date();
 const defaultDauStartDate = new Date();
 defaultDauStartDate.setDate(defaultDauStartDate.getDate() - 6);
 const defaultMauStartDate = new Date();
-defaultMauStartDate.setDate(defaultMauStartDate.getDate() - 27);
-const defaultTopicTextStartDate = new Date();
-defaultTopicTextStartDate.setDate(defaultTopicTextStartDate.getDate() - 27);
+defaultMauStartDate.setDate(defaultMauStartDate.getDate() - 83);
+const defaultCumulativeActivitiesStartDate = new Date();
+defaultCumulativeActivitiesStartDate.setDate(
+  defaultCumulativeActivitiesStartDate.getDate() - 83
+);
+const defaultActivitiesInProgressStartDate = new Date();
+defaultActivitiesInProgressStartDate.setDate(
+  defaultActivitiesInProgressStartDate.getDate() - 6
+);
 const defaultMessagesStartDate = new Date();
 defaultMessagesStartDate.setDate(defaultMessagesStartDate.getDate() - 6);
 
 const initialState: StatsState = {
   fetchingDau: false,
   fetchingMau: false,
-  fetchingTopicTexts: false,
+  fetchingCumulativeActivities: false,
+  fetchingActivitiesInProgress: false,
   fetchingMessages: false,
   dauStartDate: defaultDauStartDate,
   mauStartDate: defaultMauStartDate,
-  topicTextsStartDate: defaultTopicTextStartDate,
+  cumulativeActivitiesStartDate: defaultCumulativeActivitiesStartDate,
   messagesStartDate: defaultMessagesStartDate,
+  activitiesInProgressStartDate: defaultActivitiesInProgressStartDate,
   dauEndDate: today,
   mauEndDate: today,
-  topicTextsEndDate: today,
+  cumulativeActivitiesEndDate: today,
+  activitiesInProgressEndDate: today,
   messagesEndDate: today,
 };
 
 type GetDauStats = (args: DateRange) => Promise<boolean>;
 type GetMauStats = (args: DateRange) => Promise<boolean>;
-type GetTopicTextsStats = (args: DateRange) => Promise<boolean>;
+type GetCumulativeActivitiesStats = (args: DateRange) => Promise<boolean>;
+type GetActivitiesInProgressStats = (args: DateRange) => Promise<boolean>;
 type GetMessagesStats = (args: DateRange) => Promise<boolean>;
 
 interface StatsContext extends StatsState {
   getDauStats?: GetDauStats;
   getMauStats?: GetMauStats;
-  getTopicTextsStats?: GetTopicTextsStats;
+  getCumulativeActivitiesStats?: GetCumulativeActivitiesStats;
+  getActivitiesInProgressStats?: GetActivitiesInProgressStats;
   getMessagesStats?: GetMessagesStats;
 }
 
@@ -80,6 +95,7 @@ interface GetDauSuccess extends Action<'GET_DAU_SUCCESS'> {
   endDate: Date;
 }
 interface GetDauFailure extends Action<'GET_DAU_FAILURE'> {}
+
 interface GetMauRequest extends Action<'GET_MAU_REQUEST'> {}
 interface GetMauSuccess extends Action<'GET_MAU_SUCCESS'> {
   dto: StatsDTO;
@@ -87,13 +103,29 @@ interface GetMauSuccess extends Action<'GET_MAU_SUCCESS'> {
   endDate: Date;
 }
 interface GetMauFailure extends Action<'GET_MAU_FAILURE'> {}
-interface GetTopicTextsRequest extends Action<'GET_TOPICTEXTS_REQUEST'> {}
-interface GetTopicTextsSuccess extends Action<'GET_TOPICTEXTS_SUCCESS'> {
+
+interface GetCumulativeActivitiesRequest
+  extends Action<'GET_CUM_ACTIVITIES_REQUEST'> {}
+interface GetCumulativeActivitiesSuccess
+  extends Action<'GET_CUM_ACTIVITIES_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
-interface GetTopicTextsFailure extends Action<'GET_TOPICTEXTS_FAILURE'> {}
+interface GetCumulativeActivitiesFailure
+  extends Action<'GET_CUM_ACTIVITIES_FAILURE'> {}
+
+interface GetActivitiesInProgressRequest
+  extends Action<'GET_ACTIVITIES_PROGRESS_REQUEST'> {}
+interface GetActivitiesInProgressSuccess
+  extends Action<'GET_ACTIVITIES_PROGRESS_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetActivitiesInProgressFailure
+  extends Action<'GET_ACTIVITIES_PROGRESS_FAILURE'> {}
+
 interface GetMessagesRequest extends Action<'GET_MESSAGES_REQUEST'> {}
 interface GetMessagesSuccess extends Action<'GET_MESSAGES_SUCCESS'> {
   dto: StatsDTO;
@@ -109,9 +141,12 @@ type Actions =
   | GetMauRequest
   | GetMauSuccess
   | GetMauFailure
-  | GetTopicTextsRequest
-  | GetTopicTextsSuccess
-  | GetTopicTextsFailure
+  | GetCumulativeActivitiesRequest
+  | GetCumulativeActivitiesSuccess
+  | GetCumulativeActivitiesFailure
+  | GetActivitiesInProgressRequest
+  | GetActivitiesInProgressSuccess
+  | GetActivitiesInProgressFailure
   | GetMessagesRequest
   | GetMessagesSuccess
   | GetMessagesFailure;
@@ -154,23 +189,41 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
         ...state,
         fetchingMau: false,
       };
-    case 'GET_TOPICTEXTS_REQUEST':
+    case 'GET_CUM_ACTIVITIES_REQUEST':
       return {
         ...state,
-        fetchingTopicTexts: true,
+        fetchingCumulativeActivities: true,
       };
-    case 'GET_TOPICTEXTS_SUCCESS':
+    case 'GET_CUM_ACTIVITIES_SUCCESS':
       return {
         ...state,
-        fetchingTopicTexts: false,
-        topicTextsStats: action.dto,
-        topicTextsEndDate: action.endDate,
-        topicTextsStartDate: action.startDate,
+        fetchingCumulativeActivities: false,
+        cumulativeActivitiesStats: action.dto,
+        cumulativeActivitiesEndDate: action.endDate,
+        cumulativeActivitiesStartDate: action.startDate,
       };
-    case 'GET_TOPICTEXTS_FAILURE':
+    case 'GET_CUM_ACTIVITIES_FAILURE':
       return {
         ...state,
-        fetchingTopicTexts: false,
+        fetchingCumulativeActivities: false,
+      };
+    case 'GET_ACTIVITIES_PROGRESS_REQUEST':
+      return {
+        ...state,
+        fetchingActivitiesInProgress: true,
+      };
+    case 'GET_ACTIVITIES_PROGRESS_SUCCESS':
+      return {
+        ...state,
+        fetchingActivitiesInProgress: false,
+        activitiesInProgressStats: action.dto,
+        activitiesInProgressEndDate: action.endDate,
+        activitiesInProgressStartDate: action.startDate,
+      };
+    case 'GET_ACTIVITIES_PROGRESS_FAILURE':
+      return {
+        ...state,
+        fetchingActivitiesInProgress: false,
       };
     case 'GET_MESSAGES_REQUEST':
       return {
@@ -256,27 +309,60 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
-  const getTopicTextsStats: GetTopicTextsStats = async (params) => {
-    dispatch({ type: 'GET_TOPICTEXTS_REQUEST' });
+  const getCumulativeActivitiesStats: GetCumulativeActivitiesStats = async (
+    params
+  ) => {
+    dispatch({ type: 'GET_CUM_ACTIVITIES_REQUEST' });
 
     try {
-      const { status, data } = await statsService.getTopicTextStats(params);
+      const { status, data } = await statsService.getCumulativeActivitiesStats(
+        params
+      );
 
       if (status === 200) {
         dispatch({
-          type: 'GET_TOPICTEXTS_SUCCESS',
+          type: 'GET_CUM_ACTIVITIES_SUCCESS',
           dto: data,
           startDate: params.startDate,
           endDate: params.endDate,
         });
         return true;
       } else {
-        dispatch({ type: 'GET_TOPICTEXTS_FAILURE' });
+        dispatch({ type: 'GET_CUM_ACTIVITIES_FAILURE' });
         return false;
       }
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'GET_TOPICTEXTS_FAILURE' });
+      dispatch({ type: 'GET_CUM_ACTIVITIES_FAILURE' });
+      return false;
+    }
+  };
+
+  const getActivitiesInProgressStats: GetActivitiesInProgressStats = async (
+    params
+  ) => {
+    dispatch({ type: 'GET_ACTIVITIES_PROGRESS_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getActivitiesInProgressStats(
+        params
+      );
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_ACTIVITIES_PROGRESS_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_ACTIVITIES_PROGRESS_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_ACTIVITIES_PROGRESS_FAILURE' });
       return false;
     }
   };
@@ -313,8 +399,13 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     // noinspection JSIgnoredPromiseFromCall
     getMauStats({ startDate: defaultMauStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getTopicTextsStats({
-      startDate: defaultTopicTextStartDate,
+    getCumulativeActivitiesStats({
+      startDate: defaultCumulativeActivitiesStartDate,
+      endDate: today,
+    });
+    // noinspection JSIgnoredPromiseFromCall
+    getActivitiesInProgressStats({
+      startDate: defaultActivitiesInProgressStartDate,
       endDate: today,
     });
     // noinspection JSIgnoredPromiseFromCall
@@ -328,7 +419,8 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         ...state,
         getDauStats,
         getMauStats,
-        getTopicTextsStats,
+        getCumulativeActivitiesStats,
+        getActivitiesInProgressStats,
         getMessagesStats,
       }}
     >

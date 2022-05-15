@@ -1,9 +1,10 @@
 import React from 'react';
-import 'typeface-lato';
 import ReactDOM from 'react-dom';
+
 import Root from './components/Root';
 import App from './components/App';
-import authService from './services/authServices';
+
+import 'typeface-lato';
 
 let hasRendered: boolean = false;
 
@@ -20,13 +21,4 @@ const renderApp = () => {
   }
 };
 
-const loginToken: string | null = localStorage.getItem('loginToken');
-
-if (loginToken) {
-  authService
-    .loginWithToken()
-    .then(() => renderApp())
-    .catch(() => renderApp());
-} else {
-  renderApp();
-}
+renderApp();

@@ -5,15 +5,18 @@ import {
   REFERRER_EMAIL,
   REFERRER_NAME,
 } from '../../src/config/textConstants';
-let totalReferrals = 24;
+
+let totalReferrals = 36;
+let pageSize = 25;
+
 describe('Using the ReferralsPage', () => {
   beforeEach(() => {
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/referrals');
-    cy.intercept('GET', '**/rest/referrals?**').as('getReferrals');
-    cy.intercept('GET', '**/rest/referrals/**').as('getReferral');
-    cy.intercept('PUT', '**/rest/referrals/**').as('putReferral');
-    cy.intercept('DELETE', '**/rest/referrals/**').as('deleteReferral');
+    cy.intercept('POST', '/rest/login').as('postLogin');
+    cy.intercept('GET', '/rest/referrals?**').as('getReferrals');
+    cy.intercept('GET', '/rest/referrals/**').as('getReferral');
+    cy.intercept('GET', '/rest/user/organisation').as('getOrganisations');
+    cy.intercept('PUT', '/rest/referrals/**').as('putReferral');
+    cy.intercept('DELETE', '/rest/referrals/**').as('deleteReferral');
     cy.intercept('POST', '/rest/referrals*').as('postReferrals');
     cy.intercept('GET', '/rest/language').as('getLanguages');
     cy.intercept('GET', '/json/?key=*', {
@@ -21,9 +24,14 @@ describe('Using the ReferralsPage', () => {
       country: 'Australia',
       countryCode: 'AU',
     }).as('ipLookup');
+    cy.getAuthTokens(admin.email, admin.password);
+    cy.visit('/referrals');
 
+    cy.wait('@postLogin');
+    cy.wait('@getOrganisations');
+    cy.wait('@ipLookup');
     cy.wait('@getReferrals');
-    // cy.wait('@getLanguages')
+    cy.wait('@getLanguages');
   });
 
   describe('when reading referrals', () => {
@@ -31,9 +39,7 @@ describe('Using the ReferralsPage', () => {
       cy.contains(REFERRALS_TITLE).should('be.visible');
       cy.contains('learner').should('be.visible');
       cy.contains('partner').should('be.visible');
-      cy.contains(`1-${totalReferrals} of ${totalReferrals}`).should(
-        'be.visible'
-      );
+      cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
     });
 
     it('should change row size and navigate to next page', () => {
@@ -44,15 +50,17 @@ describe('Using the ReferralsPage', () => {
         cy.get('div[aria-haspopup="listbox"]').click();
       });
       cy.get('[data-value="10"]').click();
+      pageSize = 10;
       cy.wait('@getReferrals');
       cy.countElementsWithText('td', partnerRegex, 10);
-      cy.contains(`1-10 of ${totalReferrals}`).should('be.visible');
+      cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
       cy.countElementsWithText('td', partnerRegex, 2);
       cy.countElementsWithText('td', learnerRegex, 8);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
+      pageSize = 25;
     });
   });
 
@@ -163,7 +171,9 @@ describe('Using the ReferralsPage', () => {
       cy.wait('@deleteReferral');
       totalReferrals--;
       cy.contains(
-        `1-${totalReferrals > 25 ? '25' : totalReferrals} of ${totalReferrals}`
+        `1-${
+          totalReferrals > pageSize ? pageSize : totalReferrals
+        } of ${totalReferrals}`
       ).should('be.visible');
     });
   });
@@ -174,6 +184,8 @@ const submitForm = () => {
   cy.wait('@postReferrals');
   totalReferrals++;
   cy.contains(
-    `1-${totalReferrals > 25 ? '25' : totalReferrals} of ${totalReferrals}`
+    `1-${
+      totalReferrals > pageSize ? pageSize : totalReferrals
+    } of ${totalReferrals}`
   ).should('be.visible');
 };

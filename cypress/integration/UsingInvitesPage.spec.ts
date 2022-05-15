@@ -5,7 +5,6 @@ import {
   NUMBERS,
   PARTNER_QUEUE,
 } from '../../src/config/textConstants';
-import admin from '../fixtures/users/admin.json';
 import inviteResponse1 from '../fixtures/invitesResponses/inviteResponse1.json';
 
 describe('Using the InvitesPage', () => {
@@ -14,8 +13,7 @@ describe('Using the InvitesPage', () => {
     cy.intercept(`/rest/admin/invites`, {
       fixture: '/invitesResponses/inviteResponse1.json',
     });
-    cy.getAuthTokens(admin.email, admin.password);
-    cy.visit('/invites');
+    cy.visitInvitesPage();
     cy.wait('@getRankingPage');
   });
 

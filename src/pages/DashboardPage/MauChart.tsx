@@ -13,6 +13,7 @@ import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
 import { Bar } from 'react-chartjs-2';
 import ChartWrapper from '../../components/base/ChartWrapper';
+import { MAU_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
@@ -72,7 +73,7 @@ const MauChart: FC<Props> = () => {
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title="Monthly Active Users"
+      title={MAU_TITLE}
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}

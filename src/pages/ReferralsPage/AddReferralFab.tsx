@@ -1,24 +1,15 @@
 import React from 'react';
-import { makeStyles, createStyles, Theme, Fab } from '@material-ui/core';
+import { Fab } from '@material-ui/core';
 
 import { useAppNav } from '../../contexts/appNavContext';
+import { useFabStyles } from '../styles';
 import { ADD_REFERRAL_BUTTON } from '../../config/textConstants';
-
-const useStyles = makeStyles(({ palette, transitions }: Theme) =>
-  createStyles({
-    fab: {
-      position: 'absolute',
-      bottom: 8,
-      left: 8,
-    },
-  })
-);
 
 const AddReferralFab = () => {
   // ----------------------------- Hooks ---------------------------------------- //
   const { showNewReferralForm, setShowNewReferralForm } = useAppNav();
   // ----------------------------- Component functions ------------------------- //
-  const styles = useStyles();
+  const styles = useFabStyles();
   // ----------------------------- Render ---------------------------------------- //
   return (
     <Fab

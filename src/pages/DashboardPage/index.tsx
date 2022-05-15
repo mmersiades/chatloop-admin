@@ -10,8 +10,9 @@ import {
 import WithNavbar from '../../components/WithNavbar';
 import DauChart from './DauChart';
 import MauChart from './MauChart';
-import TopicTextsChart from './TopicTextsChart';
+import CumulativeActivitiesChart from './CumulativeActivitiesChart';
 import MessagesChart from './MessagesChart';
+import ActivitiesInProgressChart from './ActivitiesInProgressChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -44,7 +45,12 @@ const DashboardPage: FC = () => {
       </Card>
       <Card classes={{ root: classes.card }}>
         <CardContent>
-          <TopicTextsChart />
+          <ActivitiesInProgressChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <CumulativeActivitiesChart />
         </CardContent>
       </Card>
       <Card classes={{ root: classes.card }}>

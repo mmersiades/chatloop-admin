@@ -22,7 +22,10 @@ export interface DateRange {
 
 type GetDauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetMauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
-type GetTopicTextStats = (
+type GetCumulativeActivitiesStats = (
+  params: DateRange
+) => Promise<AxiosResponse<StatsDTO>>;
+type GetActivitiesInProgressStats = (
   params: DateRange
 ) => Promise<AxiosResponse<StatsDTO>>;
 type GetMessagesStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
@@ -30,7 +33,8 @@ type GetMessagesStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 interface StatsService {
   getDauStats: GetDauStats;
   getMauStats: GetMauStats;
-  getTopicTextStats: GetTopicTextStats;
+  getCumulativeActivitiesStats: GetCumulativeActivitiesStats;
+  getActivitiesInProgressStats: GetActivitiesInProgressStats;
   getMessagesStats: GetMessagesStats;
 }
 
@@ -40,15 +44,22 @@ const getDauStats: GetDauStats = async ({ startDate, endDate }) =>
 const getMauStats: GetMauStats = async ({ startDate, endDate }) =>
   await getStats('mau', startDate, endDate);
 
-const getTopicTextStats: GetTopicTextStats = async ({ startDate, endDate }) =>
-  await getStats('topictexts', startDate, endDate);
+const getCumulativeActivitiesStats: GetCumulativeActivitiesStats = async ({
+  startDate,
+  endDate,
+}) => await getStats('cumulative-activities', startDate, endDate);
+
+const getActivitiesInProgressStats: GetActivitiesInProgressStats = async ({
+  startDate,
+  endDate,
+}) => await getStats('in-progress-activities', startDate, endDate);
 
 const getMessagesStats: GetMessagesStats = async ({ startDate, endDate }) =>
   await getStats('messages', startDate, endDate);
 
 const getStats = async (type: string, startDate: Date, endDate: Date) => {
   const requestOptions = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   try {
@@ -67,7 +78,8 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
 const statsService: StatsService = {
   getDauStats,
   getMauStats,
-  getTopicTextStats,
+  getCumulativeActivitiesStats,
+  getActivitiesInProgressStats,
   getMessagesStats,
 };
 

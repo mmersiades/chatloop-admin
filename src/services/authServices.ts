@@ -1,55 +1,34 @@
-/**
- * @module services
- */
-
-/** */
-import apiChatloopOrg from '../config/axiosConfig';
-import { refreshHeader, authHeader } from '../helpers/getAuthHeader';
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-const loginWithCredentials = async (
-  username: string,
-  password: string
-): Promise<{ isAuthError: boolean }> => {
-  const body = {
-    username: username,
-    password: password,
-  };
+import { refreshHeader, authHeader } from '../helpers/getAuthHeader';
+import apiChatloopOrg from '../config/axiosConfig';
 
-  try {
-    const response = await apiChatloopOrg.post('/rest/login', body);
-    if (response.status === 200) {
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('loginToken', response.data.refreshToken);
-      localStorage.setItem('tokensAddedAt', new Date().toString());
-    }
-    return { isAuthError: false };
-  } catch (error) {
-    return { isAuthError: true };
-  }
+export interface TokensPair {
+  token: string;
+  refreshToken: string;
+}
+
+export interface PostCredentialsBody {
+  username: string;
+  password: string;
+}
+
+type LoginWithCredentials = (
+  body: PostCredentialsBody
+) => Promise<AxiosResponse<TokensPair>>;
+
+type LoginWithToken = () => Promise<AxiosResponse<TokensPair>>;
+
+const loginWithCredentials: LoginWithCredentials = async (body) => {
+  return await apiChatloopOrg.post('/rest/login', body);
 };
 
-/** Uses **axios** to log the User in using a refresh token. */
-const loginWithToken = async () => {
+const loginWithToken: LoginWithToken = async () => {
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: refreshHeader() },
+    headers: { Authorization: refreshHeader() },
   };
 
-  try {
-    const response = await apiChatloopOrg.post(
-      '/rest/login',
-      undefined,
-      requestOptions
-    );
-    if (response.status === 200) {
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('loginToken', response.data.refreshToken);
-      localStorage.setItem('tokensAddedAt', new Date().toString());
-    }
-    return { isAuthError: false };
-  } catch (error) {
-    return { isAuthError: true };
-  }
+  return await apiChatloopOrg.post('/rest/login', undefined, requestOptions);
 };
 
 /**
@@ -67,7 +46,7 @@ const renewTokens = () => {
   }
 
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: refreshHeader() },
+    headers: { Authorization: refreshHeader() },
   };
 
   if (elapsed && elapsed > 300000) {
@@ -104,7 +83,7 @@ function updatePassword(
   confirmPassword: string
 ): Promise<AxiosResponse> {
   const requestOptions: AxiosRequestConfig = {
-    headers: { authorization: authHeader() },
+    headers: { Authorization: authHeader() },
   };
 
   const body = {

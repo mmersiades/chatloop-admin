@@ -1,19 +1,18 @@
 import React, { FC, useState } from 'react';
 import clsx from 'clsx';
 import {
-  Drawer,
-  makeStyles,
-  createStyles,
   AppBar,
-  Toolbar,
+  Button,
+  createStyles,
+  Drawer,
+  Grid,
   IconButton,
-  Typography,
-  Theme,
   List,
   ListItem,
   ListItemText,
-  Button,
-  Grid,
+  makeStyles,
+  Toolbar,
+  Typography,
 } from '@material-ui/core';
 import { CloseRounded } from '@material-ui/icons';
 
@@ -22,48 +21,36 @@ import { ShowReplaceTutorDialog } from './Learners';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useUsers } from '../../contexts/usersContext';
 import { UserRole } from '../../@types/enums';
-import { Tutor, ExtendedUser } from '../../@types/interfaces';
+import {
+  ExtendedUser,
+  hasFirstLanguage,
+  hasNumberOfActivities,
+  Tutor,
+} from '../../@types/interfaces';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
 import {
+  CURRENT_ACTIVITIES,
+  CURRENT_LEARNERS,
+  DELETE,
   DISPLAY_NAME,
   EMAIL,
   FIRST_LANGUAGE,
   INTERFACE_LANGUAGE,
-  CURRENT_ACTIVITIES,
-  CURRENT_LEARNERS,
-  SHIFT_ONE_TUTOR,
   REPLACE_TUTOR,
-  SHIFT_TWO_TUTOR,
   RESET_PASSWORD,
-  DELETE,
+  SHIFT_ONE_TUTOR,
+  SHIFT_TWO_TUTOR,
 } from '../../config/textConstants';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
+import { useDrawerStyles } from '../styles';
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     docked: {
       top: 96,
       width: '30%',
       overflowY: 'unset',
       height: 'calc(100vh - 96px)',
-    },
-    dockedWithMenuDrawer: {
-      width: 'calc((100vw - 150px) * 0.3)',
-    },
-    list: {
-      overflowY: 'auto',
-    },
-    closeButton: {
-      marginRight: spacing(2),
-    },
-    appbar: {
-      height: 36,
-    },
-    toolbar: {
-      minHeight: 36,
-    },
-    deleteButton: {
-      color: palette.error.main,
     },
   })
 );
@@ -75,7 +62,8 @@ interface UserDrawerProps {
 }
 
 const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
-  const classes = useStyles();
+  const styles = useStyles();
+  const drawerStyles = useDrawerStyles();
 
   // ----------------------------- Component state ------------------------------ //
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
@@ -109,8 +97,8 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   return (
     <Drawer
       classes={{
-        paperAnchorDockedRight: clsx(classes.docked, {
-          [classes.dockedWithMenuDrawer]: showMenuDrawer,
+        paperAnchorDockedRight: clsx(styles.docked, {
+          [drawerStyles.dockedWithMenuDrawer]: showMenuDrawer,
         }),
       }}
       open={!!showUserDrawer}
@@ -131,21 +119,21 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           handleClose={() => setShowResetPasswordDialog(false)}
         />
       )}
-      <AppBar classes={{ root: classes.appbar }} position="relative">
-        <Toolbar classes={{ dense: classes.toolbar }} variant="dense">
+      <AppBar classes={{ root: drawerStyles.appbar }} position="relative">
+        <Toolbar classes={{ dense: drawerStyles.toolbar }} variant="dense">
           <IconButton
             color="inherit"
             aria-label="Close drawer button"
             onClick={() => setShowUserDrawer(null)}
             edge="start"
-            className={classes.closeButton}
+            className={drawerStyles.closeButton}
           >
             <CloseRounded />
           </IconButton>
           <Typography>{!!extendedUser ? extendedUser.id : '...'}</Typography>
         </Toolbar>
       </AppBar>
-      <List classes={{ root: classes.list }}>
+      <List classes={{ root: drawerStyles.list }}>
         <ListItem>
           <ListItemText
             primary={DISPLAY_NAME}
@@ -158,23 +146,25 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             secondary={extendedUser ? extendedUser.email : '...'}
           />
         </ListItem>
-        <ListItem>
-          <ListItemText
-            primary={FIRST_LANGUAGE}
-            secondary={
-              extendedUser
-                ? stringifyLanguages(extendedUser.firstLanguages)
-                : '...'
-            }
-          />
-        </ListItem>
+        {extendedUser && hasFirstLanguage(extendedUser) && (
+          <ListItem>
+            <ListItemText
+              primary={FIRST_LANGUAGE}
+              secondary={
+                extendedUser
+                  ? stringifyLanguages(extendedUser.firstLanguages)
+                  : '...'
+              }
+            />
+          </ListItem>
+        )}
         <ListItem>
           <ListItemText
             primary={INTERFACE_LANGUAGE}
             secondary={extendedUser ? extendedUser.uiLanguage : '...'}
           />
         </ListItem>
-        {!!extendedUser && extendedUser.userRole !== UserRole.tutor && (
+        {!!extendedUser && hasNumberOfActivities(extendedUser) && (
           <ListItem>
             <ListItemText
               primary={CURRENT_ACTIVITIES}
@@ -307,7 +297,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             <Button
               fullWidth
               variant="outlined"
-              classes={{ root: classes.deleteButton }}
+              classes={{ root: drawerStyles.deleteButton }}
               onClick={() => setShowDeleteUserDialog(true)}
               aria-label="Delete user button"
             >

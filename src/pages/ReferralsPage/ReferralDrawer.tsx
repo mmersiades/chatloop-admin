@@ -3,11 +3,8 @@ import clsx from 'clsx';
 import {
   AppBar,
   CircularProgress,
-  createStyles,
   Drawer,
   IconButton,
-  makeStyles,
-  Theme,
   Toolbar,
   Typography,
 } from '@material-ui/core';
@@ -16,36 +13,7 @@ import { CloseRounded } from '@material-ui/icons';
 import ReferralForm from './ReferralForm';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useReferrals } from '../../contexts/referralsContext';
-
-const useStyles = makeStyles(({ spacing }: Theme) =>
-  createStyles({
-    docked: {
-      top: 48,
-      width: '30%',
-      overflowY: 'unset',
-      height: 'calc(100vh - 48px)',
-    },
-    dockedWithMenuDrawer: {
-      width: 'calc((100vw - 150px) * 0.3)',
-    },
-    closeButton: {
-      marginRight: spacing(2),
-    },
-    appbar: {
-      height: 36,
-    },
-    toolbar: {
-      minHeight: 36,
-    },
-    spinnerContainer: {
-      height: '100%',
-      width: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  })
-);
+import { useDrawerStyles } from '../styles';
 
 const ReferralDrawer = () => {
   // ----------------------------- Hooks ---------------------------------------- //
@@ -54,7 +22,7 @@ const ReferralDrawer = () => {
   const { extendedReferral, fetchingReferral } = useReferrals();
 
   // ----------------------------- Component functions ------------------------- //
-  const styles = useStyles();
+  const styles = useDrawerStyles();
 
   // ----------------------------- Render ---------------------------------------- //
   return (
