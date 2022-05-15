@@ -81,6 +81,11 @@ export const PASSWORD_LABEL = 'Password';
 
 // Dashboard
 export const DASHBOARD_TITLE = 'Chatloop Admin';
+export const DAU_TITLE = 'Daily Active Users';
+export const MAU_TITLE = 'Monthly Active Users';
+export const ACTIVITIES_IN_PROGRESS_TITLE = 'Activities In Progress';
+export const CUMULATIVE_ACTIVITIES_TITLE = 'Cumulative Activities';
+export const MESSAGES_TITLE = 'Messages';
 
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';

@@ -14,6 +14,7 @@ import { Bar } from 'react-chartjs-2';
 
 import { useStats } from '../../contexts/statsContext';
 import ChartWrapper from '../../components/base/ChartWrapper';
+import { ACTIVITIES_IN_PROGRESS_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
@@ -81,7 +82,7 @@ const ActivitiesInProgressChart: FC<Props> = () => {
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title="Activities In Progress"
+      title={ACTIVITIES_IN_PROGRESS_TITLE}
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}

@@ -47,7 +47,7 @@
     "cypress:open": "cypress open",
     "cypress:all": "cypress run",
     "test:ci": "npm test -- --ci && npm run cypress:all",
-    "test:combined": "npm test a -- --watchAll=false && npm run cypress:all",
+    "test:combined": "npm test a -- --watchAll=false --coverage && npm run cypress:all",
     "test:coverage": "npm run clear:nyc && npm run test:combined && node ./scripts/mergeCoverage.js && open coverage-combined/lcov-report/index.html",
     "clear:nyc": "if [ -d '.nyc_output/' ]; then rm -rf .nyc_output/; fi",
     "prettier:check": "yarn prettier --check .",

@@ -128,7 +128,12 @@ Cypress.Commands.add('visitDashboardPage', () => {
   cy.intercept('GET', '/rest/language').as('getLanguages');
   cy.intercept('GET', '/rest/admin/stats/dau?**').as('getDau');
   cy.intercept('GET', '/rest/admin/stats/mau?**').as('getMau');
-  cy.intercept('GET', '/rest/admin/stats/topictexts?**').as('getTopicTexts');
+  cy.intercept('GET', '/rest/admin/stats/cumulative-activities?**').as(
+    'getCumulativeActivities'
+  );
+  cy.intercept('GET', '/rest/admin/stats/in-progress-activities?**').as(
+    'getInProgressActivities'
+  );
   cy.intercept('GET', '/rest/admin/stats/messages?**').as('getMessages');
 
   // noinspection JSIgnoredPromiseFromCall
@@ -140,7 +145,8 @@ Cypress.Commands.add('visitDashboardPage', () => {
   cy.wait('@getLanguages');
   cy.wait('@getDau');
   cy.wait('@getMau');
-  cy.wait('@getTopicTexts');
+  cy.wait('@getCumulativeActivities');
+  cy.wait('@getInProgressActivities');
   cy.wait('@getMessages');
 });
 
