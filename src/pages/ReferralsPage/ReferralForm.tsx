@@ -53,11 +53,11 @@ interface Props {
 
 export interface FormValues {
   refereeName: string;
-  refereeEmail: string;
-  refereePhone: string;
+  refereeEmail: string | null;
+  refereePhone: string | null;
   role: UserRole;
   firstLanguage: OptionTypeBase; // eg 'eng', 'ara', 'prs' ISO-639-3
-  targetOrgId?: number;
+  targetOrgId: number;
 }
 
 const useStyles = makeStyles(({ spacing, palette, typography }) => {
@@ -96,6 +96,7 @@ const defaultValues: FormValues = {
     label: 'English',
     value: 'eng',
   },
+  targetOrgId: 0,
 };
 
 const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
@@ -205,6 +206,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         !!errors.refereePhone ||
         !!errors.role ||
         !!errors.firstLanguage ||
+        !!errors.targetOrgId ||
         !touchedFields.refereeName ||
         !phoneOrEmailTouched
       );
@@ -213,6 +215,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         dirtyFields.refereeName ||
         dirtyFields.refereeEmail ||
         dirtyFields.refereePhone ||
+        dirtyFields.targetOrgId ||
         dirtyFields.role ||
         dirtyFields.firstLanguage;
 
@@ -222,6 +225,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
         !!errors.refereeEmail ||
         !!errors.refereePhone ||
         !!errors.role ||
+        !!errors.targetOrgId ||
         !!errors.firstLanguage
       ) {
         return true;
@@ -232,7 +236,9 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    let refereePhone: string | undefined;
+    let refereePhone: string | null = null;
+    let refereeEmail: string | null = null;
+    let targetOrgId: number | null = null;
     if (data.refereePhone && data.refereePhone !== dialCode) {
       refereePhone = removeLeadingZeroFromPhone({
         dialCode,
@@ -240,11 +246,17 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
       });
     }
 
+    const firstLanguage = data.firstLanguage.value;
+    refereeEmail = data.refereeEmail === '' ? null : data.refereeEmail;
+    targetOrgId = data.targetOrgId === 0 ? null : data.targetOrgId;
+
     if (type === 'create') {
       const body: PostReferralBody = {
         ...data,
+        refereeEmail,
         refereePhone,
-        firstLanguage: data.firstLanguage.value,
+        firstLanguage,
+        targetOrgId,
       };
 
       if (!!body && !!postReferral) {
@@ -262,8 +274,10 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
     } else {
       const body: PutReferralBody = {
         ...data,
+        refereeEmail,
         refereePhone,
-        firstLanguage: data.firstLanguage.value,
+        firstLanguage,
+        targetOrgId,
       };
 
       if (!!body && !!putReferral && !!extendedReferral) {
