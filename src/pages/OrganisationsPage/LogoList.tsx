@@ -10,7 +10,6 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import EditRounded from '@material-ui/icons/EditRounded';
 import { capitalize } from 'lodash';
 
 import logoPlaceholder from '../../assets/logo-placeholder.png';
