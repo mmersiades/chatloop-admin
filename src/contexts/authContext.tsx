@@ -7,15 +7,19 @@ import {
   useEffect,
   useState,
 } from 'react';
+import jwt_decode from 'jwt-decode';
 
 import authService, {
   PostCredentialsBody,
   TokensPair,
 } from '../services/authServices';
+import { AuthTokenClaims } from '../@types/interfaces';
+import { UserRole } from '../@types/enums';
 
 interface AuthState {
   loggedIn: boolean;
   loading: boolean;
+  userId?: number;
 }
 
 const initialState: AuthState = {
@@ -47,12 +51,23 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
   // -------------------------- Component state ---------------------------- //
   const [loggedIn, setLoggedIn] = useState(initialState.loggedIn);
   const [loading, setLoading] = useState(initialState.loading);
+  const [userId, setUserId] = useState<number | undefined>();
 
   // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
 
   // -------------------------- Component functions ------------------------ //
+  const handleTokenClaims = useCallback((token: string): boolean => {
+    const claims = jwt_decode(token) as AuthTokenClaims;
+    if (!claims.roles.includes(UserRole.admin)) {
+      logout();
+      return false;
+    }
+    setUserId(claims.user_id);
+    return true;
+  }, []);
+
   const loginWithCredentials = async (
     body: PostCredentialsBody
   ): Promise<boolean> => {
@@ -60,9 +75,16 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     try {
       const { status, data } = await authService.loginWithCredentials(body);
       if (status === 200) {
-        setTokens(data);
-        setLoggedIn(true);
-        return true;
+        const claimsOkay = handleTokenClaims(data.token);
+        if (claimsOkay) {
+          setTokens(data);
+          setLoggedIn(true);
+          return true;
+        } else {
+          setLoading(false);
+          setLoggedIn(false);
+          return false;
+        }
       }
       setLoading(false);
       setLoggedIn(false);
@@ -84,9 +106,17 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         const { status, data } = await authService.loginWithToken();
 
         if (status === 200) {
-          setTokens(data);
-          setLoggedIn(true);
-          return;
+          const claimsOkay = handleTokenClaims(data.token);
+          console.log('claimsOkay', claimsOkay);
+
+          if (claimsOkay) {
+            setTokens(data);
+            setLoggedIn(true);
+            return;
+          } else {
+            setLoading(false);
+            setLoggedIn(false);
+          }
         }
         setLoading(false);
         setLoggedIn(false);
@@ -96,21 +126,20 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         setLoggedIn(false);
       }
     }
-  }, [loading]);
+  }, [loading, handleTokenClaims]);
 
   const logout = () => {
     setLoggedIn(false);
     localStorage.clear();
   };
   // -------------------------- Effects ------------------------------------ //
-
   useEffect(() => {
     !loading && !loggedIn && loginWithRefreshToken();
   }, [loading, loggedIn, loginWithRefreshToken]);
   // -------------------------- Render ------------------------------------- //
   return (
     <AuthContext.Provider
-      value={{ loggedIn, loading, loginWithCredentials, logout }}
+      value={{ loggedIn, loading, userId, loginWithCredentials, logout }}
     >
       {children}
     </AuthContext.Provider>

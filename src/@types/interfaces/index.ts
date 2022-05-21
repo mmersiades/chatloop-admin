@@ -282,3 +282,11 @@ export interface Region {
   countryCode: string;
   subdivisionName: string;
 }
+
+export interface AuthTokenClaims {
+  exp: number;
+  roles: UserRole[];
+  sub: string;
+  user_display_name: string;
+  user_id: number;
+}

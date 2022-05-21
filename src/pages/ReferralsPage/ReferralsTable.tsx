@@ -45,6 +45,22 @@ const ReferralsTable: FC<Props> = () => {
   const handleChangeRowsPerPage = (event: any) =>
     changeReferralsSize && changeReferralsSize(event.target.value);
 
+  const getUserName = (referral: Referral): string => {
+    let username = '';
+    if (referral.email && !referral.phone) {
+      username = referral.email;
+      return username;
+    }
+
+    if (!referral.email && referral.phone) {
+      username = referral.phone;
+      return username;
+    }
+
+    username = `${referral.email} | ${referral.phone}`;
+    return username;
+  };
+
   // ----------------------------- Render ---------------------------------------- //
   const renderTableHead = () => (
     <TableHead classes={{ root: tableStyles.tableHead }}>
@@ -144,9 +160,7 @@ const ReferralsTable: FC<Props> = () => {
                     align="center"
                     classes={{ root: tableStyles.tableCell }}
                   >
-                    {`${referral.email}${
-                      referral.email ?? referral.phone ? ' | ' : ''
-                    }${referral.phone ?? referral.phone}`}
+                    {getUserName(referral)}
                   </TableCell>
                   <TableCell
                     align="center"
