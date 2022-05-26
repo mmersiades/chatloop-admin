@@ -5,6 +5,8 @@ import {
   REFERRER_EMAIL,
   REFERRER_NAME,
 } from '../../src/config/textConstants';
+import { getReadableRoles } from '../../src/helpers/getReadableRoles';
+import { UserRole } from '../../src/@types/enums';
 
 let totalReferrals = 36;
 let pageSize = 25;
@@ -52,12 +54,11 @@ describe('Using the ReferralsPage', () => {
       cy.get('[data-value="10"]').click();
       pageSize = 10;
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', partnerRegex, 10);
+      cy.countElementsWithText('td', partnerRegex, 8);
       cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', partnerRegex, 2);
       cy.countElementsWithText('td', learnerRegex, 8);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
       pageSize = 25;
@@ -72,9 +73,8 @@ describe('Using the ReferralsPage', () => {
       cy.get('.MuiFab-root').click();
       cy.get('input[name="refereeName"]').type(refereeName);
       cy.get('input[name="refereeEmail"]').type(refereeEmail);
-      cy.get('#mui-component-select-role').click();
-      cy.get('li[data-value="ROLE_LEARNER"]').click();
-      // Ah, fuck it. How hard should it be to use react-select via Cypress?
+      cy.get('div[id="mui-component-select-targetOrgId"]').click();
+      cy.get('li[role="option"]').first().click();
       submitForm();
     });
   });
@@ -91,6 +91,8 @@ describe('Using the ReferralsPage', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('refereePhone must be at least 8 characters');
       cy.get('input[type="phone"]').focus(); // Focus will clear error and value
+      cy.get('div[id="mui-component-select-targetOrgId"]').click();
+      cy.get('li[role="option"]').first().click();
       submitForm();
     });
   });
@@ -103,6 +105,8 @@ describe('Using the ReferralsPage', () => {
       cy.get('.MuiFab-root').click();
       cy.get('input[name="refereeName"]').type(refereeName);
       cy.get('input[type="phone"]').type(refereePhone).blur();
+      cy.get('div[id="mui-component-select-targetOrgId"]').click();
+      cy.get('li[role="option"]').first().click();
       submitForm();
     });
   });
@@ -117,17 +121,32 @@ describe('Using the ReferralsPage', () => {
       cy.get('input[name="refereeName"]').type(refereeName);
       cy.get('input[name="refereeEmail"]').type(refereeEmail);
       cy.get('input[type="phone"]').type(refereePhone);
+      cy.get('div[id="mui-component-select-targetOrgId"]').click();
+      cy.get('li[role="option"]').first().click();
       submitForm();
+    });
+  });
+
+  describe('when viewing a learner referral', () => {
+    it('should disable form', () => {
+      clickTableRow(getReadableRoles(UserRole.learner));
+      cy.get('input[name="refereeName"]').should('be.disabled');
+      cy.get('input[name="refereeEmail"]').should('be.disabled');
+      cy.get('input[type="phone"]').should('be.disabled');
+      cy.get('#mui-component-select-role').should(
+        'have.attr',
+        'aria-disabled',
+        'true'
+      );
+      cy.get('input[id="react-select-3-input"]').should('be.disabled');
+      cy.get('button[type="submit"]').should('be.disabled');
+      cy.get('button[aria-label="Delete referral"]').should('be.disabled');
     });
   });
 
   describe('when updating a Referral', () => {
     it('should show the extended Referral info in drawer', () => {
-      cy.get('tbody').within(() => {
-        cy.get('tr').first().click();
-      });
-
-      cy.wait('@getReferral');
+      clickTableRow(getReadableRoles(UserRole.orgAdmin));
 
       cy.contains(REFERRER_EMAIL).scrollIntoView().should('be.visible');
       cy.contains(INTERFACE_LANGUAGE).should('be.visible');
@@ -138,11 +157,7 @@ describe('Using the ReferralsPage', () => {
 
     it('should change name and show new name in table', () => {
       const newName = 'Bobby';
-      cy.get('tbody').within(() => {
-        cy.get('tr').first().click();
-      });
-
-      cy.wait('@getReferral');
+      clickTableRow(getReadableRoles(UserRole.orgAdmin));
 
       cy.get('div[data-test="referral-drawer"]').within(() => {
         cy.get('input[name="refereeName"]').focus().clear().type(newName);
@@ -163,9 +178,7 @@ describe('Using the ReferralsPage', () => {
 
   describe('when deleting a Referral', () => {
     it('should reduce table rows by one', () => {
-      cy.get('tbody').within(() => {
-        cy.get('tr').first().click();
-      });
+      clickTableRow(getReadableRoles(UserRole.orgAdmin));
 
       cy.get('button[aria-label="Delete referral"]').scrollIntoView().click();
       cy.wait('@deleteReferral');
@@ -188,4 +201,18 @@ const submitForm = () => {
       totalReferrals > pageSize ? pageSize : totalReferrals
     } of ${totalReferrals}`
   ).should('be.visible');
+};
+
+const clickTableRow = (role: string) => {
+  cy.get('tbody').within(() => {
+    cy.get('tr')
+      .filter((index, elem) => {
+        console.log('elem', elem.innerText);
+        return elem.innerText.includes(role);
+      })
+      .first()
+      .click();
+  });
+
+  cy.wait('@getReferral');
 };

@@ -92,7 +92,7 @@ const defaultValues: FormValues = {
   refereeName: '',
   refereeEmail: '',
   refereePhone: '',
-  role: UserRole.partner,
+  role: UserRole.orgAdmin, // Admins can only create referrals for ORG_ADMIN
   firstLanguage: {
     label: 'English',
     value: 'eng',
@@ -101,8 +101,8 @@ const defaultValues: FormValues = {
 };
 
 const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
-  const [countryCode, setCountryCode] = useState('nz');
-  const [dialCode, setDialCode] = useState('64');
+  const [countryCode, setCountryCode] = useState('au');
+  const [dialCode, setDialCode] = useState('61');
   const [ownsReferral, setOwnsReferral] = useState(false);
   const { organisations } = useOrganisations();
   // ----------------------------- 3rd party hooks ------------------------------- //
@@ -467,13 +467,16 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                 variant="outlined"
                 label="Role"
                 error={touchedFields.role && !!errors.role}
-                disabled={!ownsReferral}
+                disabled={true}
               >
                 <MenuItem key={UserRole.learner} value={UserRole.learner}>
                   {getReadableRoles(UserRole.learner)}
                 </MenuItem>
                 <MenuItem key={UserRole.partner} value={UserRole.partner}>
                   {getReadableRoles(UserRole.partner)}
+                </MenuItem>
+                <MenuItem key={UserRole.referrer} value={UserRole.referrer}>
+                  {getReadableRoles(UserRole.referrer)}
                 </MenuItem>
                 <MenuItem key={UserRole.orgAdmin} value={UserRole.orgAdmin}>
                   {getReadableRoles(UserRole.orgAdmin)}
@@ -482,7 +485,9 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
               {touchedFields.role && errors.role ? (
                 <FormHelperText error>{errors.role.message}</FormHelperText>
               ) : (
-                <div className={styles.helperTextSpacer} />
+                <FormHelperText>
+                  Admins can create/edit referrals for org admins only
+                </FormHelperText>
               )}
             </FormControl>
           )}
@@ -543,7 +548,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                   label: option.language,
                   value: option.code,
                 }))}
-                disabled={!ownsReferral}
+                isDisabled={!ownsReferral}
               />
 
               {touchedFields.firstLanguage && errors.firstLanguage ? (

@@ -107,8 +107,6 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
 
         if (status === 200) {
           const claimsOkay = handleTokenClaims(data.token);
-          console.log('claimsOkay', claimsOkay);
-
           if (claimsOkay) {
             setTokens(data);
             setLoggedIn(true);
@@ -136,6 +134,7 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
   useEffect(() => {
     !loading && !loggedIn && loginWithRefreshToken();
   }, [loading, loggedIn, loginWithRefreshToken]);
+
   // -------------------------- Render ------------------------------------- //
   return (
     <AuthContext.Provider
