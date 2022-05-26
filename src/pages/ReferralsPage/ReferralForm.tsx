@@ -45,6 +45,7 @@ import {
 import locationService from '../../services/locationService';
 import { removeLeadingZeroFromPhone } from '../../helpers/removeLeadingZeroFromPhone';
 import { useOrganisations } from '../../contexts/organisationsContext';
+import { useAuth } from '../../contexts/authContext';
 
 interface Props {
   type: 'create' | 'edit';
@@ -91,7 +92,7 @@ const defaultValues: FormValues = {
   refereeName: '',
   refereeEmail: '',
   refereePhone: '',
-  role: UserRole.partner,
+  role: UserRole.orgAdmin, // Admins can only create referrals for ORG_ADMIN
   firstLanguage: {
     label: 'English',
     value: 'eng',
@@ -100,8 +101,9 @@ const defaultValues: FormValues = {
 };
 
 const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
-  const [countryCode, setCountryCode] = useState('nz');
-  const [dialCode, setDialCode] = useState('64');
+  const [countryCode, setCountryCode] = useState('au');
+  const [dialCode, setDialCode] = useState('61');
+  const [ownsReferral, setOwnsReferral] = useState(false);
   const { organisations } = useOrganisations();
   // ----------------------------- 3rd party hooks ------------------------------- //
   const referralSchema = Yup.object().shape(
@@ -184,6 +186,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   // ----------------------------- Hooks ---------------------------------------- //
   const { languages } = useLanguages();
   const { setShowReferralDrawer } = useAppNav();
+  const { userId } = useAuth();
   const {
     fetchingReferral,
     postReferral,
@@ -196,8 +199,13 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
   const styles = useStyles(type);
 
   const disableButton = (): boolean => {
+    if (!ownsReferral) {
+      return true;
+    }
+
     const phoneOrEmailTouched =
       touchedFields.refereeEmail || touchedFields.refereePhone;
+
     if (type === 'create') {
       return (
         isSubmitting ||
@@ -325,6 +333,19 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
     getCountryCode();
   }, []);
 
+  useEffect(() => {
+    if (!extendedReferral) {
+      setOwnsReferral(true);
+      return;
+    }
+
+    if (userId) {
+      setOwnsReferral(extendedReferral.referrerId === userId);
+    } else {
+      setOwnsReferral(false);
+    }
+  }, [userId, extendedReferral]);
+
   // ----------------------------- Render ---------------------------------------- //
   return (
     <form className={styles.formContainer} onSubmit={onSubmit}>
@@ -342,6 +363,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                 type="text"
                 fullWidth
                 error={touchedFields.refereeName && !!errors.refereeName}
+                disabled={!ownsReferral}
               />
               {touchedFields.refereeName && errors.refereeName ? (
                 <FormHelperText error>
@@ -369,6 +391,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                 type="email"
                 fullWidth
                 error={touchedFields.refereeEmail && !!errors.refereeEmail}
+                disabled={!ownsReferral}
               />
               {touchedFields.refereeEmail && errors.refereeEmail ? (
                 <FormHelperText error>
@@ -415,6 +438,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                 onFocus={() =>
                   errors.refereePhone && resetField('refereePhone')
                 }
+                disabled={!ownsReferral}
               />
               {touchedFields.refereePhone && errors.refereePhone ? (
                 <FormHelperText error>
@@ -443,12 +467,16 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                 variant="outlined"
                 label="Role"
                 error={touchedFields.role && !!errors.role}
+                disabled={true}
               >
                 <MenuItem key={UserRole.learner} value={UserRole.learner}>
                   {getReadableRoles(UserRole.learner)}
                 </MenuItem>
                 <MenuItem key={UserRole.partner} value={UserRole.partner}>
                   {getReadableRoles(UserRole.partner)}
+                </MenuItem>
+                <MenuItem key={UserRole.referrer} value={UserRole.referrer}>
+                  {getReadableRoles(UserRole.referrer)}
                 </MenuItem>
                 <MenuItem key={UserRole.orgAdmin} value={UserRole.orgAdmin}>
                   {getReadableRoles(UserRole.orgAdmin)}
@@ -457,7 +485,9 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
               {touchedFields.role && errors.role ? (
                 <FormHelperText error>{errors.role.message}</FormHelperText>
               ) : (
-                <div className={styles.helperTextSpacer} />
+                <FormHelperText>
+                  Admins can create/edit referrals for org admins only
+                </FormHelperText>
               )}
             </FormControl>
           )}
@@ -480,6 +510,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                   variant="outlined"
                   label="Organisation"
                   error={!!errors.targetOrgId}
+                  disabled={!ownsReferral}
                 >
                   {organisations.map((org) => (
                     <MenuItem key={org.id} value={org.id}>
@@ -517,6 +548,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
                   label: option.language,
                   value: option.code,
                 }))}
+                isDisabled={!ownsReferral}
               />
 
               {touchedFields.firstLanguage && errors.firstLanguage ? (
@@ -576,7 +608,7 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
           aria-label="Delete referral"
           classes={{ root: styles.deleteButton }}
           variant="outlined"
-          disabled={fetchingReferral}
+          disabled={fetchingReferral || !ownsReferral}
           onClick={handleDelete}
         >
           DELETE REFERRAL
