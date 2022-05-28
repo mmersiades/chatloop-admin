@@ -13,6 +13,8 @@ import MauChart from './MauChart';
 import CumulativeActivitiesChart from './CumulativeActivitiesChart';
 import MessagesChart from './MessagesChart';
 import ActivitiesInProgressChart from './ActivitiesInProgressChart';
+import TotalActiveReferralsChart from './TotalActiveReferralsChart';
+import TotalCumulativeReferralsChart from './TotalCumulativeReferralsChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -56,6 +58,16 @@ const DashboardPage: FC = () => {
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <MessagesChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TotalActiveReferralsChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TotalCumulativeReferralsChart />
         </CardContent>
       </Card>
     </>

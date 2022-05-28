@@ -10,27 +10,43 @@ import {
 import statsService, { StatsDTO, DateRange } from '../services/statsService';
 import { Action } from '../@types/interfaces';
 
+/*
+ * ACRONYMS
+ * dau = daily active user
+ * mau = monthly active user
+ * tar = total active referrals
+ * tcr = total cumulative referrals
+ * */
+
 interface StatsState {
   fetchingDau: boolean;
   fetchingMau: boolean;
   fetchingCumulativeActivities: boolean;
   fetchingActivitiesInProgress: boolean;
   fetchingMessages: boolean;
+  fetchingTar: boolean;
+  fetchingTcr: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
   cumulativeActivitiesStartDate: Date;
   activitiesInProgressStartDate: Date;
   messagesStartDate: Date;
+  tarStartDate: Date;
+  tcrStartDate: Date;
   dauEndDate: Date;
   mauEndDate: Date;
   cumulativeActivitiesEndDate: Date;
   activitiesInProgressEndDate: Date;
   messagesEndDate: Date;
+  tarEndDate: Date;
+  tcrEndDate: Date;
   dauStats?: StatsDTO;
   mauStats?: StatsDTO;
   cumulativeActivitiesStats?: StatsDTO;
   activitiesInProgressStats?: StatsDTO;
   messagesStats?: StatsDTO;
+  tarStats?: StatsDTO;
+  tcrStats?: StatsDTO;
 }
 
 const today = new Date();
@@ -48,6 +64,10 @@ defaultActivitiesInProgressStartDate.setDate(
 );
 const defaultMessagesStartDate = new Date();
 defaultMessagesStartDate.setDate(defaultMessagesStartDate.getDate() - 6);
+const defaultTarStartDate = new Date();
+defaultTarStartDate.setDate(defaultTarStartDate.getDate() - 6);
+const defaultTcrStartDate = new Date();
+defaultTcrStartDate.setDate(defaultTcrStartDate.getDate() - 83);
 
 const initialState: StatsState = {
   fetchingDau: false,
@@ -55,30 +75,34 @@ const initialState: StatsState = {
   fetchingCumulativeActivities: false,
   fetchingActivitiesInProgress: false,
   fetchingMessages: false,
+  fetchingTar: false,
+  fetchingTcr: false,
   dauStartDate: defaultDauStartDate,
   mauStartDate: defaultMauStartDate,
-  cumulativeActivitiesStartDate: defaultCumulativeActivitiesStartDate,
+  cumulativeActivitiesStartDate: defaultTcrStartDate,
   messagesStartDate: defaultMessagesStartDate,
   activitiesInProgressStartDate: defaultActivitiesInProgressStartDate,
+  tarStartDate: defaultTarStartDate,
+  tcrStartDate: defaultTcrStartDate,
   dauEndDate: today,
   mauEndDate: today,
   cumulativeActivitiesEndDate: today,
   activitiesInProgressEndDate: today,
   messagesEndDate: today,
+  tarEndDate: today,
+  tcrEndDate: today,
 };
 
-type GetDauStats = (args: DateRange) => Promise<boolean>;
-type GetMauStats = (args: DateRange) => Promise<boolean>;
-type GetCumulativeActivitiesStats = (args: DateRange) => Promise<boolean>;
-type GetActivitiesInProgressStats = (args: DateRange) => Promise<boolean>;
-type GetMessagesStats = (args: DateRange) => Promise<boolean>;
+type GetStats = (args: DateRange) => Promise<boolean>;
 
 interface StatsContext extends StatsState {
-  getDauStats?: GetDauStats;
-  getMauStats?: GetMauStats;
-  getCumulativeActivitiesStats?: GetCumulativeActivitiesStats;
-  getActivitiesInProgressStats?: GetActivitiesInProgressStats;
-  getMessagesStats?: GetMessagesStats;
+  getDauStats?: GetStats;
+  getMauStats?: GetStats;
+  getCumulativeActivitiesStats?: GetStats;
+  getActivitiesInProgressStats?: GetStats;
+  getMessagesStats?: GetStats;
+  getTarStats?: GetStats;
+  getTcrStats?: GetStats;
 }
 
 const initialContext: StatsContext = { ...initialState };
@@ -134,6 +158,22 @@ interface GetMessagesSuccess extends Action<'GET_MESSAGES_SUCCESS'> {
 }
 interface GetMessagesFailure extends Action<'GET_MESSAGES_FAILURE'> {}
 
+interface GetTarRequest extends Action<'GET_TAR_REQUEST'> {}
+interface GetTarSuccess extends Action<'GET_TAR_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetTarFailure extends Action<'GET_TAR_FAILURE'> {}
+
+interface GetTcrRequest extends Action<'GET_TCR_REQUEST'> {}
+interface GetTcrSuccess extends Action<'GET_TCR_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetTcrFailure extends Action<'GET_TCR_FAILURE'> {}
+
 type Actions =
   | GetDauRequest
   | GetDauSuccess
@@ -149,7 +189,13 @@ type Actions =
   | GetActivitiesInProgressFailure
   | GetMessagesRequest
   | GetMessagesSuccess
-  | GetMessagesFailure;
+  | GetMessagesFailure
+  | GetTarRequest
+  | GetTarSuccess
+  | GetTarFailure
+  | GetTcrRequest
+  | GetTcrSuccess
+  | GetTcrFailure;
 
 const statsReducer = (state: StatsState, action: Actions): StatsState => {
   switch (action.type) {
@@ -243,6 +289,42 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
         ...state,
         fetchingMessages: false,
       };
+    case 'GET_TAR_REQUEST':
+      return {
+        ...state,
+        fetchingTar: true,
+      };
+    case 'GET_TAR_SUCCESS':
+      return {
+        ...state,
+        fetchingTar: false,
+        tarStats: action.dto,
+        tarEndDate: action.endDate,
+        tarStartDate: action.startDate,
+      };
+    case 'GET_TAR_FAILURE':
+      return {
+        ...state,
+        fetchingTar: false,
+      };
+    case 'GET_TCR_REQUEST':
+      return {
+        ...state,
+        fetchingTcr: true,
+      };
+    case 'GET_TCR_SUCCESS':
+      return {
+        ...state,
+        fetchingTcr: false,
+        tcrStats: action.dto,
+        tcrEndDate: action.endDate,
+        tcrStartDate: action.startDate,
+      };
+    case 'GET_TCR_FAILURE':
+      return {
+        ...state,
+        fetchingTcr: false,
+      };
     default:
       return state;
   }
@@ -259,7 +341,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
   // -------------------------- Hooks -------------------------------------- //
 
   // -------------------------- Component functions ------------------------ //
-  const getDauStats: GetDauStats = async (params) => {
+  const getDauStats: GetStats = async (params) => {
     dispatch({ type: 'GET_DAU_REQUEST' });
 
     try {
@@ -284,7 +366,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
-  const getMauStats: GetMauStats = async (params) => {
+  const getMauStats: GetStats = async (params) => {
     dispatch({ type: 'GET_MAU_REQUEST' });
 
     try {
@@ -309,9 +391,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
-  const getCumulativeActivitiesStats: GetCumulativeActivitiesStats = async (
-    params
-  ) => {
+  const getCumulativeActivitiesStats: GetStats = async (params) => {
     dispatch({ type: 'GET_CUM_ACTIVITIES_REQUEST' });
 
     try {
@@ -338,9 +418,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
-  const getActivitiesInProgressStats: GetActivitiesInProgressStats = async (
-    params
-  ) => {
+  const getActivitiesInProgressStats: GetStats = async (params) => {
     dispatch({ type: 'GET_ACTIVITIES_PROGRESS_REQUEST' });
 
     try {
@@ -367,7 +445,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
-  const getMessagesStats: GetMessagesStats = async (params) => {
+  const getMessagesStats: GetStats = async (params) => {
     dispatch({ type: 'GET_MESSAGES_REQUEST' });
 
     try {
@@ -392,6 +470,56 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getTarStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_TAR_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getTarStats(params);
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_TAR_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_TAR_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_TAR_FAILURE' });
+      return false;
+    }
+  };
+
+  const getTcrStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_TCR_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getTcrStats(params);
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_TCR_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_TCR_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_TCR_FAILURE' });
+      return false;
+    }
+  };
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
@@ -400,7 +528,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     getMauStats({ startDate: defaultMauStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
     getCumulativeActivitiesStats({
-      startDate: defaultCumulativeActivitiesStartDate,
+      startDate: defaultTcrStartDate,
       endDate: today,
     });
     // noinspection JSIgnoredPromiseFromCall
@@ -410,6 +538,10 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     });
     // noinspection JSIgnoredPromiseFromCall
     getMessagesStats({ startDate: defaultMessagesStartDate, endDate: today });
+    // noinspection JSIgnoredPromiseFromCall
+    getTarStats({ startDate: defaultTarStartDate, endDate: today });
+    // noinspection JSIgnoredPromiseFromCall
+    getTcrStats({ startDate: defaultTcrStartDate, endDate: today });
   }, []);
 
   // -------------------------- Render ------------------------------------- //
@@ -422,6 +554,8 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         getCumulativeActivitiesStats,
         getActivitiesInProgressStats,
         getMessagesStats,
+        getTarStats,
+        getTcrStats,
       }}
     >
       {children}
