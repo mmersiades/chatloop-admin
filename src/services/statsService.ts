@@ -14,6 +14,9 @@ import apiChatloopOrg from '../config/axiosConfig';
  * ooa = organisation org admin
  * ca = cumulative activities
  * aip = activities in progress
+ * oar = org active referrals
+ * oer = org expired referrals
+ * oai = org accepted invitations
  * */
 const COLOR_PRIMARY_VERY_LIGHT = '#b7e3f7';
 const COLOR_PRIMARY_LIGHT = '#64bfe9';
@@ -64,6 +67,39 @@ const mockOrStats: StatsDTO = {
     generateDataSet('Organisation 3', [25, 25, 30], COLOR_PRIMARY),
     generateDataSet('Organisation 4', [1, 1, 0], COLOR_PRIMARY_LIGHT),
     generateDataSet('Organisation 5', [15, 15, 15], COLOR_PRIMARY_VERY_LIGHT),
+  ],
+};
+
+const mockOarStats: StatsDTO = {
+  labels: mockDateLabels,
+  datasets: [
+    generateDataSet('Organisation 1', [3, 2, 3], COLOR_PRIMARY_VERY_DARK),
+    generateDataSet('Organisation 2', [5, 4, 3], COLOR_PRIMARY_DARK),
+    generateDataSet('Organisation 3', [0, 1, 1], COLOR_PRIMARY),
+    generateDataSet('Organisation 4', [1, 1, 2], COLOR_PRIMARY_LIGHT),
+    generateDataSet('Organisation 5', [4, 4, 4], COLOR_PRIMARY_VERY_LIGHT),
+  ],
+};
+
+const mockOerStats: StatsDTO = {
+  labels: mockDateLabels,
+  datasets: [
+    generateDataSet('Organisation 1', [10, 10, 10], COLOR_PRIMARY_VERY_DARK),
+    generateDataSet('Organisation 2', [16, 16, 17], COLOR_PRIMARY_DARK),
+    generateDataSet('Organisation 3', [5, 6, 6], COLOR_PRIMARY),
+    generateDataSet('Organisation 4', [1, 1, 1], COLOR_PRIMARY_LIGHT),
+    generateDataSet('Organisation 5', [3, 4, 5], COLOR_PRIMARY_VERY_LIGHT),
+  ],
+};
+
+const mockOaiStats: StatsDTO = {
+  labels: mockDateLabels,
+  datasets: [
+    generateDataSet('Organisation 1', [13, 14, 14], COLOR_PRIMARY_VERY_DARK),
+    generateDataSet('Organisation 2', [21, 21, 21], COLOR_PRIMARY_DARK),
+    generateDataSet('Organisation 3', [7, 7, 8], COLOR_PRIMARY),
+    generateDataSet('Organisation 4', [3, 5, 7], COLOR_PRIMARY_LIGHT),
+    generateDataSet('Organisation 5', [6, 6, 6], COLOR_PRIMARY_VERY_LIGHT),
   ],
 };
 
@@ -140,6 +176,7 @@ const getOrgStats: GetOrgStats = async ({
   startDate,
   endDate,
 }: OrgStatsArgs) => {
+  // TODO: implement endpoints
   switch (type) {
     case 'referrers':
       await stall(500);
@@ -147,6 +184,15 @@ const getOrgStats: GetOrgStats = async ({
     case 'org-admins':
       await stall(500);
       return { status: 200, data: mockOoaStats } as AxiosResponse<StatsDTO>;
+    case 'accepted-invitations':
+      await stall(500);
+      return { status: 200, data: mockOaiStats } as AxiosResponse<StatsDTO>;
+    case 'active-referrals':
+      await stall(500);
+      return { status: 200, data: mockOarStats } as AxiosResponse<StatsDTO>;
+    case 'expired-referrals':
+      await stall(500);
+      return { status: 200, data: mockOerStats } as AxiosResponse<StatsDTO>;
     default:
       throw new Error('Invalid OrgStatType');
   }

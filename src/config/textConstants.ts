@@ -90,6 +90,9 @@ export const TAR_TITLE = 'Total Active Referrals';
 export const TCR_TITLE = 'Total Cumulative Referrals';
 export const OR_TITLE = 'Referees In Organisations';
 export const OOA_TITLE = 'Org Admins In Organisations';
+export const OAR_TITLE = 'Active Referrals For Organisations';
+export const OER_TITLE = 'Expired Referrals For Organisations';
+export const OAI_TITLE = 'Accepted Invitations For Organisations';
 
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';

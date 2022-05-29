@@ -20,6 +20,9 @@ import { Action } from '../@types/interfaces';
  * ooa = organisation org admin
  * ca = cumulative activities
  * aip = activities in progress
+ * oar = org active referrals
+ * oer = org expired referrals
+ * oai = org accepted invitations
  * */
 
 interface StatsState {
@@ -32,6 +35,9 @@ interface StatsState {
   fetchingTcr: boolean;
   fetchingOr: boolean;
   fetchingOoa: boolean;
+  fetchingOar: boolean;
+  fetchingOer: boolean;
+  fetchingOai: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
   caStartDate: Date;
@@ -41,6 +47,9 @@ interface StatsState {
   tcrStartDate: Date;
   orStartDate: Date;
   ooaStartDate: Date;
+  oarStartDate: Date;
+  oerStartDate: Date;
+  oaiStartDate: Date;
   dauEndDate: Date;
   mauEndDate: Date;
   caEndDate: Date;
@@ -50,6 +59,9 @@ interface StatsState {
   tcrEndDate: Date;
   orEndDate: Date;
   ooaEndDate: Date;
+  oarEndDate: Date;
+  oerEndDate: Date;
+  oaiEndDate: Date;
   dauStats?: StatsDTO;
   mauStats?: StatsDTO;
   caStats?: StatsDTO;
@@ -59,6 +71,9 @@ interface StatsState {
   tcrStats?: StatsDTO;
   orStats?: StatsDTO;
   ooaStats?: StatsDTO;
+  oarStats?: StatsDTO;
+  oerStats?: StatsDTO;
+  oaiStats?: StatsDTO;
 }
 
 const today = new Date();
@@ -77,6 +92,9 @@ const initialState: StatsState = {
   fetchingTcr: false,
   fetchingOr: false,
   fetchingOoa: false,
+  fetchingOar: false,
+  fetchingOer: false,
+  fetchingOai: false,
   dauStartDate: dailyStartDate,
   mauStartDate: monthlyStartDate,
   caStartDate: monthlyStartDate,
@@ -86,6 +104,9 @@ const initialState: StatsState = {
   tcrStartDate: monthlyStartDate,
   orStartDate: monthlyStartDate,
   ooaStartDate: monthlyStartDate,
+  oarStartDate: monthlyStartDate,
+  oerStartDate: monthlyStartDate,
+  oaiStartDate: monthlyStartDate,
   dauEndDate: today,
   mauEndDate: today,
   caEndDate: today,
@@ -95,6 +116,9 @@ const initialState: StatsState = {
   tcrEndDate: today,
   orEndDate: today,
   ooaEndDate: today,
+  oarEndDate: today,
+  oerEndDate: today,
+  oaiEndDate: today,
 };
 interface OrgStatsArgs extends DateRange {
   orgIds: number[];
@@ -113,6 +137,9 @@ interface StatsContext extends StatsState {
   getTcrStats?: GetStats;
   getOrStats?: GetOrgStats;
   getOoaStats?: GetOrgStats;
+  getOarStats?: GetOrgStats;
+  getOerStats?: GetOrgStats;
+  getOaiStats?: GetOrgStats;
 }
 
 const initialContext: StatsContext = { ...initialState };
@@ -194,6 +221,30 @@ interface GetOoaSuccess extends Action<'GET_OOA_SUCCESS'> {
 }
 interface GetOoaFailure extends Action<'GET_OOA_FAILURE'> {}
 
+interface GetOarRequest extends Action<'GET_OAR_REQUEST'> {}
+interface GetOarSuccess extends Action<'GET_OAR_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetOarFailure extends Action<'GET_OAR_FAILURE'> {}
+
+interface GetOerRequest extends Action<'GET_OER_REQUEST'> {}
+interface GetOerSuccess extends Action<'GET_OER_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetOerFailure extends Action<'GET_OER_FAILURE'> {}
+
+interface GetOaiRequest extends Action<'GET_OAI_REQUEST'> {}
+interface GetOaiSuccess extends Action<'GET_OAI_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetOaiFailure extends Action<'GET_OAI_FAILURE'> {}
+
 type Actions =
   | GetDauRequest
   | GetDauSuccess
@@ -221,7 +272,16 @@ type Actions =
   | GetOrFailure
   | GetOoaRequest
   | GetOoaSuccess
-  | GetOoaFailure;
+  | GetOoaFailure
+  | GetOarRequest
+  | GetOarSuccess
+  | GetOarFailure
+  | GetOerRequest
+  | GetOerSuccess
+  | GetOerFailure
+  | GetOaiRequest
+  | GetOaiSuccess
+  | GetOaiFailure;
 
 const statsReducer = (state: StatsState, action: Actions): StatsState => {
   switch (action.type) {
@@ -387,6 +447,60 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
         ...state,
         fetchingOoa: false,
       };
+    case 'GET_OAR_REQUEST':
+      return {
+        ...state,
+        fetchingOar: true,
+      };
+    case 'GET_OAR_SUCCESS':
+      return {
+        ...state,
+        fetchingOar: false,
+        oarStats: action.dto,
+        oarEndDate: action.endDate,
+        oarStartDate: action.startDate,
+      };
+    case 'GET_OAR_FAILURE':
+      return {
+        ...state,
+        fetchingOar: false,
+      };
+    case 'GET_OER_REQUEST':
+      return {
+        ...state,
+        fetchingOer: true,
+      };
+    case 'GET_OER_SUCCESS':
+      return {
+        ...state,
+        fetchingOer: false,
+        oerStats: action.dto,
+        oerEndDate: action.endDate,
+        oerStartDate: action.startDate,
+      };
+    case 'GET_OER_FAILURE':
+      return {
+        ...state,
+        fetchingOer: false,
+      };
+    case 'GET_OAI_REQUEST':
+      return {
+        ...state,
+        fetchingOai: true,
+      };
+    case 'GET_OAI_SUCCESS':
+      return {
+        ...state,
+        fetchingOai: false,
+        oaiStats: action.dto,
+        oaiEndDate: action.endDate,
+        oaiStartDate: action.startDate,
+      };
+    case 'GET_OAI_FAILURE':
+      return {
+        ...state,
+        fetchingOai: false,
+      };
     default:
       return state;
   }
@@ -397,10 +511,6 @@ interface Props {}
 export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
   // -------------------------- Component state ---------------------------- //
   const [state, dispatch] = useReducer(statsReducer, initialState);
-
-  // -------------------------- 3rd party hooks ---------------------------- //
-
-  // -------------------------- Hooks -------------------------------------- //
 
   // -------------------------- Component functions ------------------------ //
   const getDauStats: GetStats = async (params) => {
@@ -634,6 +744,92 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getOarStats: GetOrgStats = async (args) => {
+    dispatch({ type: 'GET_OAR_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getOrgStats({
+        type: 'active-referrals',
+        ...args,
+      });
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_OAR_SUCCESS',
+          dto: data,
+          startDate: args.startDate,
+          endDate: args.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_OAR_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_OAR_FAILURE' });
+      return false;
+    }
+  };
+
+  const getOerStats: GetOrgStats = async (args) => {
+    dispatch({ type: 'GET_OER_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getOrgStats({
+        type: 'expired-referrals',
+        ...args,
+      });
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_OER_SUCCESS',
+          dto: data,
+          startDate: args.startDate,
+          endDate: args.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_OER_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_OER_FAILURE' });
+      return false;
+    }
+  };
+
+  const getOaiStats: GetOrgStats = async (args) => {
+    dispatch({ type: 'GET_OAI_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getOrgStats({
+        type: 'accepted-invitations',
+        ...args,
+      });
+
+      console.log('data', data);
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_OAI_SUCCESS',
+          dto: data,
+          startDate: args.startDate,
+          endDate: args.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_OAI_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_OAI_FAILURE' });
+      return false;
+    }
+  };
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
@@ -654,6 +850,12 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     getOrStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
     // noinspection JSIgnoredPromiseFromCall
     getOoaStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
+    // noinspection JSIgnoredPromiseFromCall
+    getOarStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
+    // noinspection JSIgnoredPromiseFromCall
+    getOerStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
+    // noinspection JSIgnoredPromiseFromCall
+    getOaiStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
   }, []);
 
   // -------------------------- Render ------------------------------------- //
@@ -670,6 +872,9 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         getTcrStats,
         getOrStats,
         getOoaStats,
+        getOarStats,
+        getOerStats,
+        getOaiStats,
       }}
     >
       {children}

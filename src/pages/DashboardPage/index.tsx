@@ -17,6 +17,9 @@ import TarChart from './TarChart';
 import TcrChart from './TcrChart';
 import OrChart from './OrChart';
 import OoaChart from './OoaChart';
+import OarChart from './OarChart';
+import OerChart from './OerChart';
+import OaiChart from './OaiChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -80,6 +83,21 @@ const DashboardPage: FC = () => {
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <OoaChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OarChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OerChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OaiChart />
         </CardContent>
       </Card>
     </>
