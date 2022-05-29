@@ -8,14 +8,12 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { RangeKeyDict } from 'react-date-range';
-import { Bar } from 'react-chartjs-2';
-import { CircularProgress, Grid } from '@material-ui/core';
-
-import ChartWrapper from '../../components/base/ChartWrapper';
-import { options } from './DauChart';
 import { useStats } from '../../contexts/statsContext';
-import { TAR_TITLE } from '../../config/textConstants';
+import { RangeKeyDict } from 'react-date-range';
+import { CircularProgress, Grid } from '@material-ui/core';
+import { Bar } from 'react-chartjs-2';
+import ChartWrapper from '../../components/base/ChartWrapper';
+import { CUMULATIVE_ACTIVITIES_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
@@ -26,56 +24,41 @@ ChartJS.register(
   Legend
 );
 
-// Use something like this when setting up dark mode
-// https://www.chartjs.org/docs/latest/configuration/
-// const options: ChartOptions<'bar'> = {
-//   responsive: true,
-//   plugins: {
-//     legend: {
-//       labels: {
-//         color: '#fff',
-//       },
-//     },
-//   },
-//   scales: {
-//     x: {
-//       stacked: true,
-//     },
-//     y: {
-//       stacked: true,
-//     },
-//     yAxes: {
-//       grid: {
-//         drawBorder: true,
-//         color: '#FFFFFF',
-//       },
-//     },
-//     xAxes: {
-//       grid: {
-//         drawBorder: true,
-//         color: '#FFFFFF',
-//       },
-//     },
-//   },
-// };
+export const options = {
+  responsive: true,
+  scales: {
+    x: {
+      stacked: true,
+    },
+    y: {
+      stacked: true,
+    },
+  },
+};
 
 interface Props {}
 
-const TotalActiveReferralsChart: FC<Props> = () => {
+const CaChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
 
+  // -------------------------- 3rd party hooks ---------------------------- //
+
   // -------------------------- Hooks -------------------------------------- //
-  const { getTarStats, tarStats, tarEndDate, tarStartDate, fetchingTar } =
+  const { getCaStats, caStats, caEndDate, caStartDate, fetchingCa } =
     useStats();
 
   // -------------------------- Component functions ------------------------ //
+
   const handleSelect = async (ranges: RangeKeyDict) => {
     const { startDate, endDate } = ranges['selection'];
-    if (startDate && endDate && getTarStats) {
-      const success = await getTarStats({ startDate, endDate });
+    if (startDate && endDate && getCaStats) {
+      const success = await getCaStats({
+        startDate,
+        endDate,
+      });
 
       success && setPickerAnchor(null);
     }
@@ -89,20 +72,22 @@ const TotalActiveReferralsChart: FC<Props> = () => {
     }
   };
 
+  // -------------------------- Effects ------------------------------------ //
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title={TAR_TITLE}
+      title={CUMULATIVE_ACTIVITIES_TITLE}
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
       handleSelect={handleSelect}
-      startDate={tarStartDate}
-      endDate={tarEndDate}
+      startDate={caStartDate}
+      endDate={caEndDate}
       anchorEl={pickerAnchor}
     >
       <>
-        {fetchingTar || !tarStats ? (
+        {fetchingCa || !caStats ? (
           <Grid
             container
             alignItems="center"
@@ -112,11 +97,11 @@ const TotalActiveReferralsChart: FC<Props> = () => {
             <CircularProgress />
           </Grid>
         ) : (
-          <Bar data={tarStats} options={options} />
+          <Bar data={caStats} options={options} />
         )}
       </>
     </ChartWrapper>
   );
 };
 
-export default TotalActiveReferralsChart;
+export default CaChart;

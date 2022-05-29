@@ -1,68 +1,58 @@
 import { FC, useState } from 'react';
 import {
-  BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
   LinearScale,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
 } from 'chart.js';
 import { useStats } from '../../contexts/statsContext';
 import { RangeKeyDict } from 'react-date-range';
-import { CircularProgress, Grid } from '@material-ui/core';
-import { Bar } from 'react-chartjs-2';
 import ChartWrapper from '../../components/base/ChartWrapper';
-import { CUMULATIVE_ACTIVITIES_TITLE } from '../../config/textConstants';
+import { OOA_TITLE, OR_TITLE } from '../../config/textConstants';
+import { CircularProgress, Grid } from '@material-ui/core';
+import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  PointElement
 );
 
-export const options = {
+const options = {
   responsive: true,
-  scales: {
-    x: {
-      stacked: true,
-    },
-    y: {
-      stacked: true,
-    },
-  },
 };
 
 interface Props {}
 
-const CumulativeActivitiesChart: FC<Props> = () => {
+const OoaChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
 
   // -------------------------- 3rd party hooks ---------------------------- //
+  const { getOoaStats, ooaStats, ooaEndDate, ooaStartDate, fetchingOoa } =
+    useStats();
 
   // -------------------------- Hooks -------------------------------------- //
-  const {
-    getCumulativeActivitiesStats,
-    cumulativeActivitiesStats,
-    cumulativeActivitiesEndDate,
-    cumulativeActivitiesStartDate,
-    fetchingCumulativeActivities,
-  } = useStats();
 
   // -------------------------- Component functions ------------------------ //
-
   const handleSelect = async (ranges: RangeKeyDict) => {
     const { startDate, endDate } = ranges['selection'];
-    if (startDate && endDate && getCumulativeActivitiesStats) {
-      const success = await getCumulativeActivitiesStats({
+    const orgIds: number[] = []; // TODO: add org filtering
+    if (startDate && endDate && getOoaStats) {
+      const success = await getOoaStats({
         startDate,
         endDate,
+        orgIds,
       });
 
       success && setPickerAnchor(null);
@@ -77,22 +67,20 @@ const CumulativeActivitiesChart: FC<Props> = () => {
     }
   };
 
-  // -------------------------- Effects ------------------------------------ //
-
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title={CUMULATIVE_ACTIVITIES_TITLE}
+      title={OOA_TITLE}
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
       handleSelect={handleSelect}
-      startDate={cumulativeActivitiesStartDate}
-      endDate={cumulativeActivitiesEndDate}
+      startDate={ooaStartDate}
+      endDate={ooaEndDate}
       anchorEl={pickerAnchor}
     >
       <>
-        {fetchingCumulativeActivities || !cumulativeActivitiesStats ? (
+        {fetchingOoa || !ooaStats ? (
           <Grid
             container
             alignItems="center"
@@ -102,11 +90,11 @@ const CumulativeActivitiesChart: FC<Props> = () => {
             <CircularProgress />
           </Grid>
         ) : (
-          <Bar data={cumulativeActivitiesStats} options={options} />
+          <Line data={ooaStats} options={options} />
         )}
       </>
     </ChartWrapper>
   );
 };
 
-export default CumulativeActivitiesChart;
+export default OoaChart;

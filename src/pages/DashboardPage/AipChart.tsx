@@ -39,28 +39,21 @@ export const options = {
 
 interface Props {}
 
-const ActivitiesInProgressChart: FC<Props> = () => {
+const AipChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
 
-  // -------------------------- 3rd party hooks ---------------------------- //
-
   // -------------------------- Hooks -------------------------------------- //
-  const {
-    getActivitiesInProgressStats,
-    activitiesInProgressStats,
-    activitiesInProgressEndDate,
-    activitiesInProgressStartDate,
-    fetchingActivitiesInProgress,
-  } = useStats();
+  const { getAipStats, aipStats, aipEndDate, aipStartDate, fetchingAip } =
+    useStats();
 
   // -------------------------- Component functions ------------------------ //
   const handleSelect = async (ranges: RangeKeyDict) => {
     const { startDate, endDate } = ranges['selection'];
-    if (startDate && endDate && getActivitiesInProgressStats) {
-      const success = await getActivitiesInProgressStats({
+    if (startDate && endDate && getAipStats) {
+      const success = await getAipStats({
         startDate,
         endDate,
       });
@@ -77,8 +70,6 @@ const ActivitiesInProgressChart: FC<Props> = () => {
     }
   };
 
-  // -------------------------- Effects ------------------------------------ //
-
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -87,12 +78,12 @@ const ActivitiesInProgressChart: FC<Props> = () => {
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
       handleSelect={handleSelect}
-      startDate={activitiesInProgressStartDate}
-      endDate={activitiesInProgressEndDate}
+      startDate={aipStartDate}
+      endDate={aipEndDate}
       anchorEl={pickerAnchor}
     >
       <>
-        {fetchingActivitiesInProgress || !activitiesInProgressStats ? (
+        {fetchingAip || !aipStats ? (
           <Grid
             container
             alignItems="center"
@@ -102,11 +93,11 @@ const ActivitiesInProgressChart: FC<Props> = () => {
             <CircularProgress />
           </Grid>
         ) : (
-          <Bar data={activitiesInProgressStats} options={options} />
+          <Bar data={aipStats} options={options} />
         )}
       </>
     </ChartWrapper>
   );
 };
 
-export default ActivitiesInProgressChart;
+export default AipChart;

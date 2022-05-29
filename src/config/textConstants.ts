@@ -88,6 +88,8 @@ export const CUMULATIVE_ACTIVITIES_TITLE = 'Cumulative Activities';
 export const MESSAGES_TITLE = 'Messages';
 export const TAR_TITLE = 'Total Active Referrals';
 export const TCR_TITLE = 'Total Cumulative Referrals';
+export const OR_TITLE = 'Referees In Organisations';
+export const OOA_TITLE = 'Org Admins In Organisations';
 
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';

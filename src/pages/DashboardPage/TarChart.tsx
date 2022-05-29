@@ -15,7 +15,7 @@ import { CircularProgress, Grid } from '@material-ui/core';
 import ChartWrapper from '../../components/base/ChartWrapper';
 import { options } from './DauChart';
 import { useStats } from '../../contexts/statsContext';
-import { TCR_TITLE } from '../../config/textConstants';
+import { TAR_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
@@ -26,23 +26,56 @@ ChartJS.register(
   Legend
 );
 
+// Use something like this when setting up dark mode
+// https://www.chartjs.org/docs/latest/configuration/
+// const options: ChartOptions<'bar'> = {
+//   responsive: true,
+//   plugins: {
+//     legend: {
+//       labels: {
+//         color: '#fff',
+//       },
+//     },
+//   },
+//   scales: {
+//     x: {
+//       stacked: true,
+//     },
+//     y: {
+//       stacked: true,
+//     },
+//     yAxes: {
+//       grid: {
+//         drawBorder: true,
+//         color: '#FFFFFF',
+//       },
+//     },
+//     xAxes: {
+//       grid: {
+//         drawBorder: true,
+//         color: '#FFFFFF',
+//       },
+//     },
+//   },
+// };
+
 interface Props {}
 
-const TotalCumulativeReferralsChart: FC<Props> = () => {
+const TarChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
 
   // -------------------------- Hooks -------------------------------------- //
-  const { getTcrStats, tcrStats, tcrEndDate, tcrStartDate, fetchingTcr } =
+  const { getTarStats, tarStats, tarEndDate, tarStartDate, fetchingTar } =
     useStats();
 
   // -------------------------- Component functions ------------------------ //
   const handleSelect = async (ranges: RangeKeyDict) => {
     const { startDate, endDate } = ranges['selection'];
-    if (startDate && endDate && getTcrStats) {
-      const success = await getTcrStats({ startDate, endDate });
+    if (startDate && endDate && getTarStats) {
+      const success = await getTarStats({ startDate, endDate });
 
       success && setPickerAnchor(null);
     }
@@ -59,17 +92,17 @@ const TotalCumulativeReferralsChart: FC<Props> = () => {
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title={TCR_TITLE}
+      title={TAR_TITLE}
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
       handleSelect={handleSelect}
-      startDate={tcrStartDate}
-      endDate={tcrEndDate}
+      startDate={tarStartDate}
+      endDate={tarEndDate}
       anchorEl={pickerAnchor}
     >
       <>
-        {fetchingTcr || !tcrStats ? (
+        {fetchingTar || !tarStats ? (
           <Grid
             container
             alignItems="center"
@@ -79,11 +112,11 @@ const TotalCumulativeReferralsChart: FC<Props> = () => {
             <CircularProgress />
           </Grid>
         ) : (
-          <Bar data={tcrStats} options={options} />
+          <Bar data={tarStats} options={options} />
         )}
       </>
     </ChartWrapper>
   );
 };
 
-export default TotalCumulativeReferralsChart;
+export default TarChart;

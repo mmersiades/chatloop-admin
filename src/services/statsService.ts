@@ -10,12 +10,16 @@ import apiChatloopOrg from '../config/axiosConfig';
  * mau = monthly active user
  * tar = total active referrals
  * tcr = total cumulative referrals
+ * or = organisation referrer
+ * ooa = organisation org admin
+ * ca = cumulative activities
+ * aip = activities in progress
  * */
-// const COLOR_PRIMARY_VERY_LIGHT = '#b7e3f7';
-// const COLOR_PRIMARY_LIGHT = '#64bfe9';
+const COLOR_PRIMARY_VERY_LIGHT = '#b7e3f7';
+const COLOR_PRIMARY_LIGHT = '#64bfe9';
 const COLOR_PRIMARY = '#43a5e0';
-// const COLOR_PRIMARY_DARK = '#3784be';
-// const COLOR_PRIMARY_VERY_DARK = '#295486';
+const COLOR_PRIMARY_DARK = '#3784be';
+const COLOR_PRIMARY_VERY_DARK = '#295486';
 const COLOR_ERROR = '#C51162';
 
 const mockDateLabels: string[] = ['Sat, 21 May', 'Sun, 22 May', 'Mon, 23 May'];
@@ -41,9 +45,38 @@ const mockTcrStatsDTO: StatsDTO = {
   ],
 };
 
+const mockOoaStats: StatsDTO = {
+  labels: mockDateLabels,
+  datasets: [
+    generateDataSet('Organisation 1', [1, 1, 2], COLOR_PRIMARY_VERY_DARK),
+    generateDataSet('Organisation 2', [1, 1, 1], COLOR_PRIMARY_DARK),
+    generateDataSet('Organisation 3', [2, 2, 3], COLOR_PRIMARY),
+    generateDataSet('Organisation 4', [0, 0, 1], COLOR_PRIMARY_LIGHT),
+    generateDataSet('Organisation 5', [1, 1, 1], COLOR_PRIMARY_VERY_LIGHT),
+  ],
+};
+
+const mockOrStats: StatsDTO = {
+  labels: mockDateLabels,
+  datasets: [
+    generateDataSet('Organisation 1', [5, 5, 5], COLOR_PRIMARY_VERY_DARK),
+    generateDataSet('Organisation 2', [10, 11, 12], COLOR_PRIMARY_DARK),
+    generateDataSet('Organisation 3', [25, 25, 30], COLOR_PRIMARY),
+    generateDataSet('Organisation 4', [1, 1, 0], COLOR_PRIMARY_LIGHT),
+    generateDataSet('Organisation 5', [15, 15, 15], COLOR_PRIMARY_VERY_LIGHT),
+  ],
+};
+
 const stall = async (stallTime = 3000) => {
   await new Promise((resolve) => setTimeout(resolve, stallTime));
 };
+
+type OrgStatType =
+  | 'referrers'
+  | 'org-admins'
+  | 'active-referrals'
+  | 'accepted-invitations'
+  | 'expired-referrals';
 
 interface DataSetDTO {
   label: string;
@@ -62,6 +95,7 @@ export interface DateRange {
 }
 
 interface OrgStatsArgs extends DateRange {
+  type: OrgStatType;
   orgIds: number[];
 }
 
@@ -71,11 +105,12 @@ type GetOrgStats = (args: OrgStatsArgs) => Promise<AxiosResponse<StatsDTO>>;
 interface StatsService {
   getDauStats: GetStats;
   getMauStats: GetStats;
-  getCumulativeActivitiesStats: GetStats;
-  getActivitiesInProgressStats: GetStats;
+  getCaStats: GetStats;
+  getAipStats: GetStats;
   getMessagesStats: GetStats;
   getTarStats: GetStats;
   getTcrStats: GetStats;
+  getOrgStats: GetOrgStats;
 }
 
 const getDauStats: GetStats = async ({ startDate, endDate }) =>
@@ -84,10 +119,10 @@ const getDauStats: GetStats = async ({ startDate, endDate }) =>
 const getMauStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('mau', startDate, endDate);
 
-const getCumulativeActivitiesStats: GetStats = async ({ startDate, endDate }) =>
+const getCaStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('cumulative-activities', startDate, endDate);
 
-const getActivitiesInProgressStats: GetStats = async ({ startDate, endDate }) =>
+const getAipStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('in-progress-activities', startDate, endDate);
 
 const getMessagesStats: GetStats = async ({ startDate, endDate }) =>
@@ -95,8 +130,27 @@ const getMessagesStats: GetStats = async ({ startDate, endDate }) =>
 
 const getTarStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('active-referrals', startDate, endDate);
+
 const getTcrStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('cumulative-referrals', startDate, endDate);
+
+const getOrgStats: GetOrgStats = async ({
+  type,
+  orgIds,
+  startDate,
+  endDate,
+}: OrgStatsArgs) => {
+  switch (type) {
+    case 'referrers':
+      await stall(500);
+      return { status: 200, data: mockOrStats } as AxiosResponse<StatsDTO>;
+    case 'org-admins':
+      await stall(500);
+      return { status: 200, data: mockOoaStats } as AxiosResponse<StatsDTO>;
+    default:
+      throw new Error('Invalid OrgStatType');
+  }
+};
 
 const getStats = async (type: string, startDate: Date, endDate: Date) => {
   const requestOptions = {
@@ -127,11 +181,12 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
 const statsService: StatsService = {
   getDauStats,
   getMauStats,
-  getCumulativeActivitiesStats,
-  getActivitiesInProgressStats,
+  getCaStats,
+  getAipStats,
   getMessagesStats,
   getTarStats,
   getTcrStats,
+  getOrgStats,
 };
 
 export default statsService;

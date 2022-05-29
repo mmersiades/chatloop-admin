@@ -16,93 +16,103 @@ import { Action } from '../@types/interfaces';
  * mau = monthly active user
  * tar = total active referrals
  * tcr = total cumulative referrals
+ * or = organisation referrer
+ * ooa = organisation org admin
+ * ca = cumulative activities
+ * aip = activities in progress
  * */
 
 interface StatsState {
   fetchingDau: boolean;
   fetchingMau: boolean;
-  fetchingCumulativeActivities: boolean;
-  fetchingActivitiesInProgress: boolean;
+  fetchingCa: boolean;
+  fetchingAip: boolean;
   fetchingMessages: boolean;
   fetchingTar: boolean;
   fetchingTcr: boolean;
+  fetchingOr: boolean;
+  fetchingOoa: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
-  cumulativeActivitiesStartDate: Date;
-  activitiesInProgressStartDate: Date;
+  caStartDate: Date;
+  aipStartDate: Date;
   messagesStartDate: Date;
   tarStartDate: Date;
   tcrStartDate: Date;
+  orStartDate: Date;
+  ooaStartDate: Date;
   dauEndDate: Date;
   mauEndDate: Date;
-  cumulativeActivitiesEndDate: Date;
-  activitiesInProgressEndDate: Date;
+  caEndDate: Date;
+  aipEndDate: Date;
   messagesEndDate: Date;
   tarEndDate: Date;
   tcrEndDate: Date;
+  orEndDate: Date;
+  ooaEndDate: Date;
   dauStats?: StatsDTO;
   mauStats?: StatsDTO;
-  cumulativeActivitiesStats?: StatsDTO;
-  activitiesInProgressStats?: StatsDTO;
+  caStats?: StatsDTO;
+  aipStats?: StatsDTO;
   messagesStats?: StatsDTO;
   tarStats?: StatsDTO;
   tcrStats?: StatsDTO;
+  orStats?: StatsDTO;
+  ooaStats?: StatsDTO;
 }
 
 const today = new Date();
-const defaultDauStartDate = new Date();
-defaultDauStartDate.setDate(defaultDauStartDate.getDate() - 6);
-const defaultMauStartDate = new Date();
-defaultMauStartDate.setDate(defaultMauStartDate.getDate() - 83);
-const defaultCumulativeActivitiesStartDate = new Date();
-defaultCumulativeActivitiesStartDate.setDate(
-  defaultCumulativeActivitiesStartDate.getDate() - 83
-);
-const defaultActivitiesInProgressStartDate = new Date();
-defaultActivitiesInProgressStartDate.setDate(
-  defaultActivitiesInProgressStartDate.getDate() - 6
-);
-const defaultMessagesStartDate = new Date();
-defaultMessagesStartDate.setDate(defaultMessagesStartDate.getDate() - 6);
-const defaultTarStartDate = new Date();
-defaultTarStartDate.setDate(defaultTarStartDate.getDate() - 6);
-const defaultTcrStartDate = new Date();
-defaultTcrStartDate.setDate(defaultTcrStartDate.getDate() - 83);
+const dailyStartDate = new Date();
+dailyStartDate.setDate(dailyStartDate.getDate() - 6);
+const monthlyStartDate = new Date();
+monthlyStartDate.setDate(monthlyStartDate.getDate() - 83);
 
 const initialState: StatsState = {
   fetchingDau: false,
   fetchingMau: false,
-  fetchingCumulativeActivities: false,
-  fetchingActivitiesInProgress: false,
+  fetchingCa: false,
+  fetchingAip: false,
   fetchingMessages: false,
   fetchingTar: false,
   fetchingTcr: false,
-  dauStartDate: defaultDauStartDate,
-  mauStartDate: defaultMauStartDate,
-  cumulativeActivitiesStartDate: defaultTcrStartDate,
-  messagesStartDate: defaultMessagesStartDate,
-  activitiesInProgressStartDate: defaultActivitiesInProgressStartDate,
-  tarStartDate: defaultTarStartDate,
-  tcrStartDate: defaultTcrStartDate,
+  fetchingOr: false,
+  fetchingOoa: false,
+  dauStartDate: dailyStartDate,
+  mauStartDate: monthlyStartDate,
+  caStartDate: monthlyStartDate,
+  messagesStartDate: dailyStartDate,
+  aipStartDate: dailyStartDate,
+  tarStartDate: dailyStartDate,
+  tcrStartDate: monthlyStartDate,
+  orStartDate: monthlyStartDate,
+  ooaStartDate: monthlyStartDate,
   dauEndDate: today,
   mauEndDate: today,
-  cumulativeActivitiesEndDate: today,
-  activitiesInProgressEndDate: today,
+  caEndDate: today,
+  aipEndDate: today,
   messagesEndDate: today,
   tarEndDate: today,
   tcrEndDate: today,
+  orEndDate: today,
+  ooaEndDate: today,
 };
+interface OrgStatsArgs extends DateRange {
+  orgIds: number[];
+}
 
 type GetStats = (args: DateRange) => Promise<boolean>;
+type GetOrgStats = (args: OrgStatsArgs) => Promise<boolean>;
 
 interface StatsContext extends StatsState {
   getDauStats?: GetStats;
   getMauStats?: GetStats;
-  getCumulativeActivitiesStats?: GetStats;
-  getActivitiesInProgressStats?: GetStats;
+  getCaStats?: GetStats;
+  getAipStats?: GetStats;
   getMessagesStats?: GetStats;
   getTarStats?: GetStats;
   getTcrStats?: GetStats;
+  getOrStats?: GetOrgStats;
+  getOoaStats?: GetOrgStats;
 }
 
 const initialContext: StatsContext = { ...initialState };
@@ -128,27 +138,21 @@ interface GetMauSuccess extends Action<'GET_MAU_SUCCESS'> {
 }
 interface GetMauFailure extends Action<'GET_MAU_FAILURE'> {}
 
-interface GetCumulativeActivitiesRequest
-  extends Action<'GET_CUM_ACTIVITIES_REQUEST'> {}
-interface GetCumulativeActivitiesSuccess
-  extends Action<'GET_CUM_ACTIVITIES_SUCCESS'> {
+interface GetCaRequest extends Action<'GET_CA_REQUEST'> {}
+interface GetCaSuccess extends Action<'GET_CA_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
-interface GetCumulativeActivitiesFailure
-  extends Action<'GET_CUM_ACTIVITIES_FAILURE'> {}
+interface GetCaFailure extends Action<'GET_CA_FAILURE'> {}
 
-interface GetActivitiesInProgressRequest
-  extends Action<'GET_ACTIVITIES_PROGRESS_REQUEST'> {}
-interface GetActivitiesInProgressSuccess
-  extends Action<'GET_ACTIVITIES_PROGRESS_SUCCESS'> {
+interface GetAipRequest extends Action<'GET_AIP_REQUEST'> {}
+interface GetAipSuccess extends Action<'GET_AIP_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
-interface GetActivitiesInProgressFailure
-  extends Action<'GET_ACTIVITIES_PROGRESS_FAILURE'> {}
+interface GetAipFailure extends Action<'GET_AIP_FAILURE'> {}
 
 interface GetMessagesRequest extends Action<'GET_MESSAGES_REQUEST'> {}
 interface GetMessagesSuccess extends Action<'GET_MESSAGES_SUCCESS'> {
@@ -174,6 +178,22 @@ interface GetTcrSuccess extends Action<'GET_TCR_SUCCESS'> {
 }
 interface GetTcrFailure extends Action<'GET_TCR_FAILURE'> {}
 
+interface GetOrRequest extends Action<'GET_OR_REQUEST'> {}
+interface GetOrSuccess extends Action<'GET_OR_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetOrFailure extends Action<'GET_OR_FAILURE'> {}
+
+interface GetOoaRequest extends Action<'GET_OOA_REQUEST'> {}
+interface GetOoaSuccess extends Action<'GET_OOA_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetOoaFailure extends Action<'GET_OOA_FAILURE'> {}
+
 type Actions =
   | GetDauRequest
   | GetDauSuccess
@@ -181,12 +201,12 @@ type Actions =
   | GetMauRequest
   | GetMauSuccess
   | GetMauFailure
-  | GetCumulativeActivitiesRequest
-  | GetCumulativeActivitiesSuccess
-  | GetCumulativeActivitiesFailure
-  | GetActivitiesInProgressRequest
-  | GetActivitiesInProgressSuccess
-  | GetActivitiesInProgressFailure
+  | GetCaRequest
+  | GetCaSuccess
+  | GetCaFailure
+  | GetAipRequest
+  | GetAipSuccess
+  | GetAipFailure
   | GetMessagesRequest
   | GetMessagesSuccess
   | GetMessagesFailure
@@ -195,7 +215,13 @@ type Actions =
   | GetTarFailure
   | GetTcrRequest
   | GetTcrSuccess
-  | GetTcrFailure;
+  | GetTcrFailure
+  | GetOrRequest
+  | GetOrSuccess
+  | GetOrFailure
+  | GetOoaRequest
+  | GetOoaSuccess
+  | GetOoaFailure;
 
 const statsReducer = (state: StatsState, action: Actions): StatsState => {
   switch (action.type) {
@@ -235,41 +261,41 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
         ...state,
         fetchingMau: false,
       };
-    case 'GET_CUM_ACTIVITIES_REQUEST':
+    case 'GET_CA_REQUEST':
       return {
         ...state,
-        fetchingCumulativeActivities: true,
+        fetchingCa: true,
       };
-    case 'GET_CUM_ACTIVITIES_SUCCESS':
+    case 'GET_CA_SUCCESS':
       return {
         ...state,
-        fetchingCumulativeActivities: false,
-        cumulativeActivitiesStats: action.dto,
-        cumulativeActivitiesEndDate: action.endDate,
-        cumulativeActivitiesStartDate: action.startDate,
+        fetchingCa: false,
+        caStats: action.dto,
+        caEndDate: action.endDate,
+        caStartDate: action.startDate,
       };
-    case 'GET_CUM_ACTIVITIES_FAILURE':
+    case 'GET_CA_FAILURE':
       return {
         ...state,
-        fetchingCumulativeActivities: false,
+        fetchingCa: false,
       };
-    case 'GET_ACTIVITIES_PROGRESS_REQUEST':
+    case 'GET_AIP_REQUEST':
       return {
         ...state,
-        fetchingActivitiesInProgress: true,
+        fetchingAip: true,
       };
-    case 'GET_ACTIVITIES_PROGRESS_SUCCESS':
+    case 'GET_AIP_SUCCESS':
       return {
         ...state,
-        fetchingActivitiesInProgress: false,
-        activitiesInProgressStats: action.dto,
-        activitiesInProgressEndDate: action.endDate,
-        activitiesInProgressStartDate: action.startDate,
+        fetchingAip: false,
+        aipStats: action.dto,
+        aipEndDate: action.endDate,
+        aipStartDate: action.startDate,
       };
-    case 'GET_ACTIVITIES_PROGRESS_FAILURE':
+    case 'GET_AIP_FAILURE':
       return {
         ...state,
-        fetchingActivitiesInProgress: false,
+        fetchingAip: false,
       };
     case 'GET_MESSAGES_REQUEST':
       return {
@@ -324,6 +350,42 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
       return {
         ...state,
         fetchingTcr: false,
+      };
+    case 'GET_OR_REQUEST':
+      return {
+        ...state,
+        fetchingOr: true,
+      };
+    case 'GET_OR_SUCCESS':
+      return {
+        ...state,
+        fetchingOr: false,
+        orStats: action.dto,
+        orEndDate: action.endDate,
+        orStartDate: action.startDate,
+      };
+    case 'GET_OR_FAILURE':
+      return {
+        ...state,
+        fetchingOr: false,
+      };
+    case 'GET_OOA_REQUEST':
+      return {
+        ...state,
+        fetchingOoa: true,
+      };
+    case 'GET_OOA_SUCCESS':
+      return {
+        ...state,
+        fetchingOoa: false,
+        ooaStats: action.dto,
+        ooaEndDate: action.endDate,
+        ooaStartDate: action.startDate,
+      };
+    case 'GET_OOA_FAILURE':
+      return {
+        ...state,
+        fetchingOoa: false,
       };
     default:
       return state;
@@ -391,56 +453,52 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
-  const getCumulativeActivitiesStats: GetStats = async (params) => {
-    dispatch({ type: 'GET_CUM_ACTIVITIES_REQUEST' });
+  const getCaStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_CA_REQUEST' });
 
     try {
-      const { status, data } = await statsService.getCumulativeActivitiesStats(
-        params
-      );
+      const { status, data } = await statsService.getCaStats(params);
 
       if (status === 200) {
         dispatch({
-          type: 'GET_CUM_ACTIVITIES_SUCCESS',
+          type: 'GET_CA_SUCCESS',
           dto: data,
           startDate: params.startDate,
           endDate: params.endDate,
         });
         return true;
       } else {
-        dispatch({ type: 'GET_CUM_ACTIVITIES_FAILURE' });
+        dispatch({ type: 'GET_CA_FAILURE' });
         return false;
       }
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'GET_CUM_ACTIVITIES_FAILURE' });
+      dispatch({ type: 'GET_CA_FAILURE' });
       return false;
     }
   };
 
-  const getActivitiesInProgressStats: GetStats = async (params) => {
-    dispatch({ type: 'GET_ACTIVITIES_PROGRESS_REQUEST' });
+  const getAipStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_AIP_REQUEST' });
 
     try {
-      const { status, data } = await statsService.getActivitiesInProgressStats(
-        params
-      );
+      const { status, data } = await statsService.getAipStats(params);
 
       if (status === 200) {
         dispatch({
-          type: 'GET_ACTIVITIES_PROGRESS_SUCCESS',
+          type: 'GET_AIP_SUCCESS',
           dto: data,
           startDate: params.startDate,
           endDate: params.endDate,
         });
         return true;
       } else {
-        dispatch({ type: 'GET_ACTIVITIES_PROGRESS_FAILURE' });
+        dispatch({ type: 'GET_AIP_FAILURE' });
         return false;
       }
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'GET_ACTIVITIES_PROGRESS_FAILURE' });
+      dispatch({ type: 'GET_AIP_FAILURE' });
       return false;
     }
   };
@@ -520,28 +578,82 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getOrStats: GetOrgStats = async (args) => {
+    dispatch({ type: 'GET_OR_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getOrgStats({
+        type: 'referrers',
+        ...args,
+      });
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_OR_SUCCESS',
+          dto: data,
+          startDate: args.startDate,
+          endDate: args.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_OR_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_OR_FAILURE' });
+      return false;
+    }
+  };
+
+  const getOoaStats: GetOrgStats = async (args) => {
+    dispatch({ type: 'GET_OOA_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getOrgStats({
+        type: 'org-admins',
+        ...args,
+      });
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_OOA_SUCCESS',
+          dto: data,
+          startDate: args.startDate,
+          endDate: args.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_OOA_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_OOA_FAILURE' });
+      return false;
+    }
+  };
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
-    getDauStats({ startDate: defaultDauStartDate, endDate: today });
+    getDauStats({ startDate: dailyStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getMauStats({ startDate: defaultMauStartDate, endDate: today });
+    getMauStats({ startDate: monthlyStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getCumulativeActivitiesStats({
-      startDate: defaultTcrStartDate,
-      endDate: today,
-    });
+    getCaStats({ startDate: monthlyStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getActivitiesInProgressStats({
-      startDate: defaultActivitiesInProgressStartDate,
-      endDate: today,
-    });
+    getAipStats({ startDate: dailyStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getMessagesStats({ startDate: defaultMessagesStartDate, endDate: today });
+    getMessagesStats({ startDate: dailyStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getTarStats({ startDate: defaultTarStartDate, endDate: today });
+    getTarStats({ startDate: dailyStartDate, endDate: today });
     // noinspection JSIgnoredPromiseFromCall
-    getTcrStats({ startDate: defaultTcrStartDate, endDate: today });
+    getTcrStats({ startDate: monthlyStartDate, endDate: today });
+    // noinspection JSIgnoredPromiseFromCall
+    getOrStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
+    // noinspection JSIgnoredPromiseFromCall
+    getOoaStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
   }, []);
 
   // -------------------------- Render ------------------------------------- //
@@ -551,11 +663,13 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         ...state,
         getDauStats,
         getMauStats,
-        getCumulativeActivitiesStats,
-        getActivitiesInProgressStats,
+        getCaStats,
+        getAipStats,
         getMessagesStats,
         getTarStats,
         getTcrStats,
+        getOrStats,
+        getOoaStats,
       }}
     >
       {children}
