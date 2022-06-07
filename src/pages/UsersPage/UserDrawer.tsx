@@ -43,6 +43,7 @@ import {
 } from '../../config/textConstants';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { useDrawerStyles } from '../styles';
+import { convertPartnerToTutor } from '../../services/usersService';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -91,6 +92,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
     }
 
     return tutor;
+  };
+
+  const handleChangeRoleClick = async (partnerId: number) => {
+    const success = await convertPartnerToTutor(partnerId);
+    if (success) {
+      alert("User's role changed to Tutor");
+    }
   };
 
   // ----------------------------- Render ---------------------------------------- //
@@ -278,6 +286,21 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               />
             </ListItem>
           )}
+        {!!extendedUser && extendedUser.userRole.includes(UserRole.partner) && (
+          <ListItem>
+            <Button
+              fullWidth
+              color="secondary"
+              variant="outlined"
+              onClick={() =>
+                !!extendedUser && handleChangeRoleClick(extendedUser.id)
+              }
+              // aria-label="Reset password button"
+            >
+              Change role to tutor
+            </Button>
+          </ListItem>
+        )}
         {!!extendedUser && (
           <ListItem>
             <Button
