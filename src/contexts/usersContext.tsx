@@ -31,7 +31,7 @@ const initialState: UsersState = {
 
 interface UsersContext extends UsersState {
   fetchUsersByUserRole?: (userRole: UserRole) => void;
-  fetchAllRoles?: () => void;
+  fetchAllUsers?: () => void;
 }
 
 interface UsersContextProviderProps {
@@ -211,7 +211,9 @@ export const UsersContextProvider: FC<UsersContextProviderProps> = ({
   }, []);
 
   return (
-    <usersContext.Provider value={{ ...state, fetchUsersByUserRole }}>
+    <usersContext.Provider
+      value={{ ...state, fetchUsersByUserRole, fetchAllUsers }}
+    >
       {children}
     </usersContext.Provider>
   );

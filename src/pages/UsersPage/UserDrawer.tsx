@@ -72,7 +72,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
-  const { tutors } = useUsers();
+  const { tutors, fetchAllUsers } = useUsers();
 
   // ----------------------------- Component functions ------------------------- //
   const getTutor = (id: number) => {
@@ -97,6 +97,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   const handleChangeRoleClick = async (partnerId: number) => {
     const success = await convertPartnerToTutor(partnerId);
     if (success) {
+      fetchAllUsers && fetchAllUsers();
       alert("User's role changed to Tutor");
     }
   };
