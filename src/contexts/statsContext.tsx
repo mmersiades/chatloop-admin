@@ -809,8 +809,6 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         ...args,
       });
 
-      console.log('data', data);
-
       if (status === 200) {
         dispatch({
           type: 'GET_OAI_SUCCESS',

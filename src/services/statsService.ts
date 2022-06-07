@@ -23,7 +23,6 @@ const COLOR_PRIMARY_LIGHT = '#64bfe9';
 const COLOR_PRIMARY = '#43a5e0';
 const COLOR_PRIMARY_DARK = '#3784be';
 const COLOR_PRIMARY_VERY_DARK = '#295486';
-const COLOR_ERROR = '#C51162';
 
 const mockDateLabels: string[] = ['Sat, 21 May', 'Sun, 22 May', 'Mon, 23 May'];
 
@@ -32,21 +31,6 @@ const generateDataSet = (
   data: number[],
   backgroundColor: string
 ) => ({ label, data, backgroundColor });
-
-const mockTarStatsDTO: StatsDTO = {
-  labels: mockDateLabels,
-  datasets: [
-    generateDataSet('Total Active Referrals', [6, 2, 8], COLOR_PRIMARY),
-  ],
-};
-
-const mockTcrStatsDTO: StatsDTO = {
-  labels: mockDateLabels,
-  datasets: [
-    generateDataSet('Total Accepted Invitations', [80, 85, 86], COLOR_PRIMARY),
-    generateDataSet('Total Expired Referrals', [-20, -22, -24], COLOR_ERROR),
-  ],
-};
 
 const mockOoaStats: StatsDTO = {
   labels: mockDateLabels,
@@ -203,24 +187,17 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
     headers: { Authorization: authHeader() },
   };
 
-  if (type === 'active-referrals') {
-    await stall(500);
-    return { status: 200, data: mockTarStatsDTO } as AxiosResponse<StatsDTO>;
-  } else if (type === 'cumulative-referrals') {
-    await stall(500);
-    return { status: 200, data: mockTcrStatsDTO } as AxiosResponse<StatsDTO>;
-  } else {
-    try {
-      return await apiChatloopOrg.get(
-        `/rest/admin/stats/${type}?startDate=${
-          startDate.toISOString().split('T')[0]
-        }&endDate=${endDate.toISOString().split('T')[0]}`,
-        requestOptions
-      );
-    } catch (error) {
-      handleError(error);
-    }
+  try {
+    return await apiChatloopOrg.get(
+      `/rest/admin/stats/${type}?startDate=${
+        startDate.toISOString().split('T')[0]
+      }&endDate=${endDate.toISOString().split('T')[0]}`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
   }
+
   return Promise.reject();
 };
 

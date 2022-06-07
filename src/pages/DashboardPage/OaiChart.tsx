@@ -9,12 +9,13 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useStats } from '../../contexts/statsContext';
 import { RangeKeyDict } from 'react-date-range';
-import ChartWrapper from '../../components/base/ChartWrapper';
-import { OAI_TITLE, OR_TITLE } from '../../config/textConstants';
 import { CircularProgress, Grid } from '@material-ui/core';
 import { Line } from 'react-chartjs-2';
+
+import ChartWrapper from '../../components/base/ChartWrapper';
+import { useStats } from '../../contexts/statsContext';
+import { OAI_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
