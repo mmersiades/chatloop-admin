@@ -10,10 +10,11 @@ import {
   Theme,
   Typography,
 } from '@material-ui/core';
-import { ExtendedUser } from '../../@types/interfaces';
-import { convertPartnerToTutor } from '../../services/usersService';
+
 import { useUsers } from '../../contexts/usersContext';
 import { useAppNav } from '../../contexts/appNavContext';
+import { convertPartnerToTutor } from '../../services/usersService';
+import { ExtendedUser } from '../../@types/interfaces';
 import {
   CANCEL,
   CANNOT_UNDO,
@@ -37,9 +38,6 @@ interface Props {
 
 const ChangeRoleDialog: FC<Props> = ({ open, user, handleClose }) => {
   const classes = useStyles();
-  // -------------------------- Component state ---------------------------- //
-
-  // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
   const { fetchAllUsers } = useUsers();
@@ -50,12 +48,11 @@ const ChangeRoleDialog: FC<Props> = ({ open, user, handleClose }) => {
     const success = await convertPartnerToTutor(user.id);
     if (success) {
       fetchAllUsers && fetchAllUsers();
+      handleClose();
       setShowUserDrawer(null);
       alert("User's role changed to Tutor");
     }
   };
-
-  // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
   return (

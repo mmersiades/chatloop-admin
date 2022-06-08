@@ -309,7 +309,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               color="secondary"
               variant="outlined"
               onClick={() => !!extendedUser && setShowResetPasswordDialog(true)}
-              aria-label="Reset password"
+              aria-label="Reset password button"
             >
               {RESET_PASSWORD}
             </Button>
@@ -323,7 +323,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               variant="outlined"
               classes={{ root: drawerStyles.deleteButton }}
               onClick={() => setShowDeleteUserDialog(true)}
-              aria-label="Delete user"
+              aria-label="Delete user button"
             >
               {DELETE}
             </Button>
