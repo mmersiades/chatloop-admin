@@ -290,3 +290,9 @@ export interface AuthTokenClaims {
   user_display_name: string;
   user_id: number;
 }
+
+export interface StatusMessageDTO {
+  status: string;
+  message: string;
+  code: string;
+}

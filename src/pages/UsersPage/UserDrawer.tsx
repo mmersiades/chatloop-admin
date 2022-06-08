@@ -29,6 +29,7 @@ import {
 } from '../../@types/interfaces';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
 import {
+  CHANGE_ROLE,
   CURRENT_ACTIVITIES,
   CURRENT_LEARNERS,
   DELETE,
@@ -43,6 +44,8 @@ import {
 } from '../../config/textConstants';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { useDrawerStyles } from '../styles';
+import { convertPartnerToTutor } from '../../services/usersService';
+import ChangeRoleDialog from '../../components/dialogs/ChangeRoleDialog';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -68,6 +71,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   // ----------------------------- Component state ------------------------------ //
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
   const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false);
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
@@ -117,6 +121,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           open={showResetPasswordDialog}
           user={extendedUser}
           handleClose={() => setShowResetPasswordDialog(false)}
+        />
+      )}
+      {showChangeRoleDialog && extendedUser && (
+        <ChangeRoleDialog
+          open={showChangeRoleDialog}
+          user={extendedUser}
+          handleClose={() => setShowChangeRoleDialog(false)}
         />
       )}
       <AppBar classes={{ root: drawerStyles.appbar }} position="relative">
@@ -278,6 +289,19 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               />
             </ListItem>
           )}
+        {!!extendedUser && extendedUser.userRole.includes(UserRole.partner) && (
+          <ListItem>
+            <Button
+              fullWidth
+              color="secondary"
+              variant="outlined"
+              onClick={() => !!extendedUser && setShowChangeRoleDialog(true)}
+              aria-label="Change role to tutor"
+            >
+              {CHANGE_ROLE}
+            </Button>
+          </ListItem>
+        )}
         {!!extendedUser && (
           <ListItem>
             <Button

@@ -34,6 +34,7 @@ export const SHIFT_ONE_TUTOR = 'Shift one tutor';
 export const SHIFT_TWO_TUTOR = 'Shift two tutor';
 export const REPLACE_TUTOR = 'REPLACE TUTOR';
 export const RESET_PASSWORD = 'RESET PASSWORD';
+export const CHANGE_ROLE = 'CHANGE ROLE TO TUTOR';
 
 // InvitesPage
 export const INVITES_TITLE = 'Manage Invites';
@@ -103,3 +104,9 @@ export const DELETE_USER_DIALOG_TITLE = 'Delete user?';
 
 // RemoveOrgAdminDialog
 export const REMOVE_ORG_ADMIN_TITLE = 'Remove administrator?';
+
+// ChangeRoleDialog
+export const changeRoleTitle = (name: string) =>
+  `Change ${name}'s role to tutor?`;
+export const CHANGE_ROLE_LABEL = 'CHANGE ROLE';
+export const CANNOT_UNDO = 'This cannot be undone.';
