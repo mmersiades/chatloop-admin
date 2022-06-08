@@ -29,6 +29,7 @@ import {
 } from '../../@types/interfaces';
 import stringifyLanguages from '../../helpers/stringifyLanguages';
 import {
+  CHANGE_ROLE,
   CURRENT_ACTIVITIES,
   CURRENT_LEARNERS,
   DELETE,
@@ -44,6 +45,7 @@ import {
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { useDrawerStyles } from '../styles';
 import { convertPartnerToTutor } from '../../services/usersService';
+import ChangeRoleDialog from '../../components/dialogs/ChangeRoleDialog';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -69,10 +71,11 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   // ----------------------------- Component state ------------------------------ //
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
   const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false);
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
-  const { tutors, fetchAllUsers } = useUsers();
+  const { tutors } = useUsers();
 
   // ----------------------------- Component functions ------------------------- //
   const getTutor = (id: number) => {
@@ -92,14 +95,6 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
     }
 
     return tutor;
-  };
-
-  const handleChangeRoleClick = async (partnerId: number) => {
-    const success = await convertPartnerToTutor(partnerId);
-    if (success) {
-      fetchAllUsers && fetchAllUsers();
-      alert("User's role changed to Tutor");
-    }
   };
 
   // ----------------------------- Render ---------------------------------------- //
@@ -126,6 +121,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           open={showResetPasswordDialog}
           user={extendedUser}
           handleClose={() => setShowResetPasswordDialog(false)}
+        />
+      )}
+      {showChangeRoleDialog && extendedUser && (
+        <ChangeRoleDialog
+          open={showChangeRoleDialog}
+          user={extendedUser}
+          handleClose={() => setShowChangeRoleDialog(false)}
         />
       )}
       <AppBar classes={{ root: drawerStyles.appbar }} position="relative">
@@ -293,12 +295,10 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               fullWidth
               color="secondary"
               variant="outlined"
-              onClick={() =>
-                !!extendedUser && handleChangeRoleClick(extendedUser.id)
-              }
-              // aria-label="Reset password button"
+              onClick={() => !!extendedUser && setShowChangeRoleDialog(true)}
+              aria-label="Change role to tutor"
             >
-              Change role to tutor
+              {CHANGE_ROLE}
             </Button>
           </ListItem>
         )}
@@ -309,7 +309,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               color="secondary"
               variant="outlined"
               onClick={() => !!extendedUser && setShowResetPasswordDialog(true)}
-              aria-label="Reset password button"
+              aria-label="Reset password"
             >
               {RESET_PASSWORD}
             </Button>
@@ -323,7 +323,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               variant="outlined"
               classes={{ root: drawerStyles.deleteButton }}
               onClick={() => setShowDeleteUserDialog(true)}
-              aria-label="Delete user button"
+              aria-label="Delete user"
             >
               {DELETE}
             </Button>
