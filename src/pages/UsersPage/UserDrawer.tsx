@@ -44,7 +44,6 @@ import {
 } from '../../config/textConstants';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { useDrawerStyles } from '../styles';
-import { convertPartnerToTutor } from '../../services/usersService';
 import ChangeRoleDialog from '../../components/dialogs/ChangeRoleDialog';
 
 const useStyles = makeStyles(() =>
