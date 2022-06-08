@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 
 import { authHeader } from '../helpers/getAuthHeader';
-import { ExtendedUser } from '../@types/interfaces';
+import { ExtendedUser, StatusMessageDTO } from '../@types/interfaces';
 import { TutorShift, UserRole } from '../@types/enums';
 import { handleError } from '../helpers/handleError';
 import { NewUserPayload } from '../pages/UsersPage/NewUserForm';
@@ -170,5 +170,30 @@ export const resetPassword = async (email: string) => {
   } catch (error) {
     /* istanbul ignore next */
     handleError(error);
+  }
+};
+
+type ConvertPartnerToTutor = (
+  partnerId: number
+) => Promise<AxiosResponse<StatusMessageDTO> | void>;
+
+export const convertPartnerToTutor: ConvertPartnerToTutor = async (
+  partnerId
+) => {
+  const requestOptions = {
+    headers: { Authorization: authHeader() },
+  };
+
+  try {
+    const response = await apiChatloopOrg.post(
+      `/rest/admin/convert-partner?partnerId=${partnerId}`,
+      null,
+      requestOptions
+    );
+    return response;
+  } catch (error) {
+    /* istanbul ignore next */
+    handleError(error);
+    return Promise.resolve();
   }
 };
