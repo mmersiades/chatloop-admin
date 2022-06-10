@@ -13,7 +13,7 @@ import { RangeKeyDict } from 'react-date-range';
 import { Bar } from 'react-chartjs-2';
 
 import { useStats } from '../../contexts/statsContext';
-import ChartWrapper from '../../components/base/ChartWrapper';
+import ChartWrapper from './ChartWrapper';
 import { ACTIVITIES_IN_PROGRESS_TITLE } from '../../config/textConstants';
 
 ChartJS.register(

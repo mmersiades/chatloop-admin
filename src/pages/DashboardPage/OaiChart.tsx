@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -12,8 +12,9 @@ import {
 import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
 import { Line } from 'react-chartjs-2';
+import { isEqual } from 'lodash';
 
-import ChartWrapper from '../../components/base/ChartWrapper';
+import ChartWrapper from './ChartWrapper';
 import { useStats } from '../../contexts/statsContext';
 import { OAI_TITLE } from '../../config/textConstants';
 
@@ -38,24 +39,31 @@ const OaiChart: FC<Props> = () => {
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
+  const [orgIds, setOrgIds] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  let idsRef = useRef<number[]>([]);
 
   // -------------------------- Hooks -------------------------------------- //
   const { getOaiStats, oaiStats, oaiEndDate, oaiStartDate, fetchingOai } =
     useStats();
 
   // -------------------------- Component functions ------------------------ //
-  const handleSelect = async (ranges: RangeKeyDict) => {
-    const { startDate, endDate } = ranges['selection'];
-    const orgIds: number[] = []; // TODO: add org filtering
-    if (startDate && endDate && getOaiStats) {
-      const success = await getOaiStats({
-        startDate,
-        endDate,
+  const updateStats = useCallback(async () => {
+    if (getOaiStats) {
+      await getOaiStats({
+        startDate: startDate || oaiStartDate,
+        endDate: endDate || oaiEndDate,
         orgIds,
       });
-
-      success && setPickerAnchor(null);
     }
+  }, [getOaiStats, startDate, oaiStartDate, endDate, oaiEndDate, orgIds]);
+
+  const handleDateSelect = (ranges: RangeKeyDict) => {
+    const { startDate, endDate } = ranges['selection'];
+    setStartDate(startDate);
+    setEndDate(endDate);
+    setPickerAnchor(null);
   };
 
   const togglePicker = (event: any) => {
@@ -65,6 +73,23 @@ const OaiChart: FC<Props> = () => {
       setPickerAnchor(event.currentTarget);
     }
   };
+  // -------------------------- Effects ------------------------------------ //
+  useEffect(() => {
+    if (!fetchingOai && !isEqual(orgIds, idsRef.current)) {
+      idsRef.current = orgIds;
+      // noinspection JSIgnoredPromiseFromCall
+      updateStats();
+    }
+  }, [orgIds, fetchingOai, updateStats]);
+
+  useEffect(() => {
+    if (startDate && endDate && !fetchingOai) {
+      if (startDate !== oaiStartDate || endDate !== oaiEndDate) {
+        // noinspection JSIgnoredPromiseFromCall
+        updateStats();
+      }
+    }
+  }, [startDate, endDate, updateStats, fetchingOai, oaiStartDate, oaiEndDate]);
 
   // -------------------------- Render ------------------------------------- //
   return (
@@ -73,10 +98,12 @@ const OaiChart: FC<Props> = () => {
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
-      handleSelect={handleSelect}
+      handleSelect={handleDateSelect}
       startDate={oaiStartDate}
       endDate={oaiEndDate}
       anchorEl={pickerAnchor}
+      setOrgIds={setOrgIds}
+      orgIds={orgIds}
     >
       <>
         {fetchingOai || !oaiStats ? (

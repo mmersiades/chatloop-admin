@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -12,8 +12,9 @@ import {
 import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
 import { Line } from 'react-chartjs-2';
+import { isEqual } from 'lodash';
 
-import ChartWrapper from '../../components/base/ChartWrapper';
+import ChartWrapper from './ChartWrapper';
 import { useStats } from '../../contexts/statsContext';
 import { OAR_TITLE } from '../../config/textConstants';
 
@@ -38,24 +39,31 @@ const OarChart: FC<Props> = () => {
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
+  const [orgIds, setOrgIds] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  let idsRef = useRef<number[]>([]);
 
   // -------------------------- Hooks -------------------------------------- //
   const { getOarStats, oarStats, oarEndDate, oarStartDate, fetchingOar } =
     useStats();
 
   // -------------------------- Component functions ------------------------ //
-  const handleSelect = async (ranges: RangeKeyDict) => {
-    const { startDate, endDate } = ranges['selection'];
-    const orgIds: number[] = []; // TODO: add org filtering
-    if (startDate && endDate && getOarStats) {
-      const success = await getOarStats({
-        startDate,
-        endDate,
+  const updateStats = useCallback(async () => {
+    if (getOarStats) {
+      await getOarStats({
+        startDate: startDate || oarStartDate,
+        endDate: endDate || oarEndDate,
         orgIds,
       });
-
-      success && setPickerAnchor(null);
     }
+  }, [getOarStats, startDate, oarStartDate, endDate, oarEndDate, orgIds]);
+
+  const handleDateSelect = (ranges: RangeKeyDict) => {
+    const { startDate, endDate } = ranges['selection'];
+    setStartDate(startDate);
+    setEndDate(endDate);
+    setPickerAnchor(null);
   };
 
   const togglePicker = (event: any) => {
@@ -66,6 +74,24 @@ const OarChart: FC<Props> = () => {
     }
   };
 
+  // -------------------------- Effects ------------------------------------ //
+  useEffect(() => {
+    if (!fetchingOar && !isEqual(orgIds, idsRef.current)) {
+      idsRef.current = orgIds;
+      // noinspection JSIgnoredPromiseFromCall
+      updateStats();
+    }
+  }, [orgIds, fetchingOar, updateStats]);
+
+  useEffect(() => {
+    if (startDate && endDate && !fetchingOar) {
+      if (startDate !== oarStartDate || endDate !== oarEndDate) {
+        // noinspection JSIgnoredPromiseFromCall
+        updateStats();
+      }
+    }
+  }, [startDate, endDate, updateStats, fetchingOar, oarStartDate, oarEndDate]);
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -73,10 +99,12 @@ const OarChart: FC<Props> = () => {
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
-      handleSelect={handleSelect}
+      handleSelect={handleDateSelect}
       startDate={oarStartDate}
       endDate={oarEndDate}
       anchorEl={pickerAnchor}
+      setOrgIds={setOrgIds}
+      orgIds={orgIds}
     >
       <>
         {fetchingOar || !oarStats ? (

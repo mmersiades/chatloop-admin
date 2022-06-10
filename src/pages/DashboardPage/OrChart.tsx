@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -12,8 +12,9 @@ import {
 import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
 import { Line } from 'react-chartjs-2';
+import { isEqual } from 'lodash';
 
-import ChartWrapper from '../../components/base/ChartWrapper';
+import ChartWrapper from './ChartWrapper';
 import { useStats } from '../../contexts/statsContext';
 import { OR_TITLE } from '../../config/textConstants';
 
@@ -38,24 +39,31 @@ const OrChart: FC<Props> = () => {
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
+  const [orgIds, setOrgIds] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  let idsRef = useRef<number[]>([]);
 
   // -------------------------- Hooks -------------------------------------- //
   const { getOrStats, orStats, orEndDate, orStartDate, fetchingOr } =
     useStats();
 
   // -------------------------- Component functions ------------------------ //
-  const handleSelect = async (ranges: RangeKeyDict) => {
-    const { startDate, endDate } = ranges['selection'];
-    const orgIds: number[] = []; // TODO: add org filtering
-    if (startDate && endDate && getOrStats) {
-      const success = await getOrStats({
-        startDate,
-        endDate,
+  const updateStats = useCallback(async () => {
+    if (getOrStats) {
+      await getOrStats({
+        startDate: startDate || orStartDate,
+        endDate: endDate || orEndDate,
         orgIds,
       });
-
-      success && setPickerAnchor(null);
     }
+  }, [getOrStats, startDate, orStartDate, endDate, orEndDate, orgIds]);
+
+  const handleDateSelect = (ranges: RangeKeyDict) => {
+    const { startDate, endDate } = ranges['selection'];
+    setStartDate(startDate);
+    setEndDate(endDate);
+    setPickerAnchor(null);
   };
 
   const togglePicker = (event: any) => {
@@ -66,6 +74,24 @@ const OrChart: FC<Props> = () => {
     }
   };
 
+  // -------------------------- Effects ------------------------------------ //
+  useEffect(() => {
+    if (!fetchingOr && !isEqual(orgIds, idsRef.current)) {
+      idsRef.current = orgIds;
+      // noinspection JSIgnoredPromiseFromCall
+      updateStats();
+    }
+  }, [orgIds, fetchingOr, updateStats]);
+
+  useEffect(() => {
+    if (startDate && endDate && !fetchingOr) {
+      if (startDate !== orStartDate || endDate !== orEndDate) {
+        // noinspection JSIgnoredPromiseFromCall
+        updateStats();
+      }
+    }
+  }, [startDate, endDate, updateStats, fetchingOr, orStartDate, orEndDate]);
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -73,10 +99,12 @@ const OrChart: FC<Props> = () => {
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
-      handleSelect={handleSelect}
+      handleSelect={handleDateSelect}
       startDate={orStartDate}
       endDate={orEndDate}
       anchorEl={pickerAnchor}
+      setOrgIds={setOrgIds}
+      orgIds={orgIds}
     >
       <>
         {fetchingOr || !orStats ? (
