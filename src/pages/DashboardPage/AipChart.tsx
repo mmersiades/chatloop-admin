@@ -8,12 +8,13 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useStats } from '../../contexts/statsContext';
-import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
+import { RangeKeyDict } from 'react-date-range';
 import { Bar } from 'react-chartjs-2';
-import ChartWrapper from '../../components/base/ChartWrapper';
-import { CUMULATIVE_ACTIVITIES_TITLE } from '../../config/textConstants';
+
+import { useStats } from '../../contexts/statsContext';
+import ChartWrapper from './ChartWrapper';
+import { ACTIVITIES_IN_PROGRESS_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
@@ -38,29 +39,21 @@ export const options = {
 
 interface Props {}
 
-const CumulativeActivitiesChart: FC<Props> = () => {
+const AipChart: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
   const [pickerAnchor, setPickerAnchor] = useState<HTMLButtonElement | null>(
     null
   );
 
-  // -------------------------- 3rd party hooks ---------------------------- //
-
   // -------------------------- Hooks -------------------------------------- //
-  const {
-    getCumulativeActivitiesStats,
-    cumulativeActivitiesStats,
-    cumulativeActivitiesEndDate,
-    cumulativeActivitiesStartDate,
-    fetchingCumulativeActivities,
-  } = useStats();
+  const { getAipStats, aipStats, aipEndDate, aipStartDate, fetchingAip } =
+    useStats();
 
   // -------------------------- Component functions ------------------------ //
-
   const handleSelect = async (ranges: RangeKeyDict) => {
     const { startDate, endDate } = ranges['selection'];
-    if (startDate && endDate && getCumulativeActivitiesStats) {
-      const success = await getCumulativeActivitiesStats({
+    if (startDate && endDate && getAipStats) {
+      const success = await getAipStats({
         startDate,
         endDate,
       });
@@ -77,22 +70,20 @@ const CumulativeActivitiesChart: FC<Props> = () => {
     }
   };
 
-  // -------------------------- Effects ------------------------------------ //
-
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
-      title={CUMULATIVE_ACTIVITIES_TITLE}
+      title={ACTIVITIES_IN_PROGRESS_TITLE}
       open={Boolean(pickerAnchor)}
       togglePicker={togglePicker}
       handleClose={() => setPickerAnchor(null)}
       handleSelect={handleSelect}
-      startDate={cumulativeActivitiesStartDate}
-      endDate={cumulativeActivitiesEndDate}
+      startDate={aipStartDate}
+      endDate={aipEndDate}
       anchorEl={pickerAnchor}
     >
       <>
-        {fetchingCumulativeActivities || !cumulativeActivitiesStats ? (
+        {fetchingAip || !aipStats ? (
           <Grid
             container
             alignItems="center"
@@ -102,11 +93,11 @@ const CumulativeActivitiesChart: FC<Props> = () => {
             <CircularProgress />
           </Grid>
         ) : (
-          <Bar data={cumulativeActivitiesStats} options={options} />
+          <Bar data={aipStats} options={options} />
         )}
       </>
     </ChartWrapper>
   );
 };
 
-export default CumulativeActivitiesChart;
+export default AipChart;

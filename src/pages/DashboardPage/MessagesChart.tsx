@@ -12,7 +12,7 @@ import { useStats } from '../../contexts/statsContext';
 import { RangeKeyDict } from 'react-date-range';
 import { CircularProgress, Grid } from '@material-ui/core';
 import { Bar } from 'react-chartjs-2';
-import ChartWrapper from '../../components/base/ChartWrapper';
+import ChartWrapper from './ChartWrapper';
 import { MESSAGES_TITLE } from '../../config/textConstants';
 
 ChartJS.register(

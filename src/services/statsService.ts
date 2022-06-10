@@ -4,10 +4,33 @@ import { authHeader } from '../helpers/getAuthHeader';
 import { handleError } from '../helpers/handleError';
 import apiChatloopOrg from '../config/axiosConfig';
 
+/*
+ * ACRONYMS
+ * dau = daily active user
+ * mau = monthly active user
+ * tar = total active referrals
+ * tcr = total cumulative referrals
+ * or = organisation referrer
+ * ooa = organisation org admin
+ * ca = cumulative activities
+ * aip = activities in progress
+ * oar = org active referrals
+ * oer = org expired referrals
+ * oai = org accepted invitations
+ * */
+
+type OrgStatType =
+  | 'referrers'
+  | 'org-admins'
+  | 'active-referrals'
+  | 'accepted-invitations'
+  | 'expired-referrals';
+
 interface DataSetDTO {
   label: string;
   data: number[];
   backgroundColor: string;
+  borderColor?: string;
 }
 
 export interface StatsDTO {
@@ -20,42 +43,66 @@ export interface DateRange {
   endDate: Date;
 }
 
-type GetDauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
-type GetMauStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
-type GetCumulativeActivitiesStats = (
-  params: DateRange
-) => Promise<AxiosResponse<StatsDTO>>;
-type GetActivitiesInProgressStats = (
-  params: DateRange
-) => Promise<AxiosResponse<StatsDTO>>;
-type GetMessagesStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
-
-interface StatsService {
-  getDauStats: GetDauStats;
-  getMauStats: GetMauStats;
-  getCumulativeActivitiesStats: GetCumulativeActivitiesStats;
-  getActivitiesInProgressStats: GetActivitiesInProgressStats;
-  getMessagesStats: GetMessagesStats;
+interface OrgStatsArgs extends DateRange {
+  type: OrgStatType;
+  orgIds: number[];
 }
 
-const getDauStats: GetDauStats = async ({ startDate, endDate }) =>
+type GetStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
+type GetOrgStats = (args: OrgStatsArgs) => Promise<AxiosResponse<StatsDTO>>;
+
+interface StatsService {
+  getDauStats: GetStats;
+  getMauStats: GetStats;
+  getCaStats: GetStats;
+  getAipStats: GetStats;
+  getMessagesStats: GetStats;
+  getTarStats: GetStats;
+  getTcrStats: GetStats;
+  getOrgStats: GetOrgStats;
+}
+
+const getDauStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('dau', startDate, endDate);
 
-const getMauStats: GetMauStats = async ({ startDate, endDate }) =>
+const getMauStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('mau', startDate, endDate);
 
-const getCumulativeActivitiesStats: GetCumulativeActivitiesStats = async ({
-  startDate,
-  endDate,
-}) => await getStats('cumulative-activities', startDate, endDate);
+const getCaStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('cumulative-activities', startDate, endDate);
 
-const getActivitiesInProgressStats: GetActivitiesInProgressStats = async ({
-  startDate,
-  endDate,
-}) => await getStats('in-progress-activities', startDate, endDate);
+const getAipStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('in-progress-activities', startDate, endDate);
 
-const getMessagesStats: GetMessagesStats = async ({ startDate, endDate }) =>
+const getMessagesStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('messages', startDate, endDate);
+
+const getTarStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('active-referrals', startDate, endDate);
+
+const getTcrStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('cumulative-referrals', startDate, endDate);
+
+const getOrgStats: GetOrgStats = async ({
+  type,
+  orgIds,
+  startDate,
+  endDate,
+}: OrgStatsArgs) => {
+  const requestOptions = {
+    headers: { Authorization: authHeader() },
+  };
+
+  const body = { orgIds };
+
+  return await apiChatloopOrg.post(
+    `/rest/admin/stats/orgs?type=${type}&startDate=${
+      startDate.toISOString().split('T')[0]
+    }&endDate=${endDate.toISOString().split('T')[0]}`,
+    body,
+    requestOptions
+  );
+};
 
 const getStats = async (type: string, startDate: Date, endDate: Date) => {
   const requestOptions = {
@@ -72,15 +119,19 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
   } catch (error) {
     handleError(error);
   }
+
   return Promise.reject();
 };
 
 const statsService: StatsService = {
   getDauStats,
   getMauStats,
-  getCumulativeActivitiesStats,
-  getActivitiesInProgressStats,
+  getCaStats,
+  getAipStats,
   getMessagesStats,
+  getTarStats,
+  getTcrStats,
+  getOrgStats,
 };
 
 export default statsService;

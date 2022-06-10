@@ -10,9 +10,16 @@ import {
 import WithNavbar from '../../components/WithNavbar';
 import DauChart from './DauChart';
 import MauChart from './MauChart';
-import CumulativeActivitiesChart from './CumulativeActivitiesChart';
+import CaChart from './CaChart';
 import MessagesChart from './MessagesChart';
-import ActivitiesInProgressChart from './ActivitiesInProgressChart';
+import AipChart from './AipChart';
+import TarChart from './TarChart';
+import TcrChart from './TcrChart';
+import OrChart from './OrChart';
+import OoaChart from './OoaChart';
+import OarChart from './OarChart';
+import OerChart from './OerChart';
+import OaiChart from './OaiChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -45,17 +52,52 @@ const DashboardPage: FC = () => {
       </Card>
       <Card classes={{ root: classes.card }}>
         <CardContent>
-          <ActivitiesInProgressChart />
+          <AipChart />
         </CardContent>
       </Card>
       <Card classes={{ root: classes.card }}>
         <CardContent>
-          <CumulativeActivitiesChart />
+          <CaChart />
         </CardContent>
       </Card>
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <MessagesChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TarChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TcrChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OrChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OoaChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OarChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OerChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <OaiChart />
         </CardContent>
       </Card>
     </>

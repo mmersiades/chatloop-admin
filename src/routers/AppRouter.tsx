@@ -14,6 +14,7 @@ import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
 import { ReferralsProvider } from '../contexts/referralsContext';
 import { StatsProvider } from '../contexts/statsContext';
+import { CountriesProvider } from '../contexts/countriesContext';
 
 export const AppRouter = () => {
   return (
@@ -22,9 +23,11 @@ export const AppRouter = () => {
       <PrivateRoute
         path="/dashboard"
         component={() => (
-          <StatsProvider>
-            <DashboardPage />
-          </StatsProvider>
+          <CountriesProvider>
+            <StatsProvider>
+              <DashboardPage />
+            </StatsProvider>
+          </CountriesProvider>
         )}
       />
       <PrivateRoute path="/account-settings" component={AccountSettings} />
