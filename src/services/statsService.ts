@@ -38,6 +38,14 @@ export interface StatsDTO {
   datasets: DataSetDTO[];
 }
 
+export interface CapacitiesDTO {
+  tutorMaxLearnerCapacity: number;
+  learnerCount: number;
+  partnerMaxActivityCapacity: number;
+  learnerMaxActivityCapacity: number;
+  activityCount: number;
+}
+
 export interface DateRange {
   startDate: Date;
   endDate: Date;
@@ -50,6 +58,7 @@ interface OrgStatsArgs extends DateRange {
 
 type GetStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetOrgStats = (args: OrgStatsArgs) => Promise<AxiosResponse<StatsDTO>>;
+type GetCapacityStats = () => Promise<AxiosResponse<CapacitiesDTO>>;
 
 interface StatsService {
   getDauStats: GetStats;
@@ -60,6 +69,7 @@ interface StatsService {
   getTarStats: GetStats;
   getTcrStats: GetStats;
   getOrgStats: GetOrgStats;
+  getCapacityStats: GetCapacityStats;
 }
 
 const getDauStats: GetStats = async ({ startDate, endDate }) =>
@@ -123,6 +133,23 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
   return Promise.reject();
 };
 
+const getCapacityStats: GetCapacityStats = async () => {
+  const requestOptions = {
+    headers: { Authorization: authHeader() },
+  };
+
+  try {
+    return await apiChatloopOrg.get(
+      `/rest/admin/stats/capacities`,
+      requestOptions
+    );
+  } catch (error) {
+    handleError(error);
+  }
+
+  return Promise.reject();
+};
+
 const statsService: StatsService = {
   getDauStats,
   getMauStats,
@@ -132,6 +159,7 @@ const statsService: StatsService = {
   getTarStats,
   getTcrStats,
   getOrgStats,
+  getCapacityStats,
 };
 
 export default statsService;

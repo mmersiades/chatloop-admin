@@ -26,9 +26,9 @@ const Root: FC<RootProps> = ({ children }): JSX.Element => {
           <AppPropertiesProvider>
             <AuthProvider>
               <LanguagesContextProvider>
-                <OrganisationsProvider>
-                  <AppNavContextProvider>{children}</AppNavContextProvider>
-                </OrganisationsProvider>
+                <AppNavContextProvider>
+                  <OrganisationsProvider>{children}</OrganisationsProvider>
+                </AppNavContextProvider>
               </LanguagesContextProvider>
             </AuthProvider>
           </AppPropertiesProvider>
