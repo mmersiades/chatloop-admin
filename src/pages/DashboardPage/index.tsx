@@ -20,6 +20,16 @@ import OoaChart from './OoaChart';
 import OarChart from './OarChart';
 import OerChart from './OerChart';
 import OaiChart from './OaiChart';
+import CapacityCard from './CapacityCard';
+import { useStats } from '../../contexts/statsContext';
+import {
+  ACTIVITY_CAPACITY_TITLE,
+  CURRENT_ACTIVITIES_LABEL,
+  CURRENT_LEARNERS_LABEL,
+  LEARNER_CAPACITY_TITLE,
+  MAX_ACTIVITIES_LABEL,
+  MAX_LEARNERS_LABEL,
+} from '../../config/textConstants';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -38,8 +48,36 @@ const useStyles = makeStyles(({ spacing }: Theme) =>
 const DashboardPage: FC = () => {
   const classes = useStyles();
 
+  const { capacities } = useStats();
+
   return (
     <>
+      {capacities && (
+        <Card classes={{ root: classes.card }}>
+          <CardContent>
+            <CapacityCard
+              title={LEARNER_CAPACITY_TITLE}
+              maxLabel={MAX_LEARNERS_LABEL}
+              maxValue={capacities.tutorMaxLearnerCapacity}
+              currentLabel={CURRENT_LEARNERS_LABEL}
+              currentValue={capacities.learnerCount}
+            />
+          </CardContent>
+        </Card>
+      )}
+      {capacities && (
+        <Card classes={{ root: classes.card }}>
+          <CardContent>
+            <CapacityCard
+              title={ACTIVITY_CAPACITY_TITLE}
+              maxLabel={MAX_ACTIVITIES_LABEL}
+              maxValue={capacities.partnerMaxActivityCapacity}
+              currentLabel={CURRENT_ACTIVITIES_LABEL}
+              currentValue={capacities.activityCount}
+            />
+          </CardContent>
+        </Card>
+      )}
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <DauChart />

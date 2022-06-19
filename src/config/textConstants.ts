@@ -94,6 +94,13 @@ export const OOA_TITLE = 'Org Admins In Organisations';
 export const OAR_TITLE = 'Active Referrals For Organisations';
 export const OER_TITLE = 'Expired Referrals For Organisations';
 export const OAI_TITLE = 'Accepted Invitations For Organisations';
+export const LEARNER_CAPACITY_TITLE = 'Learner Capacity';
+export const ACTIVITY_CAPACITY_TITLE = 'Activity Capacity';
+export const MAX_LEARNERS_LABEL = 'Max learners';
+export const CURRENT_LEARNERS_LABEL = 'Current learners';
+export const MAX_ACTIVITIES_LABEL = 'Max activities';
+export const CURRENT_ACTIVITIES_LABEL = 'Current activities';
+export const CAPACITY_LABEL = 'Capacity';
 
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';

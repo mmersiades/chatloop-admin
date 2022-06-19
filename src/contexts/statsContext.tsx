@@ -7,7 +7,11 @@ import {
   useReducer,
 } from 'react';
 
-import statsService, { StatsDTO, DateRange } from '../services/statsService';
+import statsService, {
+  StatsDTO,
+  DateRange,
+  CapacitiesDTO,
+} from '../services/statsService';
 import { Action } from '../@types/interfaces';
 
 /*
@@ -38,6 +42,7 @@ interface StatsState {
   fetchingOar: boolean;
   fetchingOer: boolean;
   fetchingOai: boolean;
+  fetchingCapacities: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
   caStartDate: Date;
@@ -74,6 +79,7 @@ interface StatsState {
   oarStats?: StatsDTO;
   oerStats?: StatsDTO;
   oaiStats?: StatsDTO;
+  capacities?: CapacitiesDTO;
 }
 
 const today = new Date();
@@ -95,6 +101,7 @@ const initialState: StatsState = {
   fetchingOar: false,
   fetchingOer: false,
   fetchingOai: false,
+  fetchingCapacities: false,
   dauStartDate: dailyStartDate,
   mauStartDate: monthlyStartDate,
   caStartDate: monthlyStartDate,
@@ -245,6 +252,12 @@ interface GetOaiSuccess extends Action<'GET_OAI_SUCCESS'> {
 }
 interface GetOaiFailure extends Action<'GET_OAI_FAILURE'> {}
 
+interface GetCapacitiesRequest extends Action<'GET_CAPACITIES_REQUEST'> {}
+interface GetCapacitiesSuccess extends Action<'GET_CAPACITIES_SUCCESS'> {
+  capacities: CapacitiesDTO;
+}
+interface GetCapacitiesFailure extends Action<'GET_CAPACITIES_FAILURE'> {}
+
 type Actions =
   | GetDauRequest
   | GetDauSuccess
@@ -281,7 +294,10 @@ type Actions =
   | GetOerFailure
   | GetOaiRequest
   | GetOaiSuccess
-  | GetOaiFailure;
+  | GetOaiFailure
+  | GetCapacitiesRequest
+  | GetCapacitiesSuccess
+  | GetCapacitiesFailure;
 
 const statsReducer = (state: StatsState, action: Actions): StatsState => {
   switch (action.type) {
@@ -500,6 +516,22 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
       return {
         ...state,
         fetchingOai: false,
+      };
+    case 'GET_CAPACITIES_REQUEST':
+      return {
+        ...state,
+        fetchingCapacities: true,
+      };
+    case 'GET_CAPACITIES_SUCCESS':
+      return {
+        ...state,
+        fetchingCapacities: false,
+        capacities: action.capacities,
+      };
+    case 'GET_CAPACITIES_FAILURE':
+      return {
+        ...state,
+        fetchingCapacities: false,
       };
     default:
       return state;
@@ -828,6 +860,29 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getCapacities = async () => {
+    dispatch({ type: 'GET_CAPACITIES_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getCapacityStats();
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_CAPACITIES_SUCCESS',
+          capacities: data,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_CAPACITIES_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_CAPACITIES_FAILURE' });
+      return false;
+    }
+  };
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
@@ -854,6 +909,8 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     getOerStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
     // noinspection JSIgnoredPromiseFromCall
     getOaiStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
+    // noinspection JSIgnoredPromiseFromCall
+    getCapacities();
   }, []);
 
   // -------------------------- Render ------------------------------------- //
