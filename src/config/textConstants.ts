@@ -100,7 +100,8 @@ export const MAX_LEARNERS_LABEL = 'Max learners';
 export const CURRENT_LEARNERS_LABEL = 'Current learners';
 export const MAX_ACTIVITIES_LABEL = 'Max activities';
 export const CURRENT_ACTIVITIES_LABEL = 'Current activities';
-export const CAPACITY_LABEL = 'Capacity';
+export const ACTUAL_CAPACITY_LABEL = 'Actual capacity';
+export const POTENTIAL_CAPACITY_LABEL = 'Potential capacity';
 
 // ResetPasswordDialog
 export const RESET_PASSWORD_DIALOG_TITLE = 'Reset password?';

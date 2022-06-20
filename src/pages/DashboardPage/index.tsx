@@ -24,11 +24,13 @@ import CapacityCard from './CapacityCard';
 import { useStats } from '../../contexts/statsContext';
 import {
   ACTIVITY_CAPACITY_TITLE,
+  ACTUAL_CAPACITY_LABEL,
   CURRENT_ACTIVITIES_LABEL,
   CURRENT_LEARNERS_LABEL,
   LEARNER_CAPACITY_TITLE,
   MAX_ACTIVITIES_LABEL,
   MAX_LEARNERS_LABEL,
+  POTENTIAL_CAPACITY_LABEL,
 } from '../../config/textConstants';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
@@ -57,10 +59,16 @@ const DashboardPage: FC = () => {
           <CardContent>
             <CapacityCard
               title={LEARNER_CAPACITY_TITLE}
-              maxLabel={MAX_LEARNERS_LABEL}
-              maxValue={capacities.tutorMaxLearnerCapacity}
-              currentLabel={CURRENT_LEARNERS_LABEL}
-              currentValue={capacities.learnerCount}
+              label1={MAX_LEARNERS_LABEL}
+              value1={capacities.tutorMaxLearnerCapacity.toString()}
+              label2={CURRENT_LEARNERS_LABEL}
+              value2={capacities.learnerCount.toString()}
+              label3={ACTUAL_CAPACITY_LABEL}
+              value3={`${Math.floor(
+                (capacities.learnerCount / capacities.tutorMaxLearnerCapacity) *
+                  100
+              )}%`}
+              showDanger3
             />
           </CardContent>
         </Card>
@@ -70,10 +78,22 @@ const DashboardPage: FC = () => {
           <CardContent>
             <CapacityCard
               title={ACTIVITY_CAPACITY_TITLE}
-              maxLabel={MAX_ACTIVITIES_LABEL}
-              maxValue={capacities.partnerMaxActivityCapacity}
-              currentLabel={CURRENT_ACTIVITIES_LABEL}
-              currentValue={capacities.activityCount}
+              label1={MAX_ACTIVITIES_LABEL}
+              value1={capacities.partnerMaxActivityCapacity.toString()}
+              label2={POTENTIAL_CAPACITY_LABEL}
+              value2={`${Math.floor(
+                (capacities.learnerMaxActivityCapacity /
+                  capacities.partnerMaxActivityCapacity) *
+                  100
+              )}%`}
+              showDanger2
+              label3={ACTUAL_CAPACITY_LABEL}
+              value3={`${Math.floor(
+                (capacities.activityCount /
+                  capacities.partnerMaxActivityCapacity) *
+                  100
+              )}%`}
+              showDanger3
             />
           </CardContent>
         </Card>
