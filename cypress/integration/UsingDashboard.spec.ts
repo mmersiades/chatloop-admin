@@ -28,6 +28,7 @@ describe('Using the Dashboard', () => {
     cy.contains(MAU_TITLE).should('be.visible');
     cy.contains(ACTIVITIES_IN_PROGRESS_TITLE).should('be.visible');
     cy.contains(CUMULATIVE_ACTIVITIES_TITLE).should('be.visible');
+    cy.contains(MESSAGES_TITLE).should('be.visible');
     cy.contains(TAR_TITLE).should('be.visible');
     cy.contains(TCR_TITLE).should('be.visible');
     cy.contains(OR_TITLE).should('be.visible');
@@ -39,5 +40,3 @@ describe('Using the Dashboard', () => {
     cy.contains(ACTIVITY_CAPACITY_TITLE).should('be.visible');
   });
 });
-
-export default {};
