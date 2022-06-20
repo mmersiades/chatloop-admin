@@ -1,8 +1,6 @@
 import { FC } from 'react';
 import { Grid, Typography } from '@material-ui/core';
 
-import { ACTUAL_CAPACITY_LABEL } from '../../config/textConstants';
-
 interface NumberDisplayProps {
   label: string;
   value: string;
