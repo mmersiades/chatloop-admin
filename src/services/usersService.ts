@@ -197,3 +197,25 @@ export const convertPartnerToTutor: ConvertPartnerToTutor = async (
     return Promise.resolve();
   }
 };
+
+type DeactivateTutor = (tutorId: number) => Promise<boolean>;
+
+export const deactivateTutor: DeactivateTutor = async (tutorId) => {
+  const requestOptions = {
+    headers: { Authorization: authHeader() },
+  };
+
+  try {
+    const response = await apiChatloopOrg.post(
+      `/rest/admin/deactivate-tutor?tutorId=${tutorId}`,
+      null,
+      requestOptions
+    );
+
+    return response.status === 200;
+  } catch (error) {
+    /* istanbul ignore next */
+    handleError(error);
+    return false;
+  }
+};

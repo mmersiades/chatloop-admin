@@ -118,3 +118,9 @@ export const changeRoleTitle = (name: string) =>
   `Change ${name}'s role to tutor?`;
 export const CHANGE_ROLE_LABEL = 'CHANGE ROLE';
 export const CANNOT_UNDO = 'This cannot be undone.';
+
+// DeactivateTutorDialog
+export const DEACTIVATE_TUTOR_TITLE = 'Deactivate tutor?';
+export const LEARNERS_WILL_BE_REASSIGNED =
+  'All of their learners will be assigned to other tutors.';
+export const DEACTIVATE_LABEL = 'Deactivate';

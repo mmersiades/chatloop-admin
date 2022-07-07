@@ -17,6 +17,9 @@ import {
 import { CloseRounded } from '@material-ui/icons';
 
 import DeleteUserDialog from '../../components/dialogs/DeleteUserDialog';
+import ChangeRoleDialog from '../../components/dialogs/ChangeRoleDialog';
+import DeactivateTutorDialog from '../../components/dialogs/DeactivateTutorDialog';
+import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { ShowReplaceTutorDialog } from './Learners';
 import { useAppNav } from '../../contexts/appNavContext';
 import { useUsers } from '../../contexts/usersContext';
@@ -42,9 +45,7 @@ import {
   SHIFT_ONE_TUTOR,
   SHIFT_TWO_TUTOR,
 } from '../../config/textConstants';
-import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { useDrawerStyles } from '../styles';
-import ChangeRoleDialog from '../../components/dialogs/ChangeRoleDialog';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -71,6 +72,8 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
   const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
   const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false);
+  const [showDeactivateTutorDialog, setShowDeactivateTutorDialog] =
+    useState(false);
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
@@ -127,6 +130,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           open={showChangeRoleDialog}
           user={extendedUser}
           handleClose={() => setShowChangeRoleDialog(false)}
+        />
+      )}
+      {showDeactivateTutorDialog && extendedUser && (
+        <DeactivateTutorDialog
+          open={showDeactivateTutorDialog}
+          user={extendedUser}
+          handleClose={() => setShowDeactivateTutorDialog(false)}
         />
       )}
       <AppBar classes={{ root: drawerStyles.appbar }} position="relative">
@@ -298,6 +308,21 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               aria-label="Change role to tutor"
             >
               {CHANGE_ROLE}
+            </Button>
+          </ListItem>
+        )}
+        {!!extendedUser && extendedUser.userRole.includes(UserRole.tutor) && (
+          <ListItem>
+            <Button
+              fullWidth
+              color="secondary"
+              variant="outlined"
+              onClick={() =>
+                !!extendedUser && setShowDeactivateTutorDialog(true)
+              }
+              aria-label="Deactivate tutor"
+            >
+              Deactivate tutor
             </Button>
           </ListItem>
         )}
