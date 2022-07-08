@@ -219,3 +219,25 @@ export const deactivateTutor: DeactivateTutor = async (tutorId) => {
     return false;
   }
 };
+
+type ActivateTutor = (tutorId: number) => Promise<boolean>;
+
+export const activateTutor: ActivateTutor = async (tutorId) => {
+  const requestOptions = {
+    headers: { Authorization: authHeader() },
+  };
+
+  try {
+    const response = await apiChatloopOrg.post(
+      `/rest/admin/activate-tutor?tutorId=${tutorId}`,
+      null,
+      requestOptions
+    );
+
+    return response.status === 200;
+  } catch (error) {
+    /* istanbul ignore next */
+    handleError(error);
+    return false;
+  }
+};

@@ -89,17 +89,32 @@ export type usersAction =
   | SetReferrers;
 
 const usersReducer = (state: UsersState, action: usersAction): UsersState => {
+  const compareByLastActiveDate = (a: any, b: any) => {
+    return Date.parse(a.lastActiveDate) - Date.parse(b.lastActiveDate);
+  };
   switch (action.type) {
     case 'SET_LEARNERS':
-      return { ...state, learners: action.learners };
+      return {
+        ...state,
+        learners: action.learners.sort(compareByLastActiveDate),
+      };
     case 'SET_PARTNERS':
-      return { ...state, partners: action.partners };
+      return {
+        ...state,
+        partners: action.partners.sort(compareByLastActiveDate),
+      };
     case 'SET_TUTORS':
-      return { ...state, tutors: action.tutors };
+      return { ...state, tutors: action.tutors.sort(compareByLastActiveDate) };
     case 'SET_ORG_ADMINS':
-      return { ...state, orgAdmins: action.orgAdmins };
+      return {
+        ...state,
+        orgAdmins: action.orgAdmins.sort(compareByLastActiveDate),
+      };
     case 'SET_REFERRERS':
-      return { ...state, referrers: action.referrers };
+      return {
+        ...state,
+        referrers: action.referrers.sort(compareByLastActiveDate),
+      };
     case 'GET_ALL_USERS_REQUEST':
       return {
         ...state,

@@ -124,3 +124,9 @@ export const DEACTIVATE_TUTOR_TITLE = 'Deactivate tutor?';
 export const LEARNERS_WILL_BE_REASSIGNED =
   'All of their learners will be assigned to other tutors.';
 export const DEACTIVATE_LABEL = 'Deactivate';
+
+// ActivateTutorDialog
+export const ACTIVATE_TUTOR_TITLE = 'Activate tutor?';
+export const LEARNERS_CAN_BE_ASSIGNED =
+  "They'll become available to be assigned learners";
+export const ACTIVATE_LABEL = 'Activate';

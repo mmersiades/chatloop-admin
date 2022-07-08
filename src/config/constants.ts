@@ -35,3 +35,4 @@ export const DEFAULT_ORGANISATIONS_PAGE_SIZE = 25;
 // Aria labels
 export const PHONE_FIELD_AL = 'Enter phone number';
 export const CONFIRM_DEACTIVATE_TUTOR_AL = 'Confirm deactivate tutor';
+export const CONFIRM_ACTIVATE_TUTOR_AL = 'Confirm activate tutor';

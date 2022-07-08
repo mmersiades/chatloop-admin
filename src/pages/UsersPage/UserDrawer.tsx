@@ -46,6 +46,7 @@ import {
   SHIFT_TWO_TUTOR,
 } from '../../config/textConstants';
 import { useDrawerStyles } from '../styles';
+import ActivateTutorDialog from '../../components/dialogs/ActivateTutorDialog';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -74,6 +75,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false);
   const [showDeactivateTutorDialog, setShowDeactivateTutorDialog] =
     useState(false);
+  const [showActivateTutorDialog, setShowActivateTutorDialog] = useState(false);
 
   // ----------------------------- Hooks ---------------------------------------- //
   const { showUserDrawer, setShowUserDrawer, showMenuDrawer } = useAppNav();
@@ -137,6 +139,13 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           open={showDeactivateTutorDialog}
           user={extendedUser}
           handleClose={() => setShowDeactivateTutorDialog(false)}
+        />
+      )}
+      {showActivateTutorDialog && extendedUser && (
+        <ActivateTutorDialog
+          open={showActivateTutorDialog}
+          user={extendedUser}
+          handleClose={() => setShowActivateTutorDialog(false)}
         />
       )}
       <AppBar classes={{ root: drawerStyles.appbar }} position="relative">
@@ -311,21 +320,40 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             </Button>
           </ListItem>
         )}
-        {!!extendedUser && extendedUser.userRole.includes(UserRole.tutor) && (
-          <ListItem>
-            <Button
-              fullWidth
-              color="secondary"
-              variant="outlined"
-              onClick={() =>
-                !!extendedUser && setShowDeactivateTutorDialog(true)
-              }
-              aria-label="Deactivate tutor"
-            >
-              Deactivate tutor
-            </Button>
-          </ListItem>
-        )}
+        {!!extendedUser &&
+          extendedUser.userRole.includes(UserRole.tutor) &&
+          extendedUser.isActive && (
+            <ListItem>
+              <Button
+                fullWidth
+                color="secondary"
+                variant="outlined"
+                onClick={() =>
+                  !!extendedUser && setShowDeactivateTutorDialog(true)
+                }
+                aria-label="Deactivate tutor"
+              >
+                Deactivate tutor
+              </Button>
+            </ListItem>
+          )}
+        {!!extendedUser &&
+          extendedUser.userRole.includes(UserRole.tutor) &&
+          !extendedUser.isActive && (
+            <ListItem>
+              <Button
+                fullWidth
+                color="secondary"
+                variant="outlined"
+                onClick={() =>
+                  !!extendedUser && setShowActivateTutorDialog(true)
+                }
+                aria-label="Activate tutor"
+              >
+                Activate tutor
+              </Button>
+            </ListItem>
+          )}
         {!!extendedUser && (
           <ListItem>
             <Button
