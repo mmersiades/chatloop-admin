@@ -41,7 +41,7 @@ describe('Using the UsersPage', () => {
     cy.contains('button', TUTORS_TAB).click();
     cy.contains('tutor0@gmail.com').should('be.visible');
     cy.contains('SHIFT_ONE').should('be.visible');
-    cy.contains('1-3 of 3').should('be.visible');
+    cy.contains('1-5 of 5').should('be.visible');
   });
 
   it("should show a Learner's details", () => {

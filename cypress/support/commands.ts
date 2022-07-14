@@ -62,6 +62,7 @@ Cypress.Commands.add('resetDb', () => {
       headers: {
         Authorization: `Bearer ${body.token}`,
       },
+      timeout: 60000,
     }).then(({ body, status }) => {
       // Makes sure the test run stops if the db reset fails
       expect(status).to.equal(200);

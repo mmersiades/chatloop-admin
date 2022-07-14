@@ -69,6 +69,8 @@ export interface User {
   email: string;
   roles: Array<UserRole>;
   uiLanguage: string;
+  isActive: boolean;
+  lastActiveDate: string;
 }
 
 export interface Learner extends User {

@@ -52,6 +52,9 @@ const useStyles = makeStyles(({ palette, transitions }: Theme) =>
       width: '100%',
       tableLayout: 'fixed',
     },
+    inactiveCell: {
+      color: palette.grey[300],
+    },
     headerTableCell: {
       color: palette.common.white,
     },
@@ -227,11 +230,39 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                   setShowUserDrawer(user.id);
                 }}
               >
-                <TableCell align="center">{user.id}</TableCell>
-                <TableCell align="center">{user.displayName}</TableCell>
-                <TableCell align="center">{user.email}</TableCell>
+                <TableCell
+                  align="center"
+                  classes={
+                    user.isActive ? undefined : { root: classes.inactiveCell }
+                  }
+                >
+                  {user.id}
+                </TableCell>
+                <TableCell
+                  align="center"
+                  classes={
+                    user.isActive ? undefined : { root: classes.inactiveCell }
+                  }
+                >
+                  {user.displayName}
+                </TableCell>
+                <TableCell
+                  align="center"
+                  classes={
+                    user.isActive ? undefined : { root: classes.inactiveCell }
+                  }
+                >
+                  {user.email}
+                </TableCell>
                 {tableFor === UserRole.tutor && (
-                  <TableCell align="center">{user.shift}</TableCell>
+                  <TableCell
+                    align="center"
+                    classes={
+                      user.isActive ? undefined : { root: classes.inactiveCell }
+                    }
+                  >
+                    {user.shift}
+                  </TableCell>
                 )}
               </TableRow>
             ))}
