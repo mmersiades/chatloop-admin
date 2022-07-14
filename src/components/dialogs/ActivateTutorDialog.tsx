@@ -59,7 +59,7 @@ const ActivateTutorDialog: FC<Props> = ({
       fetchAllUsers && (await fetchAllUsers());
       handleClose();
       setShowUserDrawer(null);
-      alert(`${user.displayName} deactivated`);
+      alert(`${user.displayName} reactivated`);
     }
     setActivating(false);
   };
