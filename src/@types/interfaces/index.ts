@@ -86,6 +86,7 @@ export interface ExtendedLearner extends Learner {
   maxNumberOfActivities: number;
   shiftOneTutor: number; // Tutor's id
   shiftTwoTutor: number; // Tutor's id
+  disadvantaged: boolean;
 }
 
 export interface Partner extends User {

@@ -5,6 +5,7 @@ import {
   EMAIL,
   FIRST_LANGUAGE,
   INTERFACE_LANGUAGE,
+  IS_DISADVANTAGED,
   LEARNERS_TAB,
   PARTNERS_TAB,
   REPLACE_TUTOR,
@@ -53,7 +54,8 @@ describe('Using the UsersPage', () => {
     cy.contains(INTERFACE_LANGUAGE).should('be.visible');
     cy.contains(CURRENT_ACTIVITIES).should('be.visible');
     cy.contains(SHIFT_ONE_TUTOR).should('be.visible');
-    cy.contains(SHIFT_TWO_TUTOR).should('be.visible');
+    cy.contains(IS_DISADVANTAGED).should('be.visible');
+    cy.contains(SHIFT_TWO_TUTOR).scrollIntoView().should('be.visible');
     cy.contains('button', REPLACE_TUTOR).scrollIntoView().should('be.visible');
     cy.contains('button', RESET_PASSWORD).scrollIntoView().should('be.visible');
     cy.contains('button', DELETE).scrollIntoView().should('be.visible');
