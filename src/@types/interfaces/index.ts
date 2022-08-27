@@ -273,6 +273,11 @@ export interface Organisation {
 
   // Org Admin
   admins: OrgAdminDTO[];
+
+  // Other
+  emergencyInstructions: string | null;
+  canReferPartners: boolean;
+  canReferNonDisadvantaged: boolean;
 }
 
 export interface Country {

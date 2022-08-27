@@ -107,6 +107,9 @@ export interface OrgFormValues {
   contactEmail: string | null;
   websiteUrl: string | null;
   adminIds: OrgAdminDTO[]; // Using DTOs, rather than just ids, so that whole org admin can be displayed in form
+  emergencyInstructions: string | null;
+  canReferPartners: boolean;
+  canReferNonDisadvantaged: boolean;
 }
 
 const defaultValues: OrgFormValues = {
@@ -126,6 +129,9 @@ const defaultValues: OrgFormValues = {
   contactEmail: '',
   websiteUrl: '',
   adminIds: [],
+  emergencyInstructions: '',
+  canReferPartners: false,
+  canReferNonDisadvantaged: false,
 };
 
 interface Props {
@@ -195,6 +201,11 @@ const OrganisationForm: FC<Props> = ({ org }) => {
       .nullable()
       .transform((value) => (value === '' ? null : value)),
     adminIds: Yup.array(),
+    emergencyInstructions: Yup.string()
+      .nullable()
+      .transform((value) => (value === '' ? null : value)),
+    canReferPartners: Yup.boolean().required(),
+    canReferNonDisadvantaged: Yup.boolean().required(),
   });
 
   const {
@@ -661,6 +672,43 @@ const OrganisationForm: FC<Props> = ({ org }) => {
         </>
       )}
       <Divider />
+      <Typography variant="subtitle1" paragraph>
+        Other
+      </Typography>
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="canReferPartners"
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              control={<Switch {...field} />}
+              label="Organisation can refer partners"
+            />
+          )}
+        />
+      </div>
+      <div className={styles.fieldContainer}>
+        <Controller
+          name="canReferNonDisadvantaged"
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              control={<Switch {...field} />}
+              label="Organisation can refer clients who aren't refugees"
+            />
+          )}
+        />
+      </div>
+      <PlainTextField
+        name="emergencyInstructions"
+        control={control}
+        label="Emergency instructions"
+        placeholder="Instructions..."
+        helperText={'What should tutors do if something goes wrong?'}
+        errors={errors.postalCode}
+        multiline={true}
+      />
+      <Divider />
       <Button
         aria-label={!!org ? 'Create organisation' : 'Submit changes'}
         type="submit"
@@ -695,6 +743,7 @@ interface PlainTextFieldProps<FieldValues> {
   placeholder: string;
   helperText: string;
   errors?: FieldError;
+  multiline?: boolean;
 }
 const PlainTextField: <FieldValues>(
   props: PlainTextFieldProps<FieldValues>
@@ -703,6 +752,7 @@ const PlainTextField: <FieldValues>(
   label,
   helperText,
   errors,
+  multiline = false,
   ...rest
 }) => {
   const styles = useStyles();
@@ -721,6 +771,8 @@ const PlainTextField: <FieldValues>(
             fullWidth
             helperText={errors?.message || helperText}
             error={!!errors}
+            multiline={multiline}
+            rows={multiline ? 3 : 1}
           />
         )}
       />
