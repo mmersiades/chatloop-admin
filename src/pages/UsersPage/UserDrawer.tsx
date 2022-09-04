@@ -40,6 +40,7 @@ import {
   EMAIL,
   FIRST_LANGUAGE,
   INTERFACE_LANGUAGE,
+  IS_DISADVANTAGED,
   REPLACE_TUTOR,
   RESET_PASSWORD,
   SHIFT_ONE_TUTOR,
@@ -209,6 +210,15 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
             />
           </ListItem>
         )}
+        {!!extendedUser &&
+          extendedUser.userRole === UserRole.learner &&
+          extendedUser.disadvantaged && (
+            <ListItem data-testid="is-disadvantaged-list-item">
+              <ListItemText
+                primary={<Typography>{IS_DISADVANTAGED}</Typography>}
+              />
+            </ListItem>
+          )}
         {!!extendedUser &&
           extendedUser.userRole === UserRole.learner &&
           tutors && (

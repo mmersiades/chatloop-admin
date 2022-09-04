@@ -86,6 +86,7 @@ export interface ExtendedLearner extends Learner {
   maxNumberOfActivities: number;
   shiftOneTutor: number; // Tutor's id
   shiftTwoTutor: number; // Tutor's id
+  disadvantaged: boolean;
 }
 
 export interface Partner extends User {
@@ -272,6 +273,11 @@ export interface Organisation {
 
   // Org Admin
   admins: OrgAdminDTO[];
+
+  // Other
+  emergencyInstructions: string | null;
+  canReferPartners: boolean;
+  canReferNonDisadvantaged: boolean;
 }
 
 export interface Country {

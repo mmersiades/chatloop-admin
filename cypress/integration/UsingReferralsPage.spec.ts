@@ -54,12 +54,13 @@ describe('Using the ReferralsPage', () => {
       cy.get('[data-value="10"]').click();
       pageSize = 10;
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', partnerRegex, 8);
+      cy.countElementsWithText('td', learnerRegex, 10);
       cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', learnerRegex, 8);
+      cy.countElementsWithText('td', learnerRegex, 2);
+      cy.countElementsWithText('td', partnerRegex, 8);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
       pageSize = 25;
     });
