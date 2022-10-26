@@ -31,13 +31,13 @@ describe('Using the UsersPage', () => {
     cy.contains(TUTORS_TAB).should('be.visible');
     // cy.contains('button', 'Add Learner').should('be.visible');
     cy.contains(sara.email).should('be.visible');
-    cy.contains('1-9 of 9').should('be.visible');
+    cy.contains('1-10 of 10').should('be.visible');
   });
 
   it('should show Partners and Tutors lists', () => {
     cy.contains('button', PARTNERS_TAB).click();
     cy.contains('partner@gmail.com').should('be.visible');
-    cy.contains('1-16 of 16').should('be.visible');
+    cy.contains('1-17 of 17').should('be.visible');
 
     cy.contains('button', TUTORS_TAB).click();
     cy.contains('tutor0@gmail.com').should('be.visible');
