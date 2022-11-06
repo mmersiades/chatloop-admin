@@ -42,7 +42,7 @@ const deleteInvite = async (id: number) => {
 
   try {
     const response: AxiosResponse = await apiChatloopOrg.delete(
-      `/rest/chatInvites/delete-invite/${id}`,
+      `/rest/activity-invites/delete-activity-request/${id}`,
       requestOptions
     );
     return response;

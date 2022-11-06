@@ -68,7 +68,7 @@ describe('Using the InvitesPage', () => {
     cy.contains('button', 'DELETE').click();
     cy.intercept(
       'DELETE',
-      `/rest/chatInvites/delete-invite/${inviteResponse1.content[0].id}`,
+      `/rest/activity-invites/delete-activity-request/${inviteResponse1.content[0].id}`,
       'Invite-Deleted'
     );
     cy.intercept(`/rest/admin/invites`, {
