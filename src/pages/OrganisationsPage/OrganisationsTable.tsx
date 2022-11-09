@@ -74,10 +74,10 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
           logo
         </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
-          officialName
+          official name
         </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
-          administrativeArea
+          operational regions
         </TableCell>
         <TableCell classes={{ root: styles.headerTableCell }} align="center">
           country
@@ -147,13 +147,17 @@ const OrganisationsTable: FC<Props> = ({ handleRowClick }) => {
                       align="center"
                       classes={{ root: styles.tableCell }}
                     >
-                      {org.administrativeArea}
+                      {org.operationalRegions
+                        .map((or) => or.subdivisionName)
+                        .join(', ')}
                     </TableCell>
                     <TableCell
                       align="center"
                       classes={{ root: styles.tableCell }}
                     >
-                      {org.country}
+                      {org.operationalCountries
+                        .map((c) => c.countryName)
+                        .join(', ')}
                     </TableCell>
                   </TableRow>
                 ))}
