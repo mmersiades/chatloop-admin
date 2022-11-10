@@ -158,7 +158,7 @@ const OrganisationForm: FC<Props> = ({ org }) => {
     shortName: Yup.string()
       .nullable()
       .transform((value) => (value === '' ? null : value))
-      .min(3),
+      .min(2),
     premise: Yup.string()
       .nullable()
       .transform((value) => (value === '' ? null : value)),
