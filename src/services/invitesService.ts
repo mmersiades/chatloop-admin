@@ -3,14 +3,18 @@ import { authHeader } from '../helpers/getAuthHeader';
 import { handleError } from '../helpers/handleError';
 import { AxiosResponse } from 'axios';
 
-const getPartnerQueue = async (page: number, size: number) => {
+const getPartnerQueue = async (
+  page: number,
+  size: number,
+  activity: string
+) => {
   const requestOptions = {
     headers: { Authorization: authHeader() },
   };
 
   try {
     const response: AxiosResponse = await apiChatloopOrg.get(
-      `/rest/admin/partner-ranking?page=${page}&size=${size}`,
+      `/rest/admin/partner-ranking/${activity}?page=${page}&size=${size}`,
       requestOptions
     );
     return response.data;
