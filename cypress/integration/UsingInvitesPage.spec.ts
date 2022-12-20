@@ -9,7 +9,9 @@ import inviteResponse1 from '../fixtures/invitesResponses/inviteResponse1.json';
 
 describe('Using the InvitesPage', () => {
   beforeEach(() => {
-    cy.intercept('GET', '/rest/admin/partner-ranking?*').as('getRankingPage');
+    cy.intercept('GET', '/rest/admin/partner-ranking/topictext?*').as(
+      'getRankingPage'
+    );
     cy.intercept(`/rest/admin/invites`, {
       fixture: '/invitesResponses/inviteResponse1.json',
     });

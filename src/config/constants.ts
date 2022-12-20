@@ -13,7 +13,7 @@ export const DEV_EXPIRY_INTERVAL = {
 };
 
 export const PROD_PARTNER_QUEUE_SIZE = 20;
-export const DEV_PARTNER_QUEUE_SIZE = 20;
+export const DEV_PARTNER_QUEUE_SIZE = 5;
 
 export const UI_LANGUAGES: UiLanguageOption[] = [
   { code: 'ar', language: 'Arabic' },
