@@ -33,9 +33,12 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('getAuthTokens', (username: string, password: string) => {
+  console.log("Cypress.env('API_HOST')", Cypress.env('API_HOST'));
+  const url = `${Cypress.env('API_HOST')}/rest/login`;
+  console.log('url', url);
   cy.request({
     method: 'POST',
-    url: `${Cypress.env('API_HOST')}/rest/login`,
+    url: url,
     body: {
       username,
       password,
@@ -159,7 +162,7 @@ Cypress.Commands.add('visitInvitesPage', () => {
   // noinspection JSIgnoredPromiseFromCall
   cy.getAuthTokens(admin.email, admin.password);
   cy.visit('/invites');
-
+  //
   cy.wait('@postLogin');
   cy.wait('@getOrganisations');
   cy.wait('@getLanguages');
