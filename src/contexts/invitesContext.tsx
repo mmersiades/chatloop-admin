@@ -110,7 +110,11 @@ export const InvitesContextProvider: FC<InvitesContextProviderProps> = ({
   const fetchQueue = useCallback(
     async (page: number = 0, size: number = defaultSize) => {
       dispatch({ type: 'PARTNER_QUEUE_REQUEST' });
-      const partnerQueue = await invitesService.getPartnerQueue(page, size);
+      const partnerQueue = await invitesService.getPartnerQueue(
+        page,
+        size,
+        'topictext'
+      );
       dispatch({ type: 'PARTNER_QUEUE_SUCCESS', payload: partnerQueue });
     },
     [defaultSize]
@@ -129,7 +133,11 @@ export const InvitesContextProvider: FC<InvitesContextProviderProps> = ({
 
   const fetchMoreQueue = async (page: number, size: number = defaultSize) => {
     dispatch({ type: 'MORE_QUEUE_REQUEST' });
-    const partnerQueue = await invitesService.getPartnerQueue(page, size);
+    const partnerQueue = await invitesService.getPartnerQueue(
+      page,
+      size,
+      'topictext'
+    );
     dispatch({ type: 'MORE_QUEUE_SUCCESS', payload: partnerQueue });
   };
 

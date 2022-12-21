@@ -39,7 +39,7 @@ export const IS_DISADVANTAGED = 'Is considered disadvantaged';
 
 // InvitesPage
 export const INVITES_TITLE = 'Manage Invites';
-export const PARTNER_QUEUE = 'Partner queue';
+export const PARTNER_QUEUE = 'TopicText partner queue';
 export const NUMBERS = 'Numbers';
 export const NO_INVITES = 'No invites';
 
