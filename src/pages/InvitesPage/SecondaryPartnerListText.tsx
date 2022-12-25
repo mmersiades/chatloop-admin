@@ -15,10 +15,11 @@ const SecondaryPartnerListText: FC<SecondaryPartnerListTextProps> = ({
     if (!partner.lastActivityFinished) {
       return 'No activities yet';
     }
-    console.log('partner.lastActivityFinished', partner.lastActivityFinished);
+
     const lastActivityDuration = moment.duration(
       moment().diff(moment(partner.lastActivityFinished))
     );
+
     return `Last activity: ${lastActivityDuration.days()} ${
       lastActivityDuration.days() === 1 ? 'day' : 'days'
     } and ${lastActivityDuration.hours()} ${
@@ -27,15 +28,15 @@ const SecondaryPartnerListText: FC<SecondaryPartnerListTextProps> = ({
   };
 
   const getQueueTime = (): string => {
-    // if (!partner.lastInviteMissed) {
-    //   return 'Queue time: No invites missed';
-    // }
-    const time = moment(partner.lastActivityFinished);
+    if (!partner.lastInviteMissed) {
+      return 'Queue time: No invites missed';
+    }
+
+    const time = moment(partner.lastInviteMissed);
 
     return `Queue time: ${time.format('MMM D HH')}:00`;
   };
 
-  console.log('partner.lastInviteMissed', partner.lastInviteMissed);
   return (
     <Grid container>
       <Grid item xs={12}>
