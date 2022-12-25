@@ -201,7 +201,8 @@ export interface PartnerInQueue {
   displayName: string;
   currentNumberOfActivities: number;
   maxNumberOfActivities: number;
-  lastChatFinished: string;
+  lastActivityFinished: string | null;
+  lastInviteMissed: string | null;
 }
 
 export interface Invite {

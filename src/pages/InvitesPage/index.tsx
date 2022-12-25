@@ -214,9 +214,6 @@ const InvitesPage: FC = () => {
                   scrollableTarget="scrollableDiv"
                 >
                   {queuePageable.content.map((partner: PartnerInQueue) => {
-                    const duration = moment.duration(
-                      moment().diff(moment(partner.lastChatFinished))
-                    );
                     return (
                       <ListItem
                         key={partner.id}
@@ -231,13 +228,7 @@ const InvitesPage: FC = () => {
                             />
                           }
                           secondary={
-                            <SecondaryPartnerListText
-                              duration={duration}
-                              currentActivities={
-                                partner.currentNumberOfActivities
-                              }
-                              maxActivities={partner.maxNumberOfActivities}
-                            />
+                            <SecondaryPartnerListText partner={partner} />
                           }
                         />
                       </ListItem>
@@ -351,7 +342,9 @@ const InvitesPage: FC = () => {
                           </ListItem>
                           {invite.partners.map((partner: PartnerInQueue) => {
                             const duration = moment.duration(
-                              moment().diff(moment(partner.lastChatFinished))
+                              moment().diff(
+                                moment(partner.lastActivityFinished)
+                              )
                             );
                             return (
                               <ListItem
