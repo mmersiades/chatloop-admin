@@ -13,18 +13,12 @@ const SecondaryPartnerListText: FC<SecondaryPartnerListTextProps> = ({
 }) => {
   const getLastActivity = (): string => {
     if (!partner.lastActivityFinished) {
-      return 'No activities yet';
+      return 'Last activity: no activities yet';
     }
 
-    const lastActivityDuration = moment.duration(
-      moment().diff(moment(partner.lastActivityFinished))
-    );
+    const time = moment(partner.lastActivityFinished);
 
-    return `Last activity: ${lastActivityDuration.days()} ${
-      lastActivityDuration.days() === 1 ? 'day' : 'days'
-    } and ${lastActivityDuration.hours()} ${
-      lastActivityDuration.hours() === 1 ? 'hour' : 'hours'
-    } ago`;
+    return `Last activity: ${time.fromNow()}`;
   };
 
   const getQueueTime = (): string => {
