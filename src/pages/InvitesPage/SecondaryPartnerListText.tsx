@@ -18,7 +18,7 @@ const SecondaryPartnerListText: FC<SecondaryPartnerListTextProps> = ({
 
     const time = moment(partner.lastActivityFinished);
 
-    return `Last activity: ${time.fromNow()}`;
+    return `Last activity: ${time.format('MMM D HH')}:00`;
   };
 
   const getQueueTime = (): string => {
