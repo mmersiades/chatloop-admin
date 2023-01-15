@@ -2,7 +2,12 @@ import React, { FC } from 'react';
 import WithNavbar from '../../components/WithNavbar';
 import { useLearners } from '../../contexts/learnersContext';
 import { usePageStyles, useTableStyles } from '../styles';
-import { CheckRounded, CloseRounded } from '@material-ui/icons';
+import {
+  CheckRounded,
+  CloseRounded,
+  KeyboardArrowDownRounded,
+  KeyboardArrowUpRounded,
+} from '@material-ui/icons';
 import {
   CircularProgress,
   Paper,
@@ -15,6 +20,9 @@ import {
   TablePagination,
   TableFooter,
   Link,
+  makeStyles,
+  Theme,
+  createStyles,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
@@ -22,6 +30,7 @@ import {
   TABLE_SIZE_OPTIONS_DEV,
   TABLE_SIZE_OPTIONS_PROD,
 } from '../../config/constants';
+import { LearnerSortProperty } from '../../services/learnersService';
 
 const env = process.env.REACT_APP_ENV;
 
@@ -38,16 +47,17 @@ const LearnersPage: FC<Props> = () => {
     learners,
     page,
     size,
-    ascending,
     sort,
+    ascending,
     totalElements,
     changePageNumber,
     changePageSize,
     changeSort,
+    changeSortDirection,
   } = useLearners();
 
   // -------------------------- Component functions ------------------------ //
-  const styles = usePageStyles();
+  const pageStyles = usePageStyles();
   const tableStyles = useTableStyles();
 
   const handleChangePage = (event: any, newPage: number) =>
@@ -59,6 +69,45 @@ const LearnersPage: FC<Props> = () => {
   // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
+  const renderHeaderCellContent = (
+    sortValue: LearnerSortProperty,
+    label: string
+  ) => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Link
+        style={{ color: '#fff', cursor: 'pointer' }}
+        underline={sort === sortValue ? 'always' : 'hover'}
+        onClick={() => changeSort!(sortValue)}
+      >
+        {label}
+      </Link>
+      {ascending === 'true' ? (
+        <KeyboardArrowDownRounded
+          style={{
+            marginLeft: 8,
+            cursor: 'pointer',
+          }}
+          onClick={() => changeSortDirection!(sortValue, 'false')}
+        />
+      ) : (
+        <KeyboardArrowUpRounded
+          style={{
+            marginLeft: 8,
+            cursor: 'pointer',
+          }}
+          onClick={() => changeSortDirection!(sortValue, 'true')}
+        />
+      )}
+    </div>
+  );
+
   const renderTableHead = () => (
     <TableHead classes={{ root: tableStyles.tableHead }}>
       <TableRow classes={{ root: tableStyles.tableRow }}>
@@ -67,104 +116,59 @@ const LearnersPage: FC<Props> = () => {
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('displayName')}
-          >
-            Name
-          </Link>
+          {renderHeaderCellContent('displayName', 'Name')}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('lastActiveDate')}
-          >
-            Last Active
-          </Link>
+          {renderHeaderCellContent('lastActiveDate', 'Last Active')}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('currentActivities')}
-          >
-            Activities
-          </Link>
+          {renderHeaderCellContent('currentActivities', 'Activities')}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('currentNewActivityRequests')}
-          >
-            Activity Reqs
-          </Link>
+          {renderHeaderCellContent(
+            'currentNewActivityRequests',
+            'Activity Reqs'
+          )}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('isActive')}
-          >
-            Active
-          </Link>
+          {renderHeaderCellContent('isActive', 'Active')}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('isDisadvantaged')}
-          >
-            Disadvantaged
-          </Link>
+          {renderHeaderCellContent('isDisadvantaged', 'Disadvantaged')}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('uiLanguage')}
-          >
-            UI
-          </Link>
+          {renderHeaderCellContent('uiLanguage', 'UI')}
         </TableCell>
         <TableCell
           classes={{ root: tableStyles.headerTableCell }}
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('referringOrg')}
-          >
-            Org
-          </Link>
+          {renderHeaderCellContent('referringOrg', 'Referred by')}
         </TableCell>
         <TableCell
           classes={{
@@ -173,20 +177,14 @@ const LearnersPage: FC<Props> = () => {
           align="center"
           sortDirection={ascending === 'true' ? 'asc' : 'desc'}
         >
-          <Link
-            style={{ color: '#fff', cursor: 'pointer' }}
-            underline={'hover'}
-            onClick={() => changeSort!('id')}
-          >
-            Id
-          </Link>
+          {renderHeaderCellContent('id', 'Id')}
         </TableCell>
       </TableRow>
     </TableHead>
   );
 
   return (
-    <div className={styles.container}>
+    <div className={pageStyles.container}>
       {fetching ? (
         <>
           <Table size="small">{renderTableHead()}</Table>

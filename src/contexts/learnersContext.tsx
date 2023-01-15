@@ -52,11 +52,17 @@ type ChangePageNumber = (page: number) => void;
 type ChangeSort = (sort: LearnerSortProperty) => void;
 type GetLearnersPage = (args: GetLearnersArgs) => void;
 
+type ChangeSortDirection = (
+  sort: LearnerSortProperty,
+  ascending: 'true' | 'false'
+) => void;
+
 interface LearnersContext extends LearnersState {
   getLearnersPage?: GetLearnersPage;
   changePageSize?: ChangePageSize;
   changePageNumber?: ChangePageNumber;
   changeSort?: ChangeSort;
+  changeSortDirection?: ChangeSortDirection;
 }
 
 const initialContext: LearnersContext = { ...initialState };
@@ -86,13 +92,19 @@ interface SetSort extends Action<'SET_SORT'> {
   sort: LearnerSortProperty;
 }
 
+interface SetSortDirection extends Action<'SET_SORT_DIRECTION'> {
+  sort: LearnerSortProperty;
+  ascending: 'true' | 'false';
+}
+
 type Actions =
   | GetLearnersRequest
   | GetLearnersSuccess
   | GetLearnersFailure
   | SetPageNumber
   | SetPageSize
-  | SetSort;
+  | SetSort
+  | SetSortDirection;
 
 const learnersReducer = (
   state: LearnersState,
@@ -135,6 +147,12 @@ const learnersReducer = (
       return {
         ...state,
         sort: action.sort,
+      };
+    case 'SET_SORT_DIRECTION':
+      return {
+        ...state,
+        sort: action.sort,
+        ascending: action.ascending,
       };
     default:
       return state;
@@ -179,6 +197,13 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
 
   const changeSort: ChangeSort = (sort) => dispatch({ type: 'SET_SORT', sort });
 
+  const changeSortDirection: ChangeSortDirection = (sort, ascending) =>
+    dispatch({
+      type: 'SET_SORT_DIRECTION',
+      sort,
+      ascending,
+    });
+
   // ----------------------------- Effects ---------------------------------- //
   useEffect(() => {
     loggedIn &&
@@ -188,7 +213,14 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
         sort: state.sort,
         ascending: state.ascending,
       });
-  }, [loggedIn, state.page, state.size, state.sort, getLearnersPage]);
+  }, [
+    loggedIn,
+    state.page,
+    state.size,
+    state.sort,
+    state.ascending,
+    getLearnersPage,
+  ]);
 
   // ----------------------------- Render ----------------------------------- //
   return (
@@ -199,6 +231,7 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
         changePageSize,
         changePageNumber,
         changeSort,
+        changeSortDirection,
       }}
     >
       {children}
