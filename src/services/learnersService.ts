@@ -14,7 +14,6 @@ export interface GetLearnersArgs {
     | 'uiLanguage'
     | 'referringOrg'
     | 'isActive'
-    | 'lastActiveDate'
     | 'currentActivities'
     | 'currentNewActivityRequests'
     | 'isDisadvantaged';

@@ -12,22 +12,45 @@ import {
   TableRow,
   TableContainer,
   TableBody,
+  TablePagination,
+  TableFooter,
 } from '@material-ui/core';
 import clsx from 'clsx';
+import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
+import {
+  TABLE_SIZE_OPTIONS_DEV,
+  TABLE_SIZE_OPTIONS_PROD,
+} from '../../config/constants';
+
+const env = process.env.REACT_APP_ENV;
 
 interface Props {}
 
-const LearnersPage: FC<Props> = ({}) => {
+const LearnersPage: FC<Props> = () => {
   // -------------------------- Component state ---------------------------- //
 
   // -------------------------- 3rd party hooks ---------------------------- //
 
   // -------------------------- Hooks -------------------------------------- //
-  const { fetching, learners } = useLearners();
+  const {
+    fetching,
+    learners,
+    page,
+    size,
+    totalElements,
+    changePageNumber,
+    changePageSize,
+  } = useLearners();
 
   // -------------------------- Component functions ------------------------ //
   const styles = usePageStyles();
   const tableStyles = useTableStyles();
+
+  const handleChangePage = (event: any, newPage: number) =>
+    changePageNumber!(newPage);
+
+  const handleChangeRowsPerPage = (event: any) =>
+    changePageSize!(event.target.value);
 
   // -------------------------- Effects ------------------------------------ //
 
@@ -184,6 +207,24 @@ const LearnersPage: FC<Props> = ({}) => {
                 );
               })}
             </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  data-test="pagination"
+                  count={totalElements}
+                  rowsPerPage={size}
+                  page={page}
+                  rowsPerPageOptions={
+                    env === 'prod'
+                      ? TABLE_SIZE_OPTIONS_PROD
+                      : TABLE_SIZE_OPTIONS_DEV
+                  }
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
           </Table>
         </TableContainer>
       )}

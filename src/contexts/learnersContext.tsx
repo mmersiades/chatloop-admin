@@ -10,8 +10,12 @@ import {
 import { Action, LearnerDataDTO, PageableResponse } from '../@types/interfaces';
 import learnersService, { GetLearnersArgs } from '../services/learnersService';
 import { useAuth } from './authContext';
+import {
+  DEFAULT_TABLE_SIZE_DEV,
+  DEFAULT_TABLE_SIZE_PROD,
+} from '../config/constants';
 
-export const DEFAULT_LEARNERS_SIZE = 25;
+const env = process.env.REACT_APP_ENV;
 
 export interface LearnersState {
   fetching: boolean;
@@ -28,17 +32,21 @@ const initialState: LearnersState = {
   fetching: false,
   learners: [],
   page: 0,
-  size: DEFAULT_LEARNERS_SIZE,
+  size: env === 'prod' ? DEFAULT_TABLE_SIZE_PROD : DEFAULT_TABLE_SIZE_DEV,
   totalPages: 1,
   totalElements: 1,
   last: true,
   first: true,
 };
 
+type ChangePageSize = (size: number) => void;
+type ChangePageNumber = (page: number) => void;
 type GetLearnersPage = (args: GetLearnersArgs) => void;
 
 interface LearnersContext extends LearnersState {
   getLearnersPage?: GetLearnersPage;
+  changePageSize?: ChangePageSize;
+  changePageNumber?: ChangePageNumber;
 }
 
 const initialContext: LearnersContext = { ...initialState };
@@ -56,7 +64,20 @@ interface GetLearnersSuccess extends Action<'GET_LEARNERS_SUCCESS'> {
 
 interface GetLearnersFailure extends Action<'GET_LEARNERS_FAILURE'> {}
 
-type Actions = GetLearnersRequest | GetLearnersSuccess | GetLearnersFailure;
+interface SetPageSize extends Action<'SET_PAGE_SIZE'> {
+  size: number;
+}
+
+interface SetPageNumber extends Action<'SET_PAGE_NUMBER'> {
+  page: number;
+}
+
+type Actions =
+  | GetLearnersRequest
+  | GetLearnersSuccess
+  | GetLearnersFailure
+  | SetPageNumber
+  | SetPageSize;
 
 const learnersReducer = (
   state: LearnersState,
@@ -84,6 +105,16 @@ const learnersReducer = (
       return {
         ...state,
         fetching: false,
+      };
+    case 'SET_PAGE_NUMBER':
+      return {
+        ...state,
+        page: action.page,
+      };
+    case 'SET_PAGE_SIZE':
+      return {
+        ...state,
+        size: action.size,
       };
     default:
       return state;
@@ -120,10 +151,16 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
     [dispatch]
   );
 
+  const changePageSize: ChangePageSize = (size) =>
+    dispatch({ type: 'SET_PAGE_SIZE', size });
+
+  const changePageNumber: ChangePageNumber = (page) =>
+    dispatch({ type: 'SET_PAGE_NUMBER', page });
+
   // ----------------------------- Effects ---------------------------------- //
   useEffect(() => {
-    loggedIn && getLearnersPage({ page: 0, size: DEFAULT_LEARNERS_SIZE });
-  }, [loggedIn, getLearnersPage]);
+    loggedIn && getLearnersPage({ size: state.size, page: state.page });
+  }, [loggedIn, state.page, state.size, getLearnersPage]);
 
   // ----------------------------- Render ----------------------------------- //
   return (
@@ -131,6 +168,8 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
       value={{
         ...state,
         getLearnersPage,
+        changePageSize,
+        changePageNumber,
       }}
     >
       {children}
