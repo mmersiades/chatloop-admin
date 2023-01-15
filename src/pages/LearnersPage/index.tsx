@@ -1,7 +1,4 @@
 import React, { FC } from 'react';
-import WithNavbar from '../../components/WithNavbar';
-import { useLearners } from '../../contexts/learnersContext';
-import { usePageStyles, useTableStyles } from '../styles';
 import {
   CheckRounded,
   CloseRounded,
@@ -20,27 +17,24 @@ import {
   TablePagination,
   TableFooter,
   Link,
-  makeStyles,
-  Theme,
-  createStyles,
 } from '@material-ui/core';
-import clsx from 'clsx';
 import TablePaginationActions from '@material-ui/core/TablePagination/TablePaginationActions';
+import clsx from 'clsx';
+
+import WithNavbar from '../../components/WithNavbar';
+import { useLearners } from '../../contexts/learnersContext';
+import { LearnerSortProperty } from '../../services/learnersService';
+import { usePageStyles, useTableStyles } from '../styles';
 import {
   TABLE_SIZE_OPTIONS_DEV,
   TABLE_SIZE_OPTIONS_PROD,
 } from '../../config/constants';
-import { LearnerSortProperty } from '../../services/learnersService';
 
 const env = process.env.REACT_APP_ENV;
 
 interface Props {}
 
 const LearnersPage: FC<Props> = () => {
-  // -------------------------- Component state ---------------------------- //
-
-  // -------------------------- 3rd party hooks ---------------------------- //
-
   // -------------------------- Hooks -------------------------------------- //
   const {
     fetching,
@@ -65,8 +59,6 @@ const LearnersPage: FC<Props> = () => {
 
   const handleChangeRowsPerPage = (event: any) =>
     changePageSize!(event.target.value);
-
-  // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
   const renderHeaderCellContent = (

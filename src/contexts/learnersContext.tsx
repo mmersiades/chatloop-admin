@@ -7,12 +7,13 @@ import {
   useEffect,
   useReducer,
 } from 'react';
-import { Action, LearnerDataDTO, PageableResponse } from '../@types/interfaces';
+
+import { useAuth } from './authContext';
 import learnersService, {
   GetLearnersArgs,
   LearnerSortProperty,
 } from '../services/learnersService';
-import { useAuth } from './authContext';
+import { Action, LearnerDataDTO, PageableResponse } from '../@types/interfaces';
 import {
   DEFAULT_TABLE_SIZE_DEV,
   DEFAULT_TABLE_SIZE_PROD,
