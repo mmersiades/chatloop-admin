@@ -10,13 +10,13 @@ import { useAppNav } from '../../contexts/appNavContext';
 import { usePageStyles } from '../styles';
 
 const ReferralsPage = () => {
-  // ----------------------------- Hooks ---------------------------------------- //
+  // ----------------------------- Hooks ------------------------------------ //
   const { showReferralDrawer, showNewReferralForm } = useAppNav();
 
-  // ----------------------------- Component functions ------------------------- //
+  // ----------------------------- Component functions ---------------------- //
   const styles = usePageStyles();
 
-  // ----------------------------- Effects ---------------------------------------- //
+  // ----------------------------- Effects ---------------------------------- //
   return (
     <div className={styles.container}>
       <div

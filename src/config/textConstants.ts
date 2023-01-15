@@ -10,6 +10,7 @@ export const INVITES = 'Invites';
 export const REFERRALS = 'Referrals';
 export const ORGANISATIONS = 'Organisations';
 export const USERS = 'Users';
+export const LEARNERS = 'Learners';
 export const DASHBOARD = 'Dashboard';
 
 // Common
