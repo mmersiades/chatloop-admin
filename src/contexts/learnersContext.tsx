@@ -8,7 +8,10 @@ import {
   useReducer,
 } from 'react';
 import { Action, LearnerDataDTO, PageableResponse } from '../@types/interfaces';
-import learnersService, { GetLearnersArgs } from '../services/learnersService';
+import learnersService, {
+  GetLearnersArgs,
+  LearnerSortProperty,
+} from '../services/learnersService';
 import { useAuth } from './authContext';
 import {
   DEFAULT_TABLE_SIZE_DEV,
@@ -26,6 +29,9 @@ export interface LearnersState {
   totalElements: number;
   last: boolean;
   first: boolean;
+
+  sort: LearnerSortProperty;
+  ascending: 'true' | 'false';
 }
 
 const initialState: LearnersState = {
@@ -37,16 +43,20 @@ const initialState: LearnersState = {
   totalElements: 1,
   last: true,
   first: true,
+  sort: 'lastActiveDate',
+  ascending: 'false',
 };
 
 type ChangePageSize = (size: number) => void;
 type ChangePageNumber = (page: number) => void;
+type ChangeSort = (sort: LearnerSortProperty) => void;
 type GetLearnersPage = (args: GetLearnersArgs) => void;
 
 interface LearnersContext extends LearnersState {
   getLearnersPage?: GetLearnersPage;
   changePageSize?: ChangePageSize;
   changePageNumber?: ChangePageNumber;
+  changeSort?: ChangeSort;
 }
 
 const initialContext: LearnersContext = { ...initialState };
@@ -72,12 +82,17 @@ interface SetPageNumber extends Action<'SET_PAGE_NUMBER'> {
   page: number;
 }
 
+interface SetSort extends Action<'SET_SORT'> {
+  sort: LearnerSortProperty;
+}
+
 type Actions =
   | GetLearnersRequest
   | GetLearnersSuccess
   | GetLearnersFailure
   | SetPageNumber
-  | SetPageSize;
+  | SetPageSize
+  | SetSort;
 
 const learnersReducer = (
   state: LearnersState,
@@ -115,6 +130,11 @@ const learnersReducer = (
       return {
         ...state,
         size: action.size,
+      };
+    case 'SET_SORT':
+      return {
+        ...state,
+        sort: action.sort,
       };
     default:
       return state;
@@ -157,10 +177,18 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
   const changePageNumber: ChangePageNumber = (page) =>
     dispatch({ type: 'SET_PAGE_NUMBER', page });
 
+  const changeSort: ChangeSort = (sort) => dispatch({ type: 'SET_SORT', sort });
+
   // ----------------------------- Effects ---------------------------------- //
   useEffect(() => {
-    loggedIn && getLearnersPage({ size: state.size, page: state.page });
-  }, [loggedIn, state.page, state.size, getLearnersPage]);
+    loggedIn &&
+      getLearnersPage({
+        size: state.size,
+        page: state.page,
+        sort: state.sort,
+        ascending: state.ascending,
+      });
+  }, [loggedIn, state.page, state.size, state.sort, getLearnersPage]);
 
   // ----------------------------- Render ----------------------------------- //
   return (
@@ -170,6 +198,7 @@ export const LearnersProvider: FC<PropsWithChildren<Props>> = ({
         getLearnersPage,
         changePageSize,
         changePageNumber,
+        changeSort,
       }}
     >
       {children}

@@ -4,35 +4,33 @@ import apiChatloopOrg from '../config/axiosConfig';
 import { handleError } from '../helpers/handleError';
 import { AxiosResponse } from 'axios';
 
+export type LearnerSortProperty =
+  | 'lastActiveDate'
+  | 'id'
+  | 'displayName'
+  | 'uiLanguage'
+  | 'referringOrg'
+  | 'isActive'
+  | 'currentActivities'
+  | 'currentNewActivityRequests'
+  | 'isDisadvantaged';
+
 export interface GetLearnersArgs {
   page: number;
   size: number;
-  sort?:
-    | 'lastActiveDate'
-    | 'id'
-    | 'displayName'
-    | 'uiLanguage'
-    | 'referringOrg'
-    | 'isActive'
-    | 'currentActivities'
-    | 'currentNewActivityRequests'
-    | 'isDisadvantaged';
-  ascending?: 'true' | 'false';
+  sort: LearnerSortProperty;
+  ascending: 'true' | 'false';
 }
 
 type GetLearners = (
   args: GetLearnersArgs
 ) => Promise<AxiosResponse<PageableResponse<LearnerDataDTO>>>;
+
 interface LearnersService {
   getLearners: GetLearners;
 }
 
-const getLearners: GetLearners = async ({
-  page,
-  size,
-  sort = 'lastActiveDate',
-  ascending = 'false',
-}) => {
+const getLearners: GetLearners = async ({ page, size, sort, ascending }) => {
   const requestOptions = {
     headers: { Authorization: authHeader() },
     params: { page, size, sort, ascending },
