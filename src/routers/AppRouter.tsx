@@ -10,11 +10,13 @@ import AccountSettings from '../pages/AccountSettings';
 import InvitesPage from '../pages/InvitesPage';
 import OrganisationsPage from '../pages/OrganisationsPage';
 import ReferralsPage from '../pages/ReferralsPage';
+import LearnersPage from '../pages/LearnersPage';
 import { InvitesContextProvider } from '../contexts/invitesContext';
 import { UsersContextProvider } from '../contexts/usersContext';
 import { ReferralsProvider } from '../contexts/referralsContext';
 import { StatsProvider } from '../contexts/statsContext';
 import { CountriesProvider } from '../contexts/countriesContext';
+import { LearnersProvider } from '../contexts/learnersContext';
 
 export const AppRouter = () => {
   return (
@@ -37,6 +39,14 @@ export const AppRouter = () => {
           <UsersContextProvider>
             <UsersPage />
           </UsersContextProvider>
+        )}
+      />
+      <PrivateRoute
+        path="/learners"
+        component={() => (
+          <LearnersProvider>
+            <LearnersPage />
+          </LearnersProvider>
         )}
       />
       <PrivateRoute

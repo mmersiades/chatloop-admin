@@ -305,3 +305,15 @@ export interface StatusMessageDTO {
   message: string;
   code: string;
 }
+
+export interface LearnerDataDTO {
+  id: string;
+  displayName: string;
+  uiLanguage: string;
+  referringOrg: string;
+  active: boolean;
+  lastActiveDate: string;
+  currentActivities: string;
+  currentNewActivityRequests: string;
+  disadvantaged: boolean;
+}

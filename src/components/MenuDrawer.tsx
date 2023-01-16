@@ -21,6 +21,7 @@ import {
   ACCOUNT_SETTINGS,
   DASHBOARD,
   INVITES,
+  LEARNERS,
   LOG_OUT,
   ORGANISATIONS,
   REFERRALS,
@@ -95,6 +96,18 @@ const MenuDrawer: FC = () => {
           to={{ pathname: '/users' }}
         >
           <ListItemText primary={USERS} />
+        </ListItem>
+        <ListItem
+          classes={
+            location.pathname === '/learners'
+              ? { root: classes.selectedItem }
+              : {}
+          }
+          button
+          component={Link}
+          to={{ pathname: '/learners' }}
+        >
+          <ListItemText primary={LEARNERS} />
         </ListItem>
         <ListItem
           classes={

@@ -31,6 +31,10 @@ export const UI_LANGUAGES: UiLanguageOption[] = [
 
 export const DEFAULT_REFERRAL_PAGE_SIZE = 25;
 export const DEFAULT_ORGANISATIONS_PAGE_SIZE = 25;
+export const DEFAULT_TABLE_SIZE_PROD = 50;
+export const DEFAULT_TABLE_SIZE_DEV = 5;
+export const TABLE_SIZE_OPTIONS_PROD = [10, 25, 50, 100];
+export const TABLE_SIZE_OPTIONS_DEV = [5, 10, 15, 20];
 
 // Aria labels
 export const PHONE_FIELD_AL = 'Enter phone number';

@@ -272,13 +272,13 @@ interface Props {}
 export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
   children,
 }) => {
-  // ----------------------------- Component state ------------------------------ //
+  // ----------------------------- Component state -------------------------- //
   const [state, dispatch] = useReducer(orgsReducer, initialState);
 
   const { setShowOrgDrawer } = useAppNav();
   const { loggedIn } = useAuth();
 
-  // ----------------------------- Component functions ------------------------- //
+  // ----------------------------- Component functions ---------------------- //
   const getOrganisations: GetOrganisations = useCallback(async () => {
     dispatch({ type: 'GET_ORGS_REQUEST' });
 
@@ -412,12 +412,12 @@ export const OrganisationsProvider: FC<PropsWithChildren<Props>> = ({
     }
   };
 
-  // ----------------------------- Effects ---------------------------------------- //
+  // ----------------------------- Effects ---------------------------------- //
   useEffect(() => {
     loggedIn && getOrganisations();
   }, [loggedIn, getOrganisations]);
 
-  // ----------------------------- Render ---------------------------------------- //
+  // ----------------------------- Render ----------------------------------- //
   return (
     <OrganisationsContext.Provider
       value={{
