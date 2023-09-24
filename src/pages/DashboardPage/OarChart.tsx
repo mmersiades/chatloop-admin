@@ -74,6 +74,9 @@ const OarChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-06-10');
+  const maxDate = new Date();
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     if (!fetchingOar && !isEqual(orgIds, idsRef.current)) {
@@ -105,6 +108,8 @@ const OarChart: FC<Props> = () => {
       anchorEl={pickerAnchor}
       setOrgIds={setOrgIds}
       orgIds={orgIds}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingOar || !oarStats ? (

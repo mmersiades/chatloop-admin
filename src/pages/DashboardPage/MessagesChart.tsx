@@ -73,6 +73,9 @@ const MessagesChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-04-24');
+  const maxDate = new Date();
+
   // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
@@ -86,6 +89,8 @@ const MessagesChart: FC<Props> = () => {
       startDate={messagesStartDate}
       endDate={messagesEndDate}
       anchorEl={pickerAnchor}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingMessages || !messagesStats ? (

@@ -70,6 +70,9 @@ const AipChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-04-24');
+  const maxDate = new Date();
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -81,6 +84,8 @@ const AipChart: FC<Props> = () => {
       startDate={aipStartDate}
       endDate={aipEndDate}
       anchorEl={pickerAnchor}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingAip || !aipStats ? (

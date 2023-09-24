@@ -56,6 +56,9 @@ const TcrChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-06-10');
+  const maxDate = new Date();
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -67,6 +70,8 @@ const TcrChart: FC<Props> = () => {
       startDate={tcrStartDate}
       endDate={tcrEndDate}
       anchorEl={pickerAnchor}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingTcr || !tcrStats ? (

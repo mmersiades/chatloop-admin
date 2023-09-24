@@ -76,6 +76,9 @@ const OoaChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-06-10');
+  const maxDate = new Date();
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     if (!fetchingOoa && !isEqual(orgIds, idsRef.current)) {
@@ -107,6 +110,8 @@ const OoaChart: FC<Props> = () => {
       anchorEl={pickerAnchor}
       setOrgIds={setOrgIds}
       orgIds={orgIds}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingOoa || !ooaStats ? (

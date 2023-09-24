@@ -16,6 +16,8 @@ interface Props {
   handleSelect: (ranges: RangeKeyDict) => void;
   startDate: Date;
   endDate: Date;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 const isSameRange = (
@@ -100,7 +102,13 @@ const extendedRanges = createStaticRanges([
 
 const truncatedRanges = [...defaultStaticRanges].splice(2);
 
-const DateRangePicker: FC<Props> = ({ handleSelect, startDate, endDate }) => (
+const DateRangePicker: FC<Props> = ({
+  handleSelect,
+  startDate,
+  endDate,
+  minDate,
+  maxDate,
+}) => (
   <RDRPicker
     ranges={[
       {
@@ -114,6 +122,8 @@ const DateRangePicker: FC<Props> = ({ handleSelect, startDate, endDate }) => (
     onChange={handleSelect}
     rangeColors={[midBlue, navy, darkNavy]}
     retainEndDateOnFirstSelection
+    minDate={minDate}
+    maxDate={maxDate}
   />
 );
 
