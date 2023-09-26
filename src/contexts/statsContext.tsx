@@ -35,6 +35,7 @@ interface StatsState {
   fetchingCa: boolean;
   fetchingAip: boolean;
   fetchingMessages: boolean;
+  fetchingLearnerFeedback: boolean;
   fetchingTar: boolean;
   fetchingTcr: boolean;
   fetchingOr: boolean;
@@ -48,6 +49,7 @@ interface StatsState {
   caStartDate: Date;
   aipStartDate: Date;
   messagesStartDate: Date;
+  learnerFeedbackStartDate: Date;
   tarStartDate: Date;
   tcrStartDate: Date;
   orStartDate: Date;
@@ -60,6 +62,7 @@ interface StatsState {
   caEndDate: Date;
   aipEndDate: Date;
   messagesEndDate: Date;
+  learnerFeedbackEndDate: Date;
   tarEndDate: Date;
   tcrEndDate: Date;
   orEndDate: Date;
@@ -72,6 +75,7 @@ interface StatsState {
   caStats?: StatsDTO;
   aipStats?: StatsDTO;
   messagesStats?: StatsDTO;
+  learnerFeedbackStats?: StatsDTO;
   tarStats?: StatsDTO;
   tcrStats?: StatsDTO;
   orStats?: StatsDTO;
@@ -94,6 +98,7 @@ const initialState: StatsState = {
   fetchingCa: false,
   fetchingAip: false,
   fetchingMessages: false,
+  fetchingLearnerFeedback: false,
   fetchingTar: false,
   fetchingTcr: false,
   fetchingOr: false,
@@ -106,6 +111,7 @@ const initialState: StatsState = {
   mauStartDate: monthlyStartDate,
   caStartDate: monthlyStartDate,
   messagesStartDate: dailyStartDate,
+  learnerFeedbackStartDate: dailyStartDate,
   aipStartDate: dailyStartDate,
   tarStartDate: dailyStartDate,
   tcrStartDate: monthlyStartDate,
@@ -119,6 +125,7 @@ const initialState: StatsState = {
   caEndDate: today,
   aipEndDate: today,
   messagesEndDate: today,
+  learnerFeedbackEndDate: today,
   tarEndDate: today,
   tcrEndDate: today,
   orEndDate: today,
@@ -140,6 +147,7 @@ interface StatsContext extends StatsState {
   getCaStats?: GetStats;
   getAipStats?: GetStats;
   getMessagesStats?: GetStats;
+  getLearnerFeedbackStats?: GetStats;
   getTarStats?: GetStats;
   getTcrStats?: GetStats;
   getOrStats?: GetOrgStats;
@@ -195,6 +203,17 @@ interface GetMessagesSuccess extends Action<'GET_MESSAGES_SUCCESS'> {
   endDate: Date;
 }
 interface GetMessagesFailure extends Action<'GET_MESSAGES_FAILURE'> {}
+
+interface GetLearnerFeedbackRequest
+  extends Action<'GET_LEARNER_FEEDBACK_REQUEST'> {}
+interface GetLearnerFeedbackSuccess
+  extends Action<'GET_LEARNER_FEEDBACK_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+interface GetLearnerFeedbackFailure
+  extends Action<'GET_LEARNER_FEEDBACK_FAILURE'> {}
 
 interface GetTarRequest extends Action<'GET_TAR_REQUEST'> {}
 interface GetTarSuccess extends Action<'GET_TAR_SUCCESS'> {
@@ -274,6 +293,9 @@ type Actions =
   | GetMessagesRequest
   | GetMessagesSuccess
   | GetMessagesFailure
+  | GetLearnerFeedbackRequest
+  | GetLearnerFeedbackSuccess
+  | GetLearnerFeedbackFailure
   | GetTarRequest
   | GetTarSuccess
   | GetTarFailure
@@ -390,6 +412,24 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
       return {
         ...state,
         fetchingMessages: false,
+      };
+    case 'GET_LEARNER_FEEDBACK_REQUEST':
+      return {
+        ...state,
+        fetchingLearnerFeedback: true,
+      };
+    case 'GET_LEARNER_FEEDBACK_SUCCESS':
+      return {
+        ...state,
+        fetchingLearnerFeedback: false,
+        learnerFeedbackStats: action.dto,
+        learnerFeedbackEndDate: action.endDate,
+        learnerFeedbackStartDate: action.startDate,
+      };
+    case 'GET_LEARNER_FEEDBACK_FAILURE':
+      return {
+        ...state,
+        fetchingLearnerFeedback: false,
       };
     case 'GET_TAR_REQUEST':
       return {
@@ -670,6 +710,33 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getLearnerFeedbackStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_LEARNER_FEEDBACK_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getLearnerFeedbackStats(
+        params
+      );
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_LEARNER_FEEDBACK_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_LEARNER_FEEDBACK_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_LEARNER_FEEDBACK_FAILURE' });
+      return false;
+    }
+  };
+
   const getTarStats: GetStats = async (params) => {
     dispatch({ type: 'GET_TAR_REQUEST' });
 
@@ -885,32 +952,40 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
 
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
-    getDauStats({ startDate: dailyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getMauStats({ startDate: monthlyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getCaStats({ startDate: monthlyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getAipStats({ startDate: dailyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getMessagesStats({ startDate: dailyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getTarStats({ startDate: dailyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getTcrStats({ startDate: monthlyStartDate, endDate: today });
-    // noinspection JSIgnoredPromiseFromCall
-    getOrStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
-    // noinspection JSIgnoredPromiseFromCall
-    getOoaStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
-    // noinspection JSIgnoredPromiseFromCall
-    getOarStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
-    // noinspection JSIgnoredPromiseFromCall
-    getOerStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
-    // noinspection JSIgnoredPromiseFromCall
-    getOaiStats({ startDate: monthlyStartDate, endDate: today, orgIds: [] });
-    // noinspection JSIgnoredPromiseFromCall
-    getCapacities();
+    void getDauStats({ startDate: dailyStartDate, endDate: today });
+    void getMauStats({ startDate: monthlyStartDate, endDate: today });
+    void getCaStats({ startDate: monthlyStartDate, endDate: today });
+    void getAipStats({ startDate: dailyStartDate, endDate: today });
+    void getMessagesStats({ startDate: dailyStartDate, endDate: today });
+    void getLearnerFeedbackStats({ startDate: dailyStartDate, endDate: today });
+    void getTarStats({ startDate: dailyStartDate, endDate: today });
+    void getTcrStats({ startDate: monthlyStartDate, endDate: today });
+    void getOrStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+      orgIds: [],
+    });
+    void getOoaStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+      orgIds: [],
+    });
+    void getOarStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+      orgIds: [],
+    });
+    void getOerStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+      orgIds: [],
+    });
+    void getOaiStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+      orgIds: [],
+    });
+    void getCapacities();
   }, []);
 
   // -------------------------- Render ------------------------------------- //
@@ -923,6 +998,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         getCaStats,
         getAipStats,
         getMessagesStats,
+        getLearnerFeedbackStats,
         getTarStats,
         getTcrStats,
         getOrStats,

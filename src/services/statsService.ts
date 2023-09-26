@@ -66,6 +66,7 @@ interface StatsService {
   getCaStats: GetStats;
   getAipStats: GetStats;
   getMessagesStats: GetStats;
+  getLearnerFeedbackStats: GetStats;
   getTarStats: GetStats;
   getTcrStats: GetStats;
   getOrgStats: GetOrgStats;
@@ -86,6 +87,9 @@ const getAipStats: GetStats = async ({ startDate, endDate }) =>
 
 const getMessagesStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('messages', startDate, endDate);
+
+const getLearnerFeedbackStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('learner-feedback', startDate, endDate);
 
 const getTarStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('active-referrals', startDate, endDate);
@@ -156,6 +160,7 @@ const statsService: StatsService = {
   getCaStats,
   getAipStats,
   getMessagesStats,
+  getLearnerFeedbackStats,
   getTarStats,
   getTcrStats,
   getOrgStats,

@@ -89,6 +89,7 @@ export const MAU_TITLE = 'Monthly Active Users';
 export const ACTIVITIES_IN_PROGRESS_TITLE = 'Activities In Progress';
 export const CUMULATIVE_ACTIVITIES_TITLE = 'Cumulative Activities';
 export const MESSAGES_TITLE = 'Messages';
+export const LEARNER_FEEDBACK_TITLE = 'Learner Feedback';
 export const TAR_TITLE = 'Total Active Referrals';
 export const TCR_TITLE = 'Total Cumulative Referrals';
 export const OR_TITLE = 'Referrers In Organisations';
