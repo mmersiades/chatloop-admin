@@ -16,7 +16,7 @@ describe('Replacing tutors', () => {
     cy.contains('button', REPLACE_TUTOR).scrollIntoView().should('be.visible');
     cy.get('li[data-testid="shift-one-tutor-box"]').within(() => {
       cy.contains('Heather').should('be.visible');
-      cy.contains('tutor0@gmail.com').should('be.visible');
+      cy.contains('tutor0@email.com').should('be.visible');
     });
     cy.contains('button', REPLACE_TUTOR).first().click();
     cy.get('input[type="radio"]').first().click();
@@ -30,7 +30,7 @@ describe('Replacing tutors', () => {
     cy.wait('@getUser');
     cy.get('li[data-testid="shift-one-tutor-box"]').within(() => {
       cy.contains('tutor2').should('be.visible');
-      cy.contains('tutor2@gmail.com').should('be.visible');
+      cy.contains('tutor2@email.com').should('be.visible');
     });
   });
 });

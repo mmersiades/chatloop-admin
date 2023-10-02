@@ -36,11 +36,11 @@ describe('Using the UsersPage', () => {
 
   it('should show Partners and Tutors lists', () => {
     cy.contains('button', PARTNERS_TAB).click();
-    cy.contains('partner@gmail.com').should('be.visible');
+    cy.contains('partner@email.com').should('be.visible');
     cy.contains('1-17 of 17').should('be.visible');
 
     cy.contains('button', TUTORS_TAB).click();
-    cy.contains('tutor0@gmail.com').should('be.visible');
+    cy.contains('tutor0@email.com').should('be.visible');
     cy.contains('SHIFT_ONE').should('be.visible');
     cy.contains('1-5 of 5').should('be.visible');
   });
