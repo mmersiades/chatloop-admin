@@ -14,7 +14,7 @@ const getPartnerQueue = async (
 
   try {
     const response: AxiosResponse = await apiChatloopOrg.get(
-      `/rest/admin/partner-ranking/${activity}?page=${page}&size=${size}`,
+      `/rest/admin/partner-ranking?page=${page}&size=${size}`,
       requestOptions
     );
     return response.data;

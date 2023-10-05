@@ -2,7 +2,7 @@ import { OperatingSystem, TutorShift } from '../../src/@types/enums';
 
 describe('Creating new users', () => {
   const userDisplayName = 'somebody';
-  const userEmail = 'somebody@gmail.com';
+  const userEmail = 'somebody@email.com';
   beforeEach(() => {
     cy.visitUsersPage();
   });
@@ -121,14 +121,14 @@ describe('Creating new users', () => {
       'div[id="mui-component-select-shiftOneTutorId"]',
       'Select for shift one'
     ).click();
-    cy.contains('li[role="option"]', 'tutor0@gmail.com').should('be.visible');
-    cy.contains('li[role="option"]', 'tutor0@gmail.com').click();
+    cy.contains('li[role="option"]', 'tutor0@email.com').should('be.visible');
+    cy.contains('li[role="option"]', 'tutor0email.com').click();
     cy.contains(
       'div[id="mui-component-select-shiftTwoTutorId"]',
       'Select for shift two'
     ).click();
-    cy.contains('li[role="option"]', 'tutor1@gmail.com').should('be.visible');
-    cy.contains('li[role="option"]', 'tutor1@gmail.com').click();
+    cy.contains('li[role="option"]', 'tutor1@email.com').should('be.visible');
+    cy.contains('li[role="option"]', 'tutor1@email.com').click();
     cy.get('#mui-component-select-shiftTwoTutorId').blur();
 
     cy.contains('button[type="submit"]', 'SUBMIT').should('not.be.disabled');

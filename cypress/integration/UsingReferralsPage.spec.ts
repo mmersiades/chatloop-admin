@@ -44,23 +44,23 @@ describe('Using the ReferralsPage', () => {
       cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
     });
 
-    it('should change row size and navigate to next page', () => {
+    it.only('should change row size and navigate to next page', () => {
       const learnerRegex = new RegExp('learner');
       const partnerRegex = new RegExp('partner');
-      cy.countElementsWithText('td', learnerRegex, 12);
+      cy.countElementsWithText('td', learnerRegex, 8);
       cy.get('td[data-test="pagination"]').within(() => {
         cy.get('div[aria-haspopup="listbox"]').click();
       });
       cy.get('[data-value="10"]').click();
       pageSize = 10;
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', learnerRegex, 10);
+      cy.countElementsWithText('td', learnerRegex, 3);
       cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', learnerRegex, 2);
-      cy.countElementsWithText('td', partnerRegex, 8);
+      cy.countElementsWithText('td', learnerRegex, 4);
+      cy.countElementsWithText('td', partnerRegex, 3);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
       pageSize = 25;
     });

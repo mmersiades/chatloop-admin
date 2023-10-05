@@ -1,7 +1,7 @@
 import { DELETE_USER_DIALOG_TITLE } from '../../src/config/textConstants';
 
 describe('Deleting a user', () => {
-  const userEmail = 'learner4@gmail.com';
+  const userEmail = 'learner4@email.com';
   beforeEach(() => {
     cy.visitUsersPage();
   });
