@@ -80,6 +80,7 @@ const LearnerCapacityChart: FC<Props> = () => {
       }
       return dataSet;
     }) ?? [];
+
   return (
     <ChartWrapper
       title={LEARNER_CAPACITY_STATS_TITLE}

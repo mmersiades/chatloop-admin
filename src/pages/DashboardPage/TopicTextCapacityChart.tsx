@@ -15,10 +15,7 @@ import { CircularProgress, Grid } from '@material-ui/core';
 
 import ChartWrapper from './ChartWrapper';
 import { useStats } from '../../contexts/statsContext';
-import {
-  LEARNER_CAPACITY_STATS_TITLE,
-  TOPICTEXT_CAPACITY_STATS_TITLE,
-} from '../../config/textConstants';
+import { TOPICTEXT_CAPACITY_STATS_TITLE } from '../../config/textConstants';
 
 ChartJS.register(
   CategoryScale,
@@ -85,6 +82,7 @@ const TopicTextCapacityChart: FC<Props> = () => {
 
       return dataSet;
     }) ?? [];
+
   return (
     <ChartWrapper
       title={TOPICTEXT_CAPACITY_STATS_TITLE}

@@ -22,6 +22,8 @@ import OerChart from './OerChart';
 import OaiChart from './OaiChart';
 import CapacityCard from './CapacityCard';
 import LearnerFeedbackChart from './LearnerFeedbackChart';
+import LearnerCapacityChart from './LearnerCapacityChart';
+import TopicTextCapacityChart from './TopicTextCapacityChart';
 import { useStats } from '../../contexts/statsContext';
 import {
   ACTIVITY_CAPACITY_TITLE,
@@ -32,8 +34,6 @@ import {
   MAX_LEARNERS_LABEL,
   POTENTIAL_CAPACITY_LABEL,
 } from '../../config/textConstants';
-import LearnerCapacityChart from './LearnerCapacityChart';
-import TopicTextCapacityChart from './TopicTextCapacityChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
