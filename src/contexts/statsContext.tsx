@@ -44,6 +44,8 @@ interface StatsState {
   fetchingOer: boolean;
   fetchingOai: boolean;
   fetchingCapacities: boolean;
+  fetchingTopicTextCapacityStats: boolean;
+  fetchingLearnerCapacityStats: boolean;
   dauStartDate: Date;
   mauStartDate: Date;
   caStartDate: Date;
@@ -52,6 +54,8 @@ interface StatsState {
   learnerFeedbackStartDate: Date;
   tarStartDate: Date;
   tcrStartDate: Date;
+  topicTextCapacityStartDate: Date;
+  learnerCapacityStartDate: Date;
   orStartDate: Date;
   ooaStartDate: Date;
   oarStartDate: Date;
@@ -65,6 +69,8 @@ interface StatsState {
   learnerFeedbackEndDate: Date;
   tarEndDate: Date;
   tcrEndDate: Date;
+  topicTextCapacityEndDate: Date;
+  learnerCapacityEndDate: Date;
   orEndDate: Date;
   ooaEndDate: Date;
   oarEndDate: Date;
@@ -78,6 +84,8 @@ interface StatsState {
   learnerFeedbackStats?: StatsDTO;
   tarStats?: StatsDTO;
   tcrStats?: StatsDTO;
+  topicTextCapacityStats?: StatsDTO;
+  learnerCapacityStats?: StatsDTO;
   orStats?: StatsDTO;
   ooaStats?: StatsDTO;
   oarStats?: StatsDTO;
@@ -107,6 +115,8 @@ const initialState: StatsState = {
   fetchingOer: false,
   fetchingOai: false,
   fetchingCapacities: false,
+  fetchingTopicTextCapacityStats: false,
+  fetchingLearnerCapacityStats: false,
   dauStartDate: dailyStartDate,
   mauStartDate: monthlyStartDate,
   caStartDate: monthlyStartDate,
@@ -115,6 +125,8 @@ const initialState: StatsState = {
   aipStartDate: dailyStartDate,
   tarStartDate: dailyStartDate,
   tcrStartDate: monthlyStartDate,
+  topicTextCapacityStartDate: monthlyStartDate,
+  learnerCapacityStartDate: monthlyStartDate,
   orStartDate: monthlyStartDate,
   ooaStartDate: monthlyStartDate,
   oarStartDate: monthlyStartDate,
@@ -128,12 +140,15 @@ const initialState: StatsState = {
   learnerFeedbackEndDate: today,
   tarEndDate: today,
   tcrEndDate: today,
+  topicTextCapacityEndDate: today,
+  learnerCapacityEndDate: today,
   orEndDate: today,
   ooaEndDate: today,
   oarEndDate: today,
   oerEndDate: today,
   oaiEndDate: today,
 };
+
 interface OrgStatsArgs extends DateRange {
   orgIds: number[];
 }
@@ -150,6 +165,8 @@ interface StatsContext extends StatsState {
   getLearnerFeedbackStats?: GetStats;
   getTarStats?: GetStats;
   getTcrStats?: GetStats;
+  getTopicTextCapacityStats?: GetStats;
+  getLearnerCapacityStats?: GetStats;
   getOrStats?: GetOrgStats;
   getOoaStats?: GetOrgStats;
   getOarStats?: GetOrgStats;
@@ -165,116 +182,170 @@ const StatsContext = createContext<StatsContext>(initialContext);
 export const useStats = () => useContext(StatsContext);
 
 interface GetDauRequest extends Action<'GET_DAU_REQUEST'> {}
+
 interface GetDauSuccess extends Action<'GET_DAU_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetDauFailure extends Action<'GET_DAU_FAILURE'> {}
 
 interface GetMauRequest extends Action<'GET_MAU_REQUEST'> {}
+
 interface GetMauSuccess extends Action<'GET_MAU_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetMauFailure extends Action<'GET_MAU_FAILURE'> {}
 
 interface GetCaRequest extends Action<'GET_CA_REQUEST'> {}
+
 interface GetCaSuccess extends Action<'GET_CA_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetCaFailure extends Action<'GET_CA_FAILURE'> {}
 
 interface GetAipRequest extends Action<'GET_AIP_REQUEST'> {}
+
 interface GetAipSuccess extends Action<'GET_AIP_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetAipFailure extends Action<'GET_AIP_FAILURE'> {}
 
 interface GetMessagesRequest extends Action<'GET_MESSAGES_REQUEST'> {}
+
 interface GetMessagesSuccess extends Action<'GET_MESSAGES_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetMessagesFailure extends Action<'GET_MESSAGES_FAILURE'> {}
 
 interface GetLearnerFeedbackRequest
   extends Action<'GET_LEARNER_FEEDBACK_REQUEST'> {}
+
 interface GetLearnerFeedbackSuccess
   extends Action<'GET_LEARNER_FEEDBACK_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetLearnerFeedbackFailure
   extends Action<'GET_LEARNER_FEEDBACK_FAILURE'> {}
 
 interface GetTarRequest extends Action<'GET_TAR_REQUEST'> {}
+
 interface GetTarSuccess extends Action<'GET_TAR_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetTarFailure extends Action<'GET_TAR_FAILURE'> {}
 
 interface GetTcrRequest extends Action<'GET_TCR_REQUEST'> {}
+
 interface GetTcrSuccess extends Action<'GET_TCR_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetTcrFailure extends Action<'GET_TCR_FAILURE'> {}
 
+interface GetTopicTextCapacityRequest
+  extends Action<'GET_TOPICTEXT_CAPACITY_REQUEST'> {}
+
+interface GetTopicTextCapacitySuccess
+  extends Action<'GET_TOPICTEXT_CAPACITY_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface GetTopicTextCapacityFailure
+  extends Action<'GET_TOPICTEXT_CAPACITY_FAILURE'> {}
+
+interface GetLearnerCapacityRequest
+  extends Action<'GET_LEARNER_CAPACITY_REQUEST'> {}
+
+interface GetLearnerCapacitySuccess
+  extends Action<'GET_LEARNER_CAPACITY_SUCCESS'> {
+  dto: StatsDTO;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface GetLearnerCapacityFailure
+  extends Action<'GET_LEARNER_CAPACITY_FAILURE'> {}
+
 interface GetOrRequest extends Action<'GET_OR_REQUEST'> {}
+
 interface GetOrSuccess extends Action<'GET_OR_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetOrFailure extends Action<'GET_OR_FAILURE'> {}
 
 interface GetOoaRequest extends Action<'GET_OOA_REQUEST'> {}
+
 interface GetOoaSuccess extends Action<'GET_OOA_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetOoaFailure extends Action<'GET_OOA_FAILURE'> {}
 
 interface GetOarRequest extends Action<'GET_OAR_REQUEST'> {}
+
 interface GetOarSuccess extends Action<'GET_OAR_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetOarFailure extends Action<'GET_OAR_FAILURE'> {}
 
 interface GetOerRequest extends Action<'GET_OER_REQUEST'> {}
+
 interface GetOerSuccess extends Action<'GET_OER_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetOerFailure extends Action<'GET_OER_FAILURE'> {}
 
 interface GetOaiRequest extends Action<'GET_OAI_REQUEST'> {}
+
 interface GetOaiSuccess extends Action<'GET_OAI_SUCCESS'> {
   dto: StatsDTO;
   startDate: Date;
   endDate: Date;
 }
+
 interface GetOaiFailure extends Action<'GET_OAI_FAILURE'> {}
 
 interface GetCapacitiesRequest extends Action<'GET_CAPACITIES_REQUEST'> {}
+
 interface GetCapacitiesSuccess extends Action<'GET_CAPACITIES_SUCCESS'> {
   capacities: CapacitiesDTO;
 }
+
 interface GetCapacitiesFailure extends Action<'GET_CAPACITIES_FAILURE'> {}
 
 type Actions =
@@ -302,6 +373,12 @@ type Actions =
   | GetTcrRequest
   | GetTcrSuccess
   | GetTcrFailure
+  | GetTopicTextCapacityRequest
+  | GetTopicTextCapacitySuccess
+  | GetTopicTextCapacityFailure
+  | GetLearnerCapacityRequest
+  | GetLearnerCapacitySuccess
+  | GetLearnerCapacityFailure
   | GetOrRequest
   | GetOrSuccess
   | GetOrFailure
@@ -465,7 +542,43 @@ const statsReducer = (state: StatsState, action: Actions): StatsState => {
     case 'GET_TCR_FAILURE':
       return {
         ...state,
-        fetchingTcr: false,
+        fetchingTopicTextCapacityStats: false,
+      };
+    case 'GET_TOPICTEXT_CAPACITY_REQUEST':
+      return {
+        ...state,
+        fetchingTopicTextCapacityStats: true,
+      };
+    case 'GET_TOPICTEXT_CAPACITY_SUCCESS':
+      return {
+        ...state,
+        fetchingTopicTextCapacityStats: false,
+        topicTextCapacityStats: action.dto,
+        topicTextCapacityEndDate: action.endDate,
+        topicTextCapacityStartDate: action.startDate,
+      };
+    case 'GET_TOPICTEXT_CAPACITY_FAILURE':
+      return {
+        ...state,
+        fetchingTopicTextCapacityStats: false,
+      };
+    case 'GET_LEARNER_CAPACITY_REQUEST':
+      return {
+        ...state,
+        fetchingLearnerCapacityStats: true,
+      };
+    case 'GET_LEARNER_CAPACITY_SUCCESS':
+      return {
+        ...state,
+        fetchingLearnerCapacityStats: false,
+        learnerCapacityStats: action.dto,
+        learnerCapacityEndDate: action.endDate,
+        learnerCapacityStartDate: action.startDate,
+      };
+    case 'GET_LEARNER_CAPACITY_FAILURE':
+      return {
+        ...state,
+        fetchingLearnerCapacityStats: false,
       };
     case 'GET_OR_REQUEST':
       return {
@@ -787,6 +900,60 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     }
   };
 
+  const getTopicTextCapacityStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_TOPICTEXT_CAPACITY_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getTopicTextCapacityStats(
+        params
+      );
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_TOPICTEXT_CAPACITY_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_TOPICTEXT_CAPACITY_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_TOPICTEXT_CAPACITY_FAILURE' });
+      return false;
+    }
+  };
+
+  const getLearnerCapacityStats: GetStats = async (params) => {
+    dispatch({ type: 'GET_LEARNER_CAPACITY_REQUEST' });
+
+    try {
+      const { status, data } = await statsService.getLearnerCapacityStats(
+        params
+      );
+
+      if (status === 200) {
+        dispatch({
+          type: 'GET_LEARNER_CAPACITY_SUCCESS',
+          dto: data,
+          startDate: params.startDate,
+          endDate: params.endDate,
+        });
+        return true;
+      } else {
+        dispatch({ type: 'GET_LEARNER_CAPACITY_FAILURE' });
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: 'GET_LEARNER_CAPACITY_FAILURE' });
+      return false;
+    }
+  };
+
   const getOrStats: GetOrgStats = async (args) => {
     dispatch({ type: 'GET_OR_REQUEST' });
 
@@ -931,7 +1098,7 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     dispatch({ type: 'GET_CAPACITIES_REQUEST' });
 
     try {
-      const { status, data } = await statsService.getCapacityStats();
+      const { status, data } = await statsService.getCapacities();
 
       if (status === 200) {
         dispatch({
@@ -960,6 +1127,14 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
     void getLearnerFeedbackStats({ startDate: dailyStartDate, endDate: today });
     void getTarStats({ startDate: dailyStartDate, endDate: today });
     void getTcrStats({ startDate: monthlyStartDate, endDate: today });
+    void getTopicTextCapacityStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+    });
+    void getLearnerCapacityStats({
+      startDate: monthlyStartDate,
+      endDate: today,
+    });
     void getOrStats({
       startDate: monthlyStartDate,
       endDate: today,
@@ -1001,6 +1176,8 @@ export const StatsProvider: FC<PropsWithChildren<Props>> = ({ children }) => {
         getLearnerFeedbackStats,
         getTarStats,
         getTcrStats,
+        getTopicTextCapacityStats,
+        getLearnerCapacityStats,
         getOrStats,
         getOoaStats,
         getOarStats,

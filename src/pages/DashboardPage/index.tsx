@@ -32,6 +32,8 @@ import {
   MAX_LEARNERS_LABEL,
   POTENTIAL_CAPACITY_LABEL,
 } from '../../config/textConstants';
+import LearnerCapacityChart from './LearnerCapacityChart';
+import TopicTextCapacityChart from './TopicTextCapacityChart';
 
 const useStyles = makeStyles(({ spacing }: Theme) =>
   createStyles({
@@ -98,6 +100,16 @@ const DashboardPage: FC = () => {
           </CardContent>
         </Card>
       )}
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <LearnerCapacityChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TopicTextCapacityChart />
+        </CardContent>
+      </Card>
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <DauChart />

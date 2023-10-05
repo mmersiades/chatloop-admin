@@ -58,7 +58,7 @@ interface OrgStatsArgs extends DateRange {
 
 type GetStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetOrgStats = (args: OrgStatsArgs) => Promise<AxiosResponse<StatsDTO>>;
-type GetCapacityStats = () => Promise<AxiosResponse<CapacitiesDTO>>;
+type GetCapacities = () => Promise<AxiosResponse<CapacitiesDTO>>;
 
 interface StatsService {
   getDauStats: GetStats;
@@ -69,8 +69,10 @@ interface StatsService {
   getLearnerFeedbackStats: GetStats;
   getTarStats: GetStats;
   getTcrStats: GetStats;
+  getTopicTextCapacityStats: GetStats;
+  getLearnerCapacityStats: GetStats;
   getOrgStats: GetOrgStats;
-  getCapacityStats: GetCapacityStats;
+  getCapacities: GetCapacities;
 }
 
 const getDauStats: GetStats = async ({ startDate, endDate }) =>
@@ -96,6 +98,12 @@ const getTarStats: GetStats = async ({ startDate, endDate }) =>
 
 const getTcrStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('cumulative-referrals', startDate, endDate);
+
+const getTopicTextCapacityStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('topictext-capacity', startDate, endDate);
+
+const getLearnerCapacityStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('learner-capacity', startDate, endDate);
 
 const getOrgStats: GetOrgStats = async ({
   type,
@@ -137,7 +145,7 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
   return Promise.reject();
 };
 
-const getCapacityStats: GetCapacityStats = async () => {
+const getCapacities: GetCapacities = async () => {
   const requestOptions = {
     headers: { Authorization: authHeader() },
   };
@@ -163,8 +171,10 @@ const statsService: StatsService = {
   getLearnerFeedbackStats,
   getTarStats,
   getTcrStats,
+  getTopicTextCapacityStats,
+  getLearnerCapacityStats,
   getOrgStats,
-  getCapacityStats,
+  getCapacities,
 };
 
 export default statsService;

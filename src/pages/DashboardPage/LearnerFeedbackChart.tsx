@@ -95,7 +95,7 @@ const MessagesChart: FC<Props> = () => {
             container
             alignItems="center"
             justifyContent="center"
-            style={{ height: 400 }}
+            style={{ height: 372 }}
           >
             <CircularProgress />
           </Grid>
