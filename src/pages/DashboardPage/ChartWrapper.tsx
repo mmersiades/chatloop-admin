@@ -27,6 +27,8 @@ interface Props {
   anchorEl?: Element | ((element: Element) => Element) | null;
   setOrgIds?: Dispatch<SetStateAction<number[]>>;
   orgIds?: number[];
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 const ChartWrapper: FC<PropsWithChildren<Props>> = ({
@@ -41,6 +43,8 @@ const ChartWrapper: FC<PropsWithChildren<Props>> = ({
   anchorEl,
   setOrgIds,
   orgIds,
+  minDate,
+  maxDate,
 }) => {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -82,6 +86,8 @@ const ChartWrapper: FC<PropsWithChildren<Props>> = ({
           handleSelect={handleSelect}
           startDate={startDate}
           endDate={endDate}
+          minDate={minDate}
+          maxDate={maxDate}
         />
       </Menu>
       <Collapse in={showFilters}>

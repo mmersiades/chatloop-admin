@@ -21,6 +21,9 @@ import OarChart from './OarChart';
 import OerChart from './OerChart';
 import OaiChart from './OaiChart';
 import CapacityCard from './CapacityCard';
+import LearnerFeedbackChart from './LearnerFeedbackChart';
+import LearnerCapacityChart from './LearnerCapacityChart';
+import TopicTextCapacityChart from './TopicTextCapacityChart';
 import { useStats } from '../../contexts/statsContext';
 import {
   ACTIVITY_CAPACITY_TITLE,
@@ -99,6 +102,16 @@ const DashboardPage: FC = () => {
       )}
       <Card classes={{ root: classes.card }}>
         <CardContent>
+          <LearnerCapacityChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <TopicTextCapacityChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
           <DauChart />
         </CardContent>
       </Card>
@@ -120,6 +133,11 @@ const DashboardPage: FC = () => {
       <Card classes={{ root: classes.card }}>
         <CardContent>
           <MessagesChart />
+        </CardContent>
+      </Card>
+      <Card classes={{ root: classes.card }}>
+        <CardContent>
+          <LearnerFeedbackChart />
         </CardContent>
       </Card>
       <Card classes={{ root: classes.card }}>

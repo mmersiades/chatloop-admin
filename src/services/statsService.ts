@@ -58,7 +58,7 @@ interface OrgStatsArgs extends DateRange {
 
 type GetStats = (params: DateRange) => Promise<AxiosResponse<StatsDTO>>;
 type GetOrgStats = (args: OrgStatsArgs) => Promise<AxiosResponse<StatsDTO>>;
-type GetCapacityStats = () => Promise<AxiosResponse<CapacitiesDTO>>;
+type GetCapacities = () => Promise<AxiosResponse<CapacitiesDTO>>;
 
 interface StatsService {
   getDauStats: GetStats;
@@ -66,10 +66,13 @@ interface StatsService {
   getCaStats: GetStats;
   getAipStats: GetStats;
   getMessagesStats: GetStats;
+  getLearnerFeedbackStats: GetStats;
   getTarStats: GetStats;
   getTcrStats: GetStats;
+  getTopicTextCapacityStats: GetStats;
+  getLearnerCapacityStats: GetStats;
   getOrgStats: GetOrgStats;
-  getCapacityStats: GetCapacityStats;
+  getCapacities: GetCapacities;
 }
 
 const getDauStats: GetStats = async ({ startDate, endDate }) =>
@@ -87,11 +90,20 @@ const getAipStats: GetStats = async ({ startDate, endDate }) =>
 const getMessagesStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('messages', startDate, endDate);
 
+const getLearnerFeedbackStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('learner-feedback', startDate, endDate);
+
 const getTarStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('active-referrals', startDate, endDate);
 
 const getTcrStats: GetStats = async ({ startDate, endDate }) =>
   await getStats('cumulative-referrals', startDate, endDate);
+
+const getTopicTextCapacityStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('topictext-capacity', startDate, endDate);
+
+const getLearnerCapacityStats: GetStats = async ({ startDate, endDate }) =>
+  await getStats('learner-capacity', startDate, endDate);
 
 const getOrgStats: GetOrgStats = async ({
   type,
@@ -133,7 +145,7 @@ const getStats = async (type: string, startDate: Date, endDate: Date) => {
   return Promise.reject();
 };
 
-const getCapacityStats: GetCapacityStats = async () => {
+const getCapacities: GetCapacities = async () => {
   const requestOptions = {
     headers: { Authorization: authHeader() },
   };
@@ -156,10 +168,13 @@ const statsService: StatsService = {
   getCaStats,
   getAipStats,
   getMessagesStats,
+  getLearnerFeedbackStats,
   getTarStats,
   getTcrStats,
+  getTopicTextCapacityStats,
+  getLearnerCapacityStats,
   getOrgStats,
-  getCapacityStats,
+  getCapacities,
 };
 
 export default statsService;

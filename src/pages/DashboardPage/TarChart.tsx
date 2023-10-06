@@ -89,6 +89,9 @@ const TarChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-06-10');
+  const maxDate = new Date();
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -100,6 +103,8 @@ const TarChart: FC<Props> = () => {
       startDate={tarStartDate}
       endDate={tarEndDate}
       anchorEl={pickerAnchor}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingTar || !tarStats ? (
@@ -107,7 +112,7 @@ const TarChart: FC<Props> = () => {
             container
             alignItems="center"
             justifyContent="center"
-            style={{ height: 400 }}
+            style={{ height: 372 }}
           >
             <CircularProgress />
           </Grid>

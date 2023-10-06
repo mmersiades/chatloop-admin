@@ -73,6 +73,10 @@ const OaiChart: FC<Props> = () => {
       setPickerAnchor(event.currentTarget);
     }
   };
+
+  const minDate = new Date('2022-06-10');
+  const maxDate = new Date();
+
   // -------------------------- Effects ------------------------------------ //
   useEffect(() => {
     if (!fetchingOai && !isEqual(orgIds, idsRef.current)) {
@@ -104,6 +108,8 @@ const OaiChart: FC<Props> = () => {
       anchorEl={pickerAnchor}
       setOrgIds={setOrgIds}
       orgIds={orgIds}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingOai || !oaiStats ? (
@@ -111,7 +117,7 @@ const OaiChart: FC<Props> = () => {
             container
             alignItems="center"
             justifyContent="center"
-            style={{ height: 400 }}
+            style={{ height: 372 }}
           >
             <CircularProgress />
           </Grid>

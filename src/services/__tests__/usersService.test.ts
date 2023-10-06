@@ -1,12 +1,11 @@
 import moxios from 'moxios';
 
-import { getLearners } from '../usersService';
 import apiChatloopOrg from '../../config/axiosConfig';
 
 const mockLearner = {
   id: 100582,
   displayName: 'Sara',
-  email: 'learner@gmail.com',
+  email: 'learner@email.com',
   showNewActivityDrawer: false,
   roles: ['ROLE_LEARNER'],
 };

@@ -66,6 +66,9 @@ const DauChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-04-24');
+  const maxDate = new Date();
+
   // -------------------------- Render ------------------------------------- //
   return (
     <ChartWrapper
@@ -77,6 +80,8 @@ const DauChart: FC<Props> = () => {
       startDate={dauStartDate}
       endDate={dauEndDate}
       anchorEl={pickerAnchor}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingDau || !dauStats ? (
@@ -84,7 +89,7 @@ const DauChart: FC<Props> = () => {
             container
             alignItems="center"
             justifyContent="center"
-            style={{ height: 400 }}
+            style={{ height: 372 }}
           >
             <CircularProgress />
           </Grid>

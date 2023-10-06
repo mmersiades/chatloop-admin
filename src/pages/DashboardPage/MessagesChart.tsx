@@ -73,6 +73,9 @@ const MessagesChart: FC<Props> = () => {
     }
   };
 
+  const minDate = new Date('2022-04-24');
+  const maxDate = new Date();
+
   // -------------------------- Effects ------------------------------------ //
 
   // -------------------------- Render ------------------------------------- //
@@ -86,6 +89,8 @@ const MessagesChart: FC<Props> = () => {
       startDate={messagesStartDate}
       endDate={messagesEndDate}
       anchorEl={pickerAnchor}
+      minDate={minDate}
+      maxDate={maxDate}
     >
       <>
         {fetchingMessages || !messagesStats ? (
@@ -93,7 +98,7 @@ const MessagesChart: FC<Props> = () => {
             container
             alignItems="center"
             justifyContent="center"
-            style={{ height: 400 }}
+            style={{ height: 372 }}
           >
             <CircularProgress />
           </Grid>
