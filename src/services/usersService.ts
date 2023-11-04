@@ -185,12 +185,35 @@ export const convertPartnerToTutor: ConvertPartnerToTutor = async (
   };
 
   try {
-    const response = await apiChatloopOrg.post(
+    return await apiChatloopOrg.post(
       `/rest/admin/convert-partner?partnerId=${partnerId}`,
       null,
       requestOptions
     );
-    return response;
+  } catch (error) {
+    /* istanbul ignore next */
+    handleError(error);
+    return Promise.resolve();
+  }
+};
+
+type ConvertReferrerToOrgAdmin = (
+  referrerId: number
+) => Promise<AxiosResponse<StatusMessageDTO> | void>;
+
+export const convertReferrerToOrgAdmin: ConvertReferrerToOrgAdmin = async (
+  referrerId
+) => {
+  const requestOptions = {
+    headers: { Authorization: authHeader() },
+  };
+
+  try {
+    return await apiChatloopOrg.post(
+      `/rest/admin/convert-referrer?referrerId=${referrerId}`,
+      null,
+      requestOptions
+    );
   } catch (error) {
     /* istanbul ignore next */
     handleError(error);

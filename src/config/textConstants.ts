@@ -36,6 +36,7 @@ export const SHIFT_TWO_TUTOR = 'Shift two tutor';
 export const REPLACE_TUTOR = 'REPLACE TUTOR';
 export const RESET_PASSWORD = 'RESET PASSWORD';
 export const CHANGE_ROLE = 'CHANGE ROLE TO TUTOR';
+export const PROMOTE_REFERRER = 'CHANGE ROLE TO ORG ADMIN';
 export const IS_DISADVANTAGED = 'Is considered disadvantaged';
 
 // InvitesPage

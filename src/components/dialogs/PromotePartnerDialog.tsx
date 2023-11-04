@@ -36,7 +36,7 @@ interface Props {
   handleClose: () => void;
 }
 
-const ChangeRoleDialog: FC<Props> = ({ open, user, handleClose }) => {
+const PromotePartnerDialog: FC<Props> = ({ open, user, handleClose }) => {
   const classes = useStyles();
 
   // -------------------------- Hooks -------------------------------------- //
@@ -83,4 +83,4 @@ const ChangeRoleDialog: FC<Props> = ({ open, user, handleClose }) => {
   );
 };
 
-export default ChangeRoleDialog;
+export default PromotePartnerDialog;

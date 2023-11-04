@@ -17,7 +17,7 @@ import {
 import { CloseRounded } from '@material-ui/icons';
 
 import DeleteUserDialog from '../../components/dialogs/DeleteUserDialog';
-import ChangeRoleDialog from '../../components/dialogs/ChangeRoleDialog';
+import PromotePartnerDialog from '../../components/dialogs/PromotePartnerDialog';
 import DeactivateTutorDialog from '../../components/dialogs/DeactivateTutorDialog';
 import ResetPasswordDialog from '../../components/dialogs/ResetPasswordDialog';
 import { ShowReplaceTutorDialog } from './Learners';
@@ -41,6 +41,7 @@ import {
   FIRST_LANGUAGE,
   INTERFACE_LANGUAGE,
   IS_DISADVANTAGED,
+  PROMOTE_REFERRER,
   REPLACE_TUTOR,
   RESET_PASSWORD,
   SHIFT_ONE_TUTOR,
@@ -48,6 +49,7 @@ import {
 } from '../../config/textConstants';
 import { useDrawerStyles } from '../styles';
 import ActivateTutorDialog from '../../components/dialogs/ActivateTutorDialog';
+import PromoteReferrerDialog from '../../components/dialogs/PromoteReferrerDialog';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -73,7 +75,10 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
   // ----------------------------- Component state ------------------------------ //
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
   const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
-  const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false);
+  const [showPromotePartnerDialog, setShowPromotePartnerDialog] =
+    useState(false);
+  const [showPromoteReferrerDialog, setShowPromoteReferrerDialog] =
+    useState(false);
   const [showDeactivateTutorDialog, setShowDeactivateTutorDialog] =
     useState(false);
   const [showActivateTutorDialog, setShowActivateTutorDialog] = useState(false);
@@ -128,11 +133,18 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
           handleClose={() => setShowResetPasswordDialog(false)}
         />
       )}
-      {showChangeRoleDialog && extendedUser && (
-        <ChangeRoleDialog
-          open={showChangeRoleDialog}
+      {showPromotePartnerDialog && extendedUser && (
+        <PromotePartnerDialog
+          open={showPromotePartnerDialog}
           user={extendedUser}
-          handleClose={() => setShowChangeRoleDialog(false)}
+          handleClose={() => setShowPromotePartnerDialog(false)}
+        />
+      )}
+      {showPromoteReferrerDialog && extendedUser && (
+        <PromoteReferrerDialog
+          open={showPromoteReferrerDialog}
+          user={extendedUser}
+          handleClose={() => setShowPromoteReferrerDialog(false)}
         />
       )}
       {showDeactivateTutorDialog && extendedUser && (
@@ -323,10 +335,27 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
               fullWidth
               color="secondary"
               variant="outlined"
-              onClick={() => !!extendedUser && setShowChangeRoleDialog(true)}
+              onClick={() =>
+                !!extendedUser && setShowPromotePartnerDialog(true)
+              }
               aria-label="Change role to tutor"
             >
               {CHANGE_ROLE}
+            </Button>
+          </ListItem>
+        )}
+        {!!extendedUser && extendedUser.userRole.includes(UserRole.referrer) && (
+          <ListItem>
+            <Button
+              fullWidth
+              color="secondary"
+              variant="outlined"
+              onClick={() =>
+                !!extendedUser && setShowPromoteReferrerDialog(true)
+              }
+              aria-label="Change role to org admin"
+            >
+              {PROMOTE_REFERRER}
             </Button>
           </ListItem>
         )}
