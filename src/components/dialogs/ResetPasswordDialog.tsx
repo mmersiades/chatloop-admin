@@ -46,7 +46,8 @@ const ResetPasswordDialog: FC<ResetPasswordDialogProps> = ({
   const handlePasswordReset = async () => {
     try {
       const response: AxiosResponse | undefined = await resetPassword(
-        user.email
+        user.email,
+        user.phone
       );
 
       if (response && response.status === 200) {

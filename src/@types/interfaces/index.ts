@@ -43,8 +43,8 @@ export interface Referrer {
 
 export interface Referral {
   id: number;
-  email: string;
-  phone: string;
+  email: string | null;
+  phone: string | null;
   createdAt: string;
   expiresAt: string;
   role: UserRole;
@@ -66,7 +66,8 @@ export interface ExtendedReferral extends Referral, Referrer {}
 export interface User {
   id: number;
   displayName: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
   roles: Array<UserRole>;
   uiLanguage: string;
   isActive: boolean;

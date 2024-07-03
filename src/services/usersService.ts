@@ -153,20 +153,22 @@ export const deleteUser = async (userId: number) => {
   }
 };
 
-export const resetPassword = async (email: string) => {
+export const resetPassword = async (
+  email: string | null,
+  phone: string | null
+) => {
   const requestOptions = {
     headers: { Authorization: authHeader() },
   };
 
-  const body = { email };
+  const body = { email, phone };
 
   try {
-    const response = await apiChatloopOrg.post(
+    return await apiChatloopOrg.post(
       '/rest/user/password/reset',
       body,
       requestOptions
     );
-    return response;
   } catch (error) {
     /* istanbul ignore next */
     handleError(error);

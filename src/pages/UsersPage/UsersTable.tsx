@@ -207,7 +207,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                 classes={{ root: classes.headerTableCell }}
                 align="center"
               >
-                email
+                email / phone
               </TableCell>
               {tableFor === UserRole.tutor && (
                 <TableCell
@@ -252,7 +252,7 @@ const UsersTable: FC<UsersTableProps> = ({ tableFor }) => {
                     user.isActive ? undefined : { root: classes.inactiveCell }
                   }
                 >
-                  {user.email}
+                  {user.email ?? user.phone}
                 </TableCell>
                 {tableFor === UserRole.tutor && (
                   <TableCell

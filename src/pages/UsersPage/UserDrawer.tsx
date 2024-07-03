@@ -101,7 +101,7 @@ const UserDrawer: FC<UserDrawerProps> = ({ extendedUser, setShowDialog }) => {
     if (!!tutorFromContext) {
       tutor.id = tutorFromContext.id.toString();
       tutor.displayName = tutorFromContext.displayName;
-      tutor.email = tutorFromContext.email;
+      tutor.email = tutorFromContext.email ?? tutorFromContext.phone ?? '...';
     }
 
     return tutor;
