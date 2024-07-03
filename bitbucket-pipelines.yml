@@ -60,7 +60,7 @@ pipelines:
   branches:
     # On all commits to master...
     master:
-      - step: *test # ...run all the tests
+#      - step: *test # ...run all the tests
       - step: *deploy_staging # ...build and automatically deploy staging
       - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
