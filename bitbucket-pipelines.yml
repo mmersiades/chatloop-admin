@@ -14,9 +14,7 @@ pipelines:
             - mv terraform /usr/local/bin/
             - terraform --version
             - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
-            - cd chatloop-network
-            - git checkout fix-env-passing-issue
-            - cd chatloop-terraform/environments/e2e
+            - cd chatloop-network/chatloop-terraform/environments/e2e
             - terraform init
             - terraform plan
             - terraform apply -auto-approve || true
