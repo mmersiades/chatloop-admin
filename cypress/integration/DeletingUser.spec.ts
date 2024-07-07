@@ -1,8 +1,9 @@
 import { DELETE_USER_DIALOG_TITLE } from '../../src/config/textConstants';
 
 describe('Deleting a user', () => {
-  const userEmail = 'learner4@email.com';
+  const userEmail = 'newlearner1_0@email.com';
   beforeEach(() => {
+    cy.intercept('DELETE', '/rest/user/hard-delete/**').as('deleteUser');
     cy.visitUsersPage();
   });
 
@@ -19,6 +20,7 @@ describe('Deleting a user', () => {
     cy.contains('h2', DELETE_USER_DIALOG_TITLE).should('not.exist');
     cy.get('button[aria-label="Delete user button"]').click();
     cy.get('button[aria-label="Confirm delete user button"]').click();
+    cy.wait('@deleteUser');
     cy.get('button[aria-label="Close drawer button"]').should('not.be.visible');
     cy.contains(userEmail).should('not.be.visible');
     cy.on('window:alert', (str) => {

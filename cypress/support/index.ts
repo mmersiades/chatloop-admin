@@ -19,7 +19,7 @@ import '@cypress/code-coverage/support';
 
 before(() => {
   cy.clearLocalStorageSnapshot();
-  cy.resetDb();
+  void cy.resetDb();
 });
 
 beforeEach(() => {

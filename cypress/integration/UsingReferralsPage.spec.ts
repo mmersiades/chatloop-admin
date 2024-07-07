@@ -8,11 +8,12 @@ import {
 import { getReadableRoles } from '../../src/helpers/getReadableRoles';
 import { UserRole } from '../../src/@types/enums';
 
-let totalReferrals = 36;
+const totalReferrals = 27;
 let pageSize = 25;
 
 describe('Using the ReferralsPage', () => {
   beforeEach(() => {
+    void cy.resetDb();
     cy.intercept('POST', '/rest/login').as('postLogin');
     cy.intercept('GET', '/rest/referrals?**').as('getReferrals');
     cy.intercept('GET', '/rest/referrals/**').as('getReferral');
@@ -26,10 +27,10 @@ describe('Using the ReferralsPage', () => {
       country: 'Australia',
       countryCode: 'AU',
     }).as('ipLookup');
-    cy.getAuthTokens(admin.email, admin.password);
+    void cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/referrals');
 
-    cy.wait('@postLogin');
+    cy.wait('@postLogin', { timeout: 10000 });
     cy.wait('@getOrganisations');
     cy.wait('@ipLookup');
     cy.wait('@getReferrals');
@@ -44,10 +45,13 @@ describe('Using the ReferralsPage', () => {
       cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
     });
 
-    it.only('should change row size and navigate to next page', () => {
+    it('should change row size and navigate to next page', () => {
       const learnerRegex = new RegExp('learner');
       const partnerRegex = new RegExp('partner');
-      cy.countElementsWithText('td', learnerRegex, 8);
+      const referrerRegex = new RegExp('referrer');
+      cy.countElementsWithText('td', learnerRegex, 3);
+      cy.countElementsWithText('td', partnerRegex, 10);
+      cy.countElementsWithText('td', referrerRegex, 11);
       cy.get('td[data-test="pagination"]').within(() => {
         cy.get('div[aria-haspopup="listbox"]').click();
       });
@@ -55,12 +59,15 @@ describe('Using the ReferralsPage', () => {
       pageSize = 10;
       cy.wait('@getReferrals');
       cy.countElementsWithText('td', learnerRegex, 3);
+      cy.countElementsWithText('td', partnerRegex, 4);
+      cy.countElementsWithText('td', referrerRegex, 3);
       cy.contains(`1-${pageSize} of ${totalReferrals}`).should('be.visible');
 
       cy.get('button[aria-label="Next page"]').click();
       cy.wait('@getReferrals');
-      cy.countElementsWithText('td', learnerRegex, 4);
-      cy.countElementsWithText('td', partnerRegex, 3);
+      cy.countElementsWithText('td', learnerRegex, 0);
+      cy.countElementsWithText('td', partnerRegex, 5);
+      cy.countElementsWithText('td', referrerRegex, 5);
       cy.contains(`11-20 of ${totalReferrals}`).should('be.visible');
       pageSize = 25;
     });
@@ -100,7 +107,7 @@ describe('Using the ReferralsPage', () => {
 
   describe('when creating a Referral with phone only', () => {
     const refereeName = 'Bob3';
-    const refereePhone = '040533333';
+    const refereePhone = '0405333333';
 
     it('should increase total number of table rows', () => {
       cy.get('.MuiFab-root').click();
@@ -183,11 +190,12 @@ describe('Using the ReferralsPage', () => {
 
       cy.get('button[aria-label="Delete referral"]').scrollIntoView().click();
       cy.wait('@deleteReferral');
-      totalReferrals--;
+      // totalReferrals--;
+      console.log('totalReferrals', totalReferrals);
       cy.contains(
-        `1-${
-          totalReferrals > pageSize ? pageSize : totalReferrals
-        } of ${totalReferrals}`
+        `1-${totalReferrals > pageSize ? pageSize : totalReferrals - 1} of ${
+          totalReferrals - 1
+        }`
       ).should('be.visible');
     });
   });
@@ -196,11 +204,11 @@ describe('Using the ReferralsPage', () => {
 const submitForm = () => {
   cy.get('button[type="submit"]').click();
   cy.wait('@postReferrals');
-  totalReferrals++;
+  // totalReferrals++;
   cy.contains(
-    `1-${
-      totalReferrals > pageSize ? pageSize : totalReferrals
-    } of ${totalReferrals}`
+    `1-${totalReferrals > pageSize ? pageSize : totalReferrals + 1} of ${
+      totalReferrals + 1
+    }`
   ).should('be.visible');
 };
 

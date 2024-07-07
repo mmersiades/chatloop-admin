@@ -115,6 +115,7 @@ Cypress.Commands.add('visitUsersPage', () => {
 
   // noinspection JSIgnoredPromiseFromCall
   cy.getAuthTokens(admin.email, admin.password);
+
   cy.visit('/users');
 
   cy.wait('@postLogin');

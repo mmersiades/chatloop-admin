@@ -2,30 +2,87 @@ image: nikolaik/python-nodejs:latest
 
 pipelines:
   custom:
+    terraform_apply:
+      - step: &terraform_apply
+          name: Prepare for tests
+          image: ubuntu:latest
+          script:
+            - echo 'Using Terraform to start on-demand E2E backend services'
+            - apt-get update && apt-get install -y git unzip curl
+            - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+            - unzip terraform.zip
+            - mv terraform /usr/local/bin/
+            - terraform --version
+            - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
+            - cd chatloop-network/chatloop-terraform/environments/e2e
+            - terraform init
+            - terraform plan
+            - terraform apply -auto-approve || true
+          artifacts:
+            - chatloop-network/chatloop-terraform/environments/e2e/terraform.tfstate
     # Run tests
     test:
       - step: &test
-          name: E2E tests
+          name: Run tests
           caches:
             - npm
             - cypress
           image: cypress/base:12
           script:
+            - apt-get update && apt-get install -y curl jq git unzip
+            - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+            - unzip terraform.zip
+            - mv terraform /usr/local/bin/
+            - terraform --version
+            - apt-get update && apt-get install -y curl jq
             - node --version
             - python --version
             - npm --version
             - npm ci
-            - export CYPRESS_API_HOST=https://staging-api.chatloop.org
+            - export CYPRESS_API_HOST=https://e2e-api.chatloop.org
             - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
             - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
             - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
-            - npm run start:staging & npx wait-on http://localhost:3000
+            - |
+              start_time=$(date +%s)
+              timeout=180  # 3 minutes timeout
+              while true; do
+                current_time=$(date +%s)
+                elapsed_time=$((current_time - start_time))
+
+                api_status=$(curl -s https://e2e-api.chatloop.org/actuator/health | jq -r '.status')
+                user_training_status=$(curl -s https://e2e-user-training.chatloop.org/actuator/health | jq -r '.status')
+
+                if [[ "$api_status" == "UP" && "$user_training_status" == "UP" ]]; then
+                  echo "Both services are healthy."
+                  break
+                fi
+
+                if [ $elapsed_time -ge $timeout ]; then
+                  echo "Health checks failed after 3 minutes."
+                  exit 1
+                fi
+
+                echo "Waiting for services to be healthy..."
+                sleep 10  # Wait for 10 seconds before the next check
+              done
+            - npm run start:e2e & npx wait-on http://localhost:3000
             - npm run test:ci
+          after-script:
+            - mkdir terraform
+            - cd terraform
+            - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
+            - cd chatloop-network/chatloop-terraform/environments/e2e
+            - cp $BITBUCKET_CLONE_DIR/chatloop-network/chatloop-terraform/environments/e2e/terraform.tfstate ./
+            - terraform init
+            - terraform destroy -auto-approve
+          artifacts:
+            - chatloop-network/chatloop-terraform/environments/e2e/terraform.tfstate
 
     # Build & deploy app to staging environment
     deploy_staging:
       - step: &deploy_staging
-          name: Deploy to Staging
+          name: Deploy to staging
           deployment: staging
           caches:
             - node
@@ -40,7 +97,7 @@ pipelines:
     # Build & deploy app to production environment, manually via pipeline web interface
     deploy_production:
       - step: &deploy_production
-          name: Deploy to Production
+          name: Deploy to production
           trigger: manual
           deployment: production
           caches:
@@ -55,12 +112,14 @@ pipelines:
 
   # Run tests on commits to all branches (except master)
   default:
+    - step: *terraform_apply                                                                                           
     - step: *test
 
   branches:
     # On all commits to master...
     master:
-#      - step: *test # ...run all the tests
+      - step: *terraform_apply                                                                                           
+      - step: *test
       - step: *deploy_staging # ...build and automatically deploy staging
       - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
@@ -68,3 +127,4 @@ definitions:
   caches:
     npm: $HOME/.npm
     cypress: /app/.cache/Cypress
+    terraform: chatloop-network/chatloop-terraform/environments/e2e/.terraform
