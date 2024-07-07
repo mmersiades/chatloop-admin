@@ -67,7 +67,7 @@ pipelines:
                 sleep 10  # Wait for 10 seconds before the next check
               done
             - npm run start:e2e & npx wait-on http://localhost:3000
-            - yarn test:ci
+            - npm run test:ci
           after-script:
             - mkdir terraform
             - cd terraform
