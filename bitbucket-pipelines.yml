@@ -4,9 +4,10 @@ pipelines:
   custom:
     terraform_apply:
       - step: &terraform_apply
-          name: Terraform Apply
+          name: Prepare for tests
           image: ubuntu:latest
           script:
+            - echo 'Using Terraform to start on-demand E2E backend services'
             - apt-get update && apt-get install -y git unzip curl
             - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
             - unzip terraform.zip
@@ -22,9 +23,9 @@ pipelines:
           artifacts:
             - chatloop-network/chatloop-terraform/environments/e2e/terraform.tfstate
     # Run tests
-    test_and_terraform_destroy:
-      - step: &test_and_terraform_destroy
-          name: E2E testing and Terraform Destroy
+    test:
+      - step: &test
+          name: Run tests
           caches:
             - npm
             - cypress
@@ -36,6 +37,14 @@ pipelines:
             - mv terraform /usr/local/bin/
             - terraform --version
             - apt-get update && apt-get install -y curl jq
+            - node --version
+            - python --version
+            - npm --version
+            - npm ci
+            - export CYPRESS_API_HOST=https://e2e-api.chatloop.org
+            - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
+            - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
+            - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - |
               start_time=$(date +%s)
               timeout=180  # 3 minutes timeout
@@ -59,18 +68,9 @@ pipelines:
                 echo "Waiting for services to be healthy..."
                 sleep 10  # Wait for 10 seconds before the next check
               done
-            - node --version
-            - python --version
-            - npm --version
-            - npm ci
-            - export CYPRESS_API_HOST=https://e2e-api.chatloop.org
-            - export CYPRESS_E2E_USERNAME=$CYPRESS_E2E_USERNAME
-            - export CYPRESS_E2E_PASSWORD=$CYPRESS_E2E_PASSWORD
-            - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - npm run start:e2e & npx wait-on http://localhost:3000
-            - yarn test:ci || test_status=$? || true
-            - echo $test_status
-            - echo $test_status > test_status.txt
+            - yarn test:ci
+          after-script:
             - mkdir terraform
             - cd terraform
             - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
@@ -80,63 +80,48 @@ pipelines:
             - terraform destroy -auto-approve
           artifacts:
             - chatloop-network/chatloop-terraform/environments/e2e/terraform.tfstate
-            - test_status.txt
-          when: always
 
     # Build & deploy app to staging environment
     deploy_staging:
       - step: &deploy_staging
-          name: Deploy to Staging
+          name: Deploy to staging
           deployment: staging
           caches:
             - node
           script: # Modify the commands below to build your repository.
-            - test_status=$(cat test_status.txt)
-            - echo $test_status
-            - if [ $test_status -eq 0 ]; then echo "Tests passed"; else exit 0; fi
             - npm ci
             - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://dev-chatloop-admin
             - aws cloudfront create-invalidation --distribution-id EB299TW0BQQ5S --paths '/*'
-          artifacts:
-              - test_status.txt
-          when:
-            result: 
-              success: true
 
     # Build & deploy app to production environment, manually via pipeline web interface
     deploy_production:
       - step: &deploy_production
-          name: Deploy to Production
+          name: Deploy to production
           trigger: manual
           deployment: production
           caches:
             - node
           script:
-            - test_status=$(cat test_status.txt)
-            - echo $test_status
-            - if [ $test_status -eq 0 ]; then echo "Tests passed"; else exit 0; fi
             - npm ci
             - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - npm run build:prod
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
             - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'
-          artifacts:
-              - test_status.txt
 
   # Run tests on commits to all branches (except master)
   default:
     - step: *terraform_apply                                                                                           
-    - step: *test_and_terraform_destroy
+    - step: *test
 
   branches:
     # On all commits to master...
     master:
       - step: *terraform_apply                                                                                           
-      - step: *test_and_terraform_destroy
+      - step: *test
       - step: *deploy_staging # ...build and automatically deploy staging
       - step: *deploy_production # ...build production and then manually deploy via Bitbucket web console
 
