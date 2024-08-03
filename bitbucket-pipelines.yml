@@ -69,6 +69,8 @@ pipelines:
             - npm run start:e2e & npx wait-on http://localhost:3000
             - npm run test:ci
           after-script:
+            - echo 'Using Terraform to tear down on-demand E2E backend services'
+            - echo $BITBUCKET_EXIT_CODE
             - mkdir terraform
             - cd terraform
             - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
