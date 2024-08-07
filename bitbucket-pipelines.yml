@@ -14,7 +14,9 @@ pipelines:
             - mv terraform /usr/local/bin/
             - terraform --version
             - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
-            - cd chatloop-network/chatloop-terraform/environments/e2e
+            - cd chatloop-network
+            - git fetch origin
+            - cd chatloop-terraform/environments/e2e
             - terraform init
             - terraform plan
             - terraform apply -auto-approve || true
@@ -27,7 +29,7 @@ pipelines:
           caches:
             - npm
             - cypress
-          image: cypress/base:12
+          image: cypress/base:18.20.3
           script:
             - apt-get update && apt-get install -y curl jq git unzip
             - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
@@ -36,7 +38,6 @@ pipelines:
             - terraform --version
             - apt-get update && apt-get install -y curl jq
             - node --version
-            - python --version
             - npm --version
             - npm ci
             - export CYPRESS_API_HOST=https://e2e-api.chatloop.org
@@ -66,9 +67,11 @@ pipelines:
                 echo "Waiting for services to be healthy..."
                 sleep 10  # Wait for 10 seconds before the next check
               done
-            - npm run start:e2e & npx wait-on http://localhost:3000
+            - npm run start:e2e & npx wait-on http://127.0.0.1:3000 -v -t 120000
             - npm run test:ci
           after-script:
+            - echo 'Using Terraform to tear down on-demand E2E backend services'
+            - echo $BITBUCKET_EXIT_CODE
             - mkdir terraform
             - cd terraform
             - git clone git@bitbucket.org:thoughtastronaut/chatloop-network.git
@@ -91,8 +94,8 @@ pipelines:
             - export REACT_APP_IP_LOOKUP_KEY=$IP_LOOKUP_KEY
             - npm run build:staging
             - pip install awscli --upgrade --ignore-installed six
-            - aws s3 sync ./build s3://dev-chatloop-admin
-            - aws cloudfront create-invalidation --distribution-id EB299TW0BQQ5S --paths '/*'
+            - aws s3 sync ./build s3://chatloop-admin-staging
+            - aws cloudfront create-invalidation --distribution-id E3DUT6FUSKD27T --paths '/*'
 
     # Build & deploy app to production environment, manually via pipeline web interface
     deploy_production:
@@ -108,7 +111,7 @@ pipelines:
             - npm run build:prod
             - pip install awscli --upgrade --ignore-installed six
             - aws s3 sync ./build s3://chatloop-admin
-            - aws cloudfront create-invalidation --distribution-id E18X4CR0C9FLXD --paths '/*'
+            - aws cloudfront create-invalidation --distribution-id EFZJAZO457W6R --paths '/*'
 
   # Run tests on commits to all branches (except master)
   default:
@@ -125,6 +128,12 @@ pipelines:
 
 definitions:
   caches:
-    npm: $HOME/.npm
-    cypress: /app/.cache/Cypress
-    terraform: chatloop-network/chatloop-terraform/environments/e2e/.terraform
+    npm:
+      path: $HOME/.npm
+    cypress:
+      path: /app/.cache/Cypress
+    terraform:
+      key:
+        files:
+          - "**/*.*"
+      path: chatloop-network/chatloop-terraform/environments/e2e/.terraform
