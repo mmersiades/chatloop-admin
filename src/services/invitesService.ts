@@ -30,7 +30,7 @@ const getInvites = async () => {
 
   try {
     const response: AxiosResponse = await apiChatloopOrg.get(
-      '/rest/admin/invites/',
+      '/rest/admin/invites',
       requestOptions
     );
     return response.data;

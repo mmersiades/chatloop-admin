@@ -102,7 +102,7 @@ const postOrg: PostOrg = async (body) => {
 
   try {
     return await apiChatloopOrg.post(
-      `/rest/user/organisation/`,
+      `/rest/user/organisation`,
       body,
       requestOptions
     );
