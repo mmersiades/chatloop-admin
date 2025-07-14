@@ -61,7 +61,7 @@ Cypress.Commands.add('resetDb', () => {
   }).then(({ body }) => {
     cy.request({
       method: 'POST',
-      url: `${Cypress.env('API_HOST')}/e2e/`,
+      url: `${Cypress.env('API_HOST')}/e2e`,
       headers: {
         Authorization: `Bearer ${body.token}`,
       },
