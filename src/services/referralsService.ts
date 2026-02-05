@@ -82,7 +82,7 @@ export const postReferral: PostReferral = async ({ body, size, page }) => {
 
   try {
     return await apiChatloopOrg.post(
-      `/rest/referrals?page=${page}&size=${size}`,
+      `/rest/referrals/v3?page=${page}&size=${size}`,
       body,
       requestOptions
     );
