@@ -42,7 +42,6 @@ import {
   REFERRER_EMAIL,
   REFERRER_NAME,
 } from '../../config/textConstants';
-import locationService from '../../services/locationService';
 import { removeLeadingZeroFromPhone } from '../../helpers/removeLeadingZeroFromPhone';
 import { useOrganisations } from '../../contexts/organisationsContext';
 import { useAuth } from '../../contexts/authContext';
@@ -101,7 +100,7 @@ const defaultValues: FormValues = {
 };
 
 const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
-  const [countryCode, setCountryCode] = useState('au');
+  const [countryCode] = useState('au');
   const [dialCode, setDialCode] = useState('61');
   const [ownsReferral, setOwnsReferral] = useState(false);
   const { organisations } = useOrganisations();
@@ -324,15 +323,6 @@ const ReferralForm: FC<Props> = ({ type, extendedReferral }) => {
       }
     }
   };
-
-  const getCountryCode = async (): Promise<void> => {
-    const code = await locationService.getCountryCodeByIp();
-    setCountryCode(code.toLowerCase());
-  };
-
-  useEffect(() => {
-    getCountryCode();
-  }, []);
 
   useEffect(() => {
     if (!extendedReferral) {

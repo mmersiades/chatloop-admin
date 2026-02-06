@@ -8,7 +8,6 @@ import {
 } from 'react';
 
 import countriesService, { CountryDTO } from '../services/countriesService';
-import locationService from '../services/locationService';
 import { Action } from '../@types/interfaces';
 
 interface CountriesState {
@@ -22,7 +21,7 @@ const initialState: CountriesState = {
   fetchingCountries: false,
   fetchingCountryByIp: false,
   countries: [],
-  countryByIp: 'NZ',
+  countryByIp: 'AU',
 };
 
 type GetCountries = () => void;
@@ -128,23 +127,10 @@ export const CountriesProvider: FC<PropsWithChildren<Props>> = ({
     }
   };
 
-  const getCountryByIp = async () => {
-    dispatch({ type: 'GET_COUNTRY_BY_IP_REQUEST' });
-
-    try {
-      const country = await locationService.getCountryCodeByIp();
-
-      dispatch({ type: 'GET_COUNTRY_BY_IP_SUCCESS', country });
-    } catch (error) {
-      console.error(error);
-      dispatch({ type: 'GET_COUNTRY_BY_IP_FAILURE' });
-    }
-  };
   // ----------------------------- Effects ---------------------------------------- //
   useEffect(() => {
     getCountries();
     // noinspection JSIgnoredPromiseFromCall
-    getCountryByIp();
   }, []);
 
   // ----------------------------- Render ---------------------------------------- //

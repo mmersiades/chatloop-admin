@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import ReactPhoneInput, { CountryData } from 'react-phone-input-material-ui';
 import {
   createStyles,
@@ -10,7 +10,6 @@ import {
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import { FieldValues } from 'react-hook-form';
 
-import locationService from '../../services/locationService';
 import { removeLeadingZeroFromPhone } from '../../helpers/removeLeadingZeroFromPhone';
 import { PHONE_FIELD_AL } from '../../config/constants';
 
@@ -46,23 +45,15 @@ const IntlPhoneInput: FC<Props> = ({
   handleDialCode,
 }) => {
   // -------------------------- Component state ---------------------------- //
-  const [countryCode, setCountryCode] = useState('nz');
+  const [countryCode] = useState('au');
 
   // -------------------------- Hooks -------------------------------------- //
   const { palette, typography, shape, spacing } = useTheme();
   const styles = useStyles();
 
   // -------------------------- Effects ------------------------------------ //
-  const getCountryCode = async (): Promise<void> => {
-    const code = await locationService.getCountryCodeByIp();
-    setCountryCode(code.toLowerCase());
-  };
 
   // -------------------------- Effects ------------------------------------ //
-  useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
-    getCountryCode();
-  }, []);
 
   // -------------------------- Render ------------------------------------- //
   return (

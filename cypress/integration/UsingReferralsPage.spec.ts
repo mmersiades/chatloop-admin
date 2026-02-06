@@ -20,19 +20,13 @@ describe('Using the ReferralsPage', () => {
     cy.intercept('GET', '/rest/user/organisation').as('getOrganisations');
     cy.intercept('PUT', '/rest/referrals/**').as('putReferral');
     cy.intercept('DELETE', '/rest/referrals/**').as('deleteReferral');
-    cy.intercept('POST', '/rest/referrals*').as('postReferrals');
+    cy.intercept('POST', '/rest/referrals/v3*').as('postReferrals');
     cy.intercept('GET', '/rest/language').as('getLanguages');
-    cy.intercept('GET', '/json/?key=*', {
-      status: 'success',
-      country: 'Australia',
-      countryCode: 'AU',
-    }).as('ipLookup');
     void cy.getAuthTokens(admin.email, admin.password);
     cy.visit('/referrals');
 
     cy.wait('@postLogin', { timeout: 10000 });
     cy.wait('@getOrganisations');
-    cy.wait('@ipLookup');
     cy.wait('@getReferrals');
     cy.wait('@getLanguages');
   });
